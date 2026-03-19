@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "about": "Sobre mí",
+    "skills": "Habilidades",
+    "projects": "Proyectos",
+    "experience": "Experiencia",
+    "certifications": "Certificaciones",
+    "contact": "Contacto",
+    "services": "Servicios",
+    "store": "Tienda"
+  },
+  "hero": {
+    "greeting": "Hola, soy",
+    "building": "Construyendo",
+    "subtitle": "Desarrollador de Aplicaciones VR y Negocios Digitales — convirtiendo ideas en realidades inmersivas en VR, IA, Backend y Diseño.",
+    "cta-projects": "Ver Proyectos",
+    "cta-contact": "Contáctame",
+    "typewriter": ["Experiencias VR", "Soluciones IA", "Mundos Digitales", "Entornos 3D", "Modelos de Datos"]
+  },
+  "about": {
+    "title": "Sobre Mí",
+    "p1": "Soy un desarrollador apasionado con experiencia en Realidad Virtual, Inteligencia Artificial, sistemas de bases de datos y Diseño Digital. Me desarrollo mejor en la intersección entre tecnología y creatividad — construyendo experiencias inmersivas que resuelven problemas del mundo real.",
+    "p2": "Actualmente cursando Ingeniería en Tecnologías de la Información, he liderado proyectos que redujeron costos operativos, construí modelos basados en datos y creé entornos 3D atractivos. Colaboro eficazmente en equipos multifuncionales con un enfoque orientado al detalle.",
+    "p3": "Mi experiencia multidisciplinaria me permite tender puentes entre el diseño, la ingeniería y el negocio — una ventaja única que aporto a cada equipo que integro.",
+    "stat1": "Tiempo de Inducción Reducido",
+    "stat2": "Dominios Tecnológicos",
+    "stat3": "Proyectos Entregados",
+    "stat4": "Años de Experiencia"
+  },
+  "skills": {
+    "title": "Habilidades",
+    "cat1": "VR / Desarrollo 3D",
+    "cat2": "Ciencia de Datos / IA / ML",
+    "cat3": "Backend / Bases de Datos",
+    "cat4": "Diseño / Multimedia"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "filter": {
+      "all": "Todos",
+      "vr": "VR / 3D",
+      "ar": "AR",
+      "data": "Ciencia de Datos",
+      "backend": "Backend",
+      "design": "Diseño",
+      "3d": "3D",
+      "video": "Video"
+    },
+    "badge": {
+      "vr": "VR / 3D",
+      "ar": "AR",
+      "data": "Ciencia de Datos",
+      "backend": "Backend",
+      "design": "Diseño",
+      "3d": "3D",
+      "video": "Video"
+    },
+    "btn": {
+      "demo": "Ver Demo",
+      "github": "GitHub",
+      "view": "Ver Proyecto"
+    },
+    "empty": "No hay proyectos en esta categoría aún.",
+    "readMore": "Leer Más"
+  },
+  "githubStats": {
+    "title": "Estadísticas de GitHub",
+    "repos": "Repositorios",
+    "stars": "Estrellas Totales",
+    "contributions": "Contribuciones",
+    "languages": "Lenguajes Principales",
+    "heatmapLabel": "contribuciones en el último año"
+  },
+  "exp": {
+    "title": "Experiencia",
+    "present": "Presente"
+  },
+  "certs": {
+    "title": "Certificaciones"
+  },
+  "testimonials": {
+    "title": "Testimonios"
+  },
+  "services": {
+    "title": "Servicios",
+    "subtitle": "Construyamos algo increíble juntos. Ofrezco servicios profesionales en todos mis dominios.",
+    "from": "Desde",
+    "inquire": "Solicitar Cotización",
+    "inquiry": {
+      "title": "Solicitar un Servicio",
+      "name": "Tu nombre",
+      "email": "Tu correo",
+      "service": "Servicio",
+      "budget": "Rango de presupuesto",
+      "message": "Cuéntame sobre tu proyecto",
+      "send": "Enviar Solicitud",
+      "success": "¡Solicitud enviada! Me pondré en contacto en menos de 24 horas.",
+      "selectService": "Selecciona un servicio"
+    }
+  },
+  "store": {
+    "title": "Tienda",
+    "subtitle": "Merch, activos digitales y más de JoshTVR.",
+    "addToCart": "Comprar Ahora",
+    "outOfStock": "Sin Stock",
+    "digital": "Digital",
+    "physical": "Físico",
+    "commission": "Comisión",
+    "success": {
+      "title": "¡Compra Exitosa!",
+      "message": "Gracias por tu compra. Recibirás un correo de confirmación pronto.",
+      "back": "Volver a la Tienda"
+    }
+  },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Estoy abierto a nuevas oportunidades, colaboraciones y conversaciones. Construyamos algo increíble juntos.",
+    "form": {
+      "name": "Tu nombre",
+      "email": "Tu correo",
+      "message": "Tu mensaje",
+      "send": "Enviar Mensaje",
+      "success": "¡Mensaje enviado! Me pondré en contacto pronto."
+    }
+  },
+  "footer": {
+    "cv": "Descargar CV",
+    "made": "Hecho con pasión · Desplegado en Vercel"
+  },
+  "admin": {
+    "dashboard": "Panel",
+    "projects": "Proyectos",
+    "store": "Tienda",
+    "services": "Servicios",
+    "orders": "Pedidos",
+    "inquiries": "Consultas",
+    "content": "Contenido",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "new": "Nuevo",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "publish": "Publicar",
+    "unpublish": "Despublicar",
+    "enable": "Activar",
+    "disable": "Desactivar",
+    "login": {
+      "title": "Acceso Admin",
+      "subtitle": "Inicia sesión con tu cuenta de GitHub para acceder al panel de administración.",
+      "button": "Iniciar sesión con GitHub"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal.",
+    "notFound": "Página no encontrada.",
+    "backHome": "Volver al Inicio"
+  }
+}

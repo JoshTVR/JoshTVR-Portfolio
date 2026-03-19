@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "experience": "Experience",
+    "certifications": "Certifications",
+    "contact": "Contact",
+    "services": "Services",
+    "store": "Store"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "building": "Building",
+    "subtitle": "VR & Digital Business Application Developer — turning ideas into immersive realities across VR, AI, Backend, and Design.",
+    "cta-projects": "View Projects",
+    "cta-contact": "Get in Touch",
+    "typewriter": ["VR Experiences", "AI Solutions", "Digital Worlds", "3D Environments", "Data Models"]
+  },
+  "about": {
+    "title": "About Me",
+    "p1": "I'm a passionate developer with expertise spanning Virtual Reality, Artificial Intelligence, Database systems, and Digital Design. I thrive at the intersection of technology and creativity — building immersive experiences that solve real-world problems.",
+    "p2": "Currently pursuing an Engineering Degree in Information Technologies, I've led projects that reduced operational costs, built data-driven models, and created engaging 3D environments. I collaborate effectively in cross-functional teams and bring a detail-oriented approach to every project.",
+    "p3": "My multi-domain background means I can bridge the gap between design, engineering, and business — a rare advantage I bring to every team I join.",
+    "stat1": "Onboarding Time Reduced",
+    "stat2": "Tech Domains",
+    "stat3": "Projects Shipped",
+    "stat4": "Years Experience"
+  },
+  "skills": {
+    "title": "Skills",
+    "cat1": "VR / 3D Development",
+    "cat2": "Data Science / AI / ML",
+    "cat3": "Backend / Databases",
+    "cat4": "Design / Multimedia"
+  },
+  "projects": {
+    "title": "Projects",
+    "filter": {
+      "all": "All",
+      "vr": "VR / 3D",
+      "ar": "AR",
+      "data": "Data Science",
+      "backend": "Backend",
+      "design": "Design",
+      "3d": "3D",
+      "video": "Video"
+    },
+    "badge": {
+      "vr": "VR / 3D",
+      "ar": "AR",
+      "data": "Data Science",
+      "backend": "Backend",
+      "design": "Design",
+      "3d": "3D",
+      "video": "Video"
+    },
+    "btn": {
+      "demo": "Live Demo",
+      "github": "GitHub",
+      "view": "View Project"
+    },
+    "empty": "No projects in this category yet.",
+    "readMore": "Read More"
+  },
+  "githubStats": {
+    "title": "GitHub Stats",
+    "repos": "Public Repos",
+    "stars": "Total Stars",
+    "contributions": "Contributions",
+    "languages": "Top Languages",
+    "heatmapLabel": "contributions in the last year"
+  },
+  "exp": {
+    "title": "Experience",
+    "present": "Present"
+  },
+  "certs": {
+    "title": "Certifications"
+  },
+  "testimonials": {
+    "title": "Testimonials"
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "Let's build something great together. I offer professional services across all my domains.",
+    "from": "From",
+    "inquire": "Get a Quote",
+    "inquiry": {
+      "title": "Request a Service",
+      "name": "Your name",
+      "email": "Your email",
+      "service": "Service",
+      "budget": "Budget range",
+      "message": "Tell me about your project",
+      "send": "Send Request",
+      "success": "Request sent! I'll get back to you within 24 hours.",
+      "selectService": "Select a service"
+    }
+  },
+  "store": {
+    "title": "Store",
+    "subtitle": "Merch, digital assets, and more from JoshTVR.",
+    "addToCart": "Buy Now",
+    "outOfStock": "Out of Stock",
+    "digital": "Digital",
+    "physical": "Physical",
+    "commission": "Commission",
+    "success": {
+      "title": "Purchase Successful!",
+      "message": "Thank you for your purchase. You'll receive a confirmation email shortly.",
+      "back": "Back to Store"
+    }
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "I'm open to new opportunities, collaborations, and conversations. Let's build something great together.",
+    "form": {
+      "name": "Your name",
+      "email": "Your email",
+      "message": "Your message",
+      "send": "Send Message",
+      "success": "Message sent! I'll get back to you soon."
+    }
+  },
+  "footer": {
+    "cv": "Download CV",
+    "made": "Made with passion · Deployed on Vercel"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "store": "Store",
+    "services": "Services",
+    "orders": "Orders",
+    "inquiries": "Inquiries",
+    "content": "Content",
+    "settings": "Settings",
+    "logout": "Logout",
+    "new": "New",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "enable": "Enable",
+    "disable": "Disable",
+    "login": {
+      "title": "Admin Access",
+      "subtitle": "Sign in with your GitHub account to access the admin panel.",
+      "button": "Sign in with GitHub"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "notFound": "Page not found.",
+    "backHome": "Back to Home"
+  }
+}

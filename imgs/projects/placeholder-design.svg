@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="338" viewBox="0 0 600 338">
+  <rect width="600" height="338" fill="#180810"/>
+  <rect x="0" y="0" width="600" height="338" fill="url(#gdes)" opacity="0.4"/>
+  <defs>
+    <linearGradient id="gdes" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  <!-- Palette icon -->
+  <g transform="translate(300,148)" fill="none" opacity="0.85">
+    <circle cx="0" cy="0" r="44" stroke="#ec4899" stroke-width="3"/>
+    <circle cx="0" cy="0" r="12" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="2"/>
+    <circle cx="-28" cy="-24" r="8" fill="#f472b6"/>
+    <circle cx="28"  cy="-24" r="8" fill="#a855f7"/>
+    <circle cx="-28" cy="24"  r="8" fill="#3b82f6"/>
+    <circle cx="28"  cy="24"  r="8" fill="#f59e0b"/>
+  </g>
+  <text x="300" y="218" text-anchor="middle" fill="#f472b6" font-family="system-ui,sans-serif" font-size="15" font-weight="600" letter-spacing="3">DESIGN PROJECT</text>
+  <text x="300" y="242" text-anchor="middle" fill="#5a2040" font-family="system-ui,sans-serif" font-size="12">Photoshop · Illustrator · After Effects</text>
+</svg>

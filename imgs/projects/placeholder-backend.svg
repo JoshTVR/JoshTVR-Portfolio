@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="338" viewBox="0 0 600 338">
+  <rect width="600" height="338" fill="#081508"/>
+  <rect x="0" y="0" width="600" height="338" fill="url(#gback)" opacity="0.4"/>
+  <defs>
+    <linearGradient id="gback" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  <!-- Database cylinder icon -->
+  <g transform="translate(300,148)" fill="none" stroke="#10b981" stroke-width="3" opacity="0.8">
+    <ellipse cx="0" cy="-30" rx="42" ry="14"/>
+    <line x1="-42" y1="-30" x2="-42" y2="22"/>
+    <line x1="42"  y1="-30" x2="42"  y2="22"/>
+    <ellipse cx="0" cy="22" rx="42" ry="14" fill="#10b981" fill-opacity="0.15"/>
+    <ellipse cx="0" cy="-8"  rx="42" ry="14" stroke-dasharray="6,4"/>
+  </g>
+  <text x="300" y="218" text-anchor="middle" fill="#34d399" font-family="system-ui,sans-serif" font-size="15" font-weight="600" letter-spacing="3">BACKEND PROJECT</text>
+  <text x="300" y="242" text-anchor="middle" fill="#1a4a30" font-family="system-ui,sans-serif" font-size="12">SQL Server · Java · REST API</text>
+</svg>

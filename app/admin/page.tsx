@@ -86,16 +86,7 @@ export default async function AdminDashboard() {
               style={{
                 padding: '24px 20px',
                 borderRadius: '12px',
-                transition: 'transform 200ms ease, box-shadow 200ms ease',
                 cursor: 'pointer',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)'
-                e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.4)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = ''
               }}
             >
               <p

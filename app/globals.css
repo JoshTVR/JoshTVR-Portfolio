@@ -360,11 +360,16 @@
 /* ── Hero responsive ── */
 @media (max-width: 900px) {
   .hero-content {
-    flex-direction: column-reverse !important;
+    flex-direction: column !important;
     text-align: center !important;
     padding-top: 100px !important;
+    align-items: center !important;
   }
   .hero-text > div { justify-content: center !important; }
+  .hero-sculpture {
+    width: min(300px, 80vw) !important;
+    height: min(300px, 80vw) !important;
+  }
 }
 
 /* ── Scrollbar ── */

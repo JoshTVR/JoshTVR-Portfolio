@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { cn } from '@/lib/utils/cn'
 
 interface NavbarProps {
@@ -47,10 +48,10 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
         scrolled ? 'py-3 border-b' : 'py-[18px]'
       )}
       style={scrolled ? {
-        background: 'rgba(10,10,15,0.85)',
+        background: 'var(--navbar-bg)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderColor: 'rgba(255,255,255,0.08)',
+        borderColor: 'var(--border-glass)',
       } : {}}
     >
       <div className="container-site flex items-center justify-between gap-6">
@@ -88,6 +89,7 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-3 flex-shrink-0">
+          <ThemeToggle />
           <LanguageToggle />
           <button
             className="md:hidden flex flex-col gap-[5px] w-7"
@@ -104,7 +106,7 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 border-b py-4 px-6 flex flex-col gap-1" style={{ background: 'rgba(10,10,15,0.97)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255,255,255,0.08)' }}>
+        <div className="md:hidden absolute top-full left-0 right-0 border-b py-4 px-6 flex flex-col gap-1" style={{ background: 'var(--navbar-bg)', backdropFilter: 'blur(20px)', borderColor: 'var(--border-glass)' }}>
           {NAV_SECTIONS.map(({ hash, key }) => (
             <a key={key} href={href(hash)} onClick={closeMenu} className="block py-3 px-4 rounded-lg text-[0.9rem] font-medium transition-colors hover:bg-white/5" style={{ color: 'var(--text-muted)' }}>
               {t(key)}

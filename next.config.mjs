@@ -4,6 +4,7 @@ const withNextIntl = createNextIntlPlugin('./lib/i18n/request.ts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing'],
   images: {
     remotePatterns: [
       {

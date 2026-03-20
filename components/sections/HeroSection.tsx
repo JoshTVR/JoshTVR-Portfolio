@@ -1,7 +1,6 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
@@ -78,30 +77,17 @@ export default function HeroSection() {
         {/* ── LEFT: Text ── */}
         <div className="hero-text reveal" style={{ flex: 1, maxWidth: '580px' }}>
 
-          {/* Greeting + small avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <Image
-              src="/imgs/profile.jpg"
-              alt=""
-              width={44}
-              height={44}
-              style={{
-                borderRadius: '50%',
-                border: '2px solid var(--accent)',
-                flexShrink: 0,
-                objectFit: 'cover',
-              }}
-            />
-            <p style={{
-              fontSize: '0.95rem',
-              fontWeight: 600,
-              color: 'var(--accent)',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-            }}>
-              {t('greeting')}
-            </p>
-          </div>
+          {/* Greeting */}
+          <p style={{
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            color: 'var(--accent)',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            marginBottom: '20px',
+          }}>
+            {t('greeting')}
+          </p>
 
           {/* Name */}
           <h1 style={{

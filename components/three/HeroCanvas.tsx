@@ -1,79 +1,129 @@
 'use client'
 
 import { useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Environment } from '@react-three/drei'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { MeshDistortMaterial, Float, Environment } from '@react-three/drei'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-const MAT_PROPS = {
-  color: new THREE.Color('#facc15'),
-  metalness: 0.88,
-  roughness: 0.10,
-  envMapIntensity: 1.8,
+function CameraController() {
+  const { camera, mouse } = useThree()
+  useFrame(() => {
+    camera.position.x += (mouse.x * 1.2 - camera.position.x) * 0.035
+    camera.position.y += (mouse.y * 0.8 - camera.position.y) * 0.035
+    camera.lookAt(0, 0, 0)
+  })
+  return null
 }
 
-function Ring({
-  radius, tube, axis, speed, offset = 0,
-}: {
-  radius: number; tube: number; axis: 'x' | 'y' | 'z'; speed: number; offset?: number
-}) {
+function MainBlob() {
   const ref = useRef<THREE.Mesh>(null)
   useFrame(({ clock }) => {
     if (!ref.current) return
-    ref.current.rotation[axis] = clock.getElapsedTime() * speed + offset
+    ref.current.rotation.y = clock.getElapsedTime() * 0.10
+    ref.current.rotation.z = clock.getElapsedTime() * 0.07
+  })
+  return (
+    <Float speed={1.4} rotationIntensity={0.15} floatIntensity={0.6}>
+      <mesh ref={ref}>
+        <sphereGeometry args={[1.7, 128, 128]} />
+        <MeshDistortMaterial
+          color="#facc15"
+          distort={0.42}
+          speed={2.2}
+          roughness={0.03}
+          metalness={0.95}
+          envMapIntensity={3}
+        />
+      </mesh>
+    </Float>
+  )
+}
+
+function OrbitBlob() {
+  const ref = useRef<THREE.Mesh>(null)
+  useFrame(({ clock }) => {
+    if (!ref.current) return
+    const t = clock.getElapsedTime()
+    ref.current.position.x = Math.cos(t * 0.38) * 2.4
+    ref.current.position.y = Math.sin(t * 0.55) * 1.3
+    ref.current.position.z = Math.cos(t * 0.25) * 0.9 - 0.5
   })
   return (
     <mesh ref={ref}>
-      <torusGeometry args={[radius, tube, 32, 160]} />
-      <meshStandardMaterial {...MAT_PROPS} />
+      <sphereGeometry args={[0.38, 64, 64]} />
+      <MeshDistortMaterial
+        color="#fde047"
+        distort={0.65}
+        speed={3.5}
+        roughness={0.08}
+        metalness={0.75}
+        transparent
+        opacity={0.82}
+        envMapIntensity={2}
+      />
     </mesh>
   )
 }
 
-function Gyroscope() {
-  const group = useRef<THREE.Group>(null)
+function SmallBlob() {
+  const ref = useRef<THREE.Mesh>(null)
   useFrame(({ clock }) => {
-    if (!group.current) return
-    group.current.rotation.y = clock.getElapsedTime() * 0.07
-    group.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.14) * 0.18
+    if (!ref.current) return
+    const t = clock.getElapsedTime()
+    ref.current.position.x = Math.sin(t * 0.5 + 2) * 1.8
+    ref.current.position.y = Math.cos(t * 0.35 + 1) * 2.0
+    ref.current.position.z = Math.sin(t * 0.45) * 0.6
   })
   return (
-    <group ref={group}>
-      {/* Outer ring — horizontal plane */}
-      <Ring radius={1.45} tube={0.055} axis="y" speed={0.30} />
-      {/* Mid ring — vertical plane */}
-      <Ring radius={1.15} tube={0.052} axis="x" speed={-0.42} offset={0.5} />
-      {/* Inner ring — diagonal plane */}
-      <Ring radius={0.82} tube={0.050} axis="z" speed={0.58} offset={1.1} />
-      {/* Core */}
-      <mesh>
-        <sphereGeometry args={[0.19, 32, 32]} />
-        <meshStandardMaterial color="#facc15" metalness={0.95} roughness={0.04} envMapIntensity={2.5} />
-      </mesh>
-    </group>
+    <mesh ref={ref}>
+      <sphereGeometry args={[0.18, 32, 32]} />
+      <MeshDistortMaterial
+        color="#facc15"
+        distort={0.8}
+        speed={4}
+        roughness={0.05}
+        metalness={0.9}
+        envMapIntensity={2}
+      />
+    </mesh>
   )
 }
 
 export default function HeroCanvas() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 4.8], fov: 44 }}
-      gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
+      camera={{ position: [0, 0, 5.5], fov: 48 }}
+      gl={{
+        antialias: true,
+        alpha: true,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 1.15,
+      }}
       style={{ background: 'transparent' }}
       dpr={[1, 2]}
     >
-      <ambientLight intensity={0.12} />
-      {/* Key light — bright white from top-right */}
-      <directionalLight position={[4, 6, 3]}  intensity={2.2} color="#ffffff" />
-      {/* Fill light — subtle yellow from left */}
-      <directionalLight position={[-4, -2, -3]} intensity={0.6} color="#facc15" />
-      {/* Rim light — from behind */}
-      <pointLight position={[0, -3, -4]} intensity={1.0} color="#facc15" />
+      <ambientLight intensity={0.04} />
+      <directionalLight position={[6, 5, 4]}  intensity={2.5} color="#ffffff" />
+      <directionalLight position={[-4, -3, -4]} intensity={0.7} color="#facc15" />
+      <pointLight position={[2, 3, 2]} intensity={3} color="#facc15" distance={9} />
+      <pointLight position={[-3, 0, 1]} intensity={1} color="#fff8dc" distance={7} />
 
-      <Gyroscope />
+      <MainBlob />
+      <OrbitBlob />
+      <SmallBlob />
+      <CameraController />
 
-      {/* Studio env for clean PBR reflections */}
-      <Environment preset="studio" />
+      <Environment preset="warehouse" />
+
+      <EffectComposer>
+        <Bloom
+          intensity={1.2}
+          luminanceThreshold={0.55}
+          luminanceSmoothing={0.9}
+          mipmapBlur
+        />
+      </EffectComposer>
     </Canvas>
   )
 }

@@ -366,9 +366,9 @@
     align-items: center !important;
   }
   .hero-text > div { justify-content: center !important; }
-  .hero-sculpture {
-    width: min(300px, 80vw) !important;
-    height: min(300px, 80vw) !important;
+  .hero-blob {
+    width: min(260px, 75vw) !important;
+    height: min(260px, 75vw) !important;
   }
 }
 

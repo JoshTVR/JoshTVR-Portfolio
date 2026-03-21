@@ -31,9 +31,9 @@ function MainBlob() {
           color="#facc15"
           distort={0.42}
           speed={2.2}
-          roughness={0.03}
-          metalness={0.95}
-          envMapIntensity={3}
+          roughness={0.05}
+          metalness={0.6}
+          envMapIntensity={0}
         />
       </mesh>
     </Float>
@@ -56,11 +56,11 @@ function OrbitBlob() {
         color="#fde047"
         distort={0.65}
         speed={3.5}
-        roughness={0.08}
-        metalness={0.75}
+        roughness={0.1}
+        metalness={0.5}
         transparent
         opacity={0.82}
-        envMapIntensity={2}
+        envMapIntensity={0}
       />
     </mesh>
   )
@@ -82,9 +82,9 @@ function SmallBlob() {
         color="#facc15"
         distort={0.8}
         speed={4}
-        roughness={0.05}
-        metalness={0.9}
-        envMapIntensity={2}
+        roughness={0.08}
+        metalness={0.5}
+        envMapIntensity={0}
       />
     </mesh>
   )
@@ -103,24 +103,26 @@ export default function HeroCanvas() {
       style={{ background: 'transparent' }}
       dpr={[1, 2]}
     >
-      <ambientLight intensity={0.04} />
-      <directionalLight position={[6, 5, 4]}  intensity={2.5} color="#ffffff" />
-      <directionalLight position={[-4, -3, -4]} intensity={0.7} color="#facc15" />
-      <pointLight position={[2, 3, 2]} intensity={3} color="#facc15" distance={9} />
-      <pointLight position={[-3, 0, 1]} intensity={1} color="#fff8dc" distance={7} />
+      <ambientLight intensity={0.15} color="#facc15" />
+      {/* Key light — warm white from top */}
+      <pointLight position={[3, 5, 3]}   intensity={40}  color="#ffffff" distance={18} decay={2} />
+      {/* Fill — yellow from left */}
+      <pointLight position={[-5, 1, 2]}  intensity={25}  color="#facc15" distance={15} decay={2} />
+      {/* Rim — cool from behind */}
+      <pointLight position={[0, -4, -4]} intensity={15}  color="#fffbe6" distance={12} decay={2} />
+      {/* Accent — small warm spot */}
+      <pointLight position={[2, -2, 4]}  intensity={10}  color="#fde047" distance={10} decay={2} />
 
       <MainBlob />
       <OrbitBlob />
       <SmallBlob />
       <CameraController />
 
-      <Environment preset="warehouse" />
-
       <EffectComposer>
         <Bloom
-          intensity={1.2}
-          luminanceThreshold={0.55}
-          luminanceSmoothing={0.9}
+          intensity={1.5}
+          luminanceThreshold={0.45}
+          luminanceSmoothing={0.85}
           mipmapBlur
         />
       </EffectComposer>

@@ -3,9 +3,17 @@
 import { useEffect, useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { usePathname } from 'next/navigation'
+import { createBrowserClient } from '@supabase/ssr'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { AuthModal } from '@/components/auth/AuthModal'
+import { UserMenu } from '@/components/auth/UserMenu'
 import { cn } from '@/lib/utils/cn'
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 interface NavbarProps {
   storeVisible?: boolean
@@ -24,8 +32,10 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
   const t        = useTranslations('nav')
   const locale   = useLocale()
   const pathname = usePathname()
-  const [scrolled,  setScrolled]  = useState(false)
-  const [menuOpen,  setMenuOpen]  = useState(false)
+  const [scrolled,   setScrolled]   = useState(false)
+  const [menuOpen,   setMenuOpen]   = useState(false)
+  const [authOpen,   setAuthOpen]   = useState(false)
+  const [hasUser,    setHasUser]    = useState(false)
 
   const isHome = pathname === `/${locale}` || pathname === '/'
 
@@ -33,6 +43,14 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
     const onScroll = () => setScrolled(window.scrollY > 50)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setHasUser(!!data.user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setHasUser(!!session?.user)
+    })
+    return () => subscription.unsubscribe()
   }, [])
 
   function href(hash: string) {
@@ -91,6 +109,18 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
         <div className="flex items-center gap-3 flex-shrink-0">
           <ThemeToggle />
           <LanguageToggle />
+          {hasUser
+            ? <UserMenu />
+            : (
+              <button
+                onClick={() => setAuthOpen(true)}
+                className="btn btn-primary"
+                style={{ padding: '8px 18px', fontSize: '0.85rem' }}
+              >
+                Sign In
+              </button>
+            )
+          }
           <button
             className="md:hidden flex flex-col gap-[5px] w-7"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -103,6 +133,8 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
           </button>
         </div>
       </div>
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       {/* Mobile menu */}
       {menuOpen && (

@@ -11,13 +11,12 @@ type FormStatus = 'idle' | 'submitting' | 'success' | 'error'
 
 export default function ContactSection({ title, subtitle }: ContactSectionProps) {
   const [status, setStatus] = useState<FormStatus>('idle')
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus('submitting')
     setErrorMessage('')
-
     const form = e.currentTarget
     const data = {
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
@@ -25,33 +24,30 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
       service_id: null as null,
     }
-
     try {
       const res = await fetch('/api/inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error((body as { message?: string }).message ?? `HTTP ${res.status}`)
       }
-
       setStatus('success')
       form.reset()
     } catch (err) {
       setStatus('error')
-      setErrorMessage(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setErrorMessage(err instanceof Error ? err.message : 'Something went wrong.')
     }
   }
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '12px 16px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '8px',
+    background: 'rgba(15,23,42,0.6)',
+    border: '1px solid var(--border-glass)',
+    borderRadius: '9px',
     color: 'var(--text-primary)',
     fontFamily: 'var(--font-body)',
     fontSize: '0.93rem',
@@ -60,147 +56,113 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
   }
 
   return (
-    <section id="contact" className="section" style={{ background: 'var(--bg-primary)' }}>
-      <div className="container">
-        {/* Section label */}
-        <div style={{ marginBottom: '16px' }}>
-          <span style={{
-            fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
-            fontSize: '0.75rem',
-            color: 'var(--text-muted)',
-            letterSpacing: '0.08em',
-          }}>
-            04 /
-          </span>
-        </div>
+    <section id="contact" className="section" style={{ background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden' }}>
+      {/* Subtle orb */}
+      <div aria-hidden="true" style={{
+        position: 'absolute',
+        width: '600px',
+        height: '600px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 65%)',
+        bottom: '-200px',
+        right: '-100px',
+        pointerEvents: 'none',
+      }} />
 
-        {/* Big CTA heading */}
-        <div style={{ marginBottom: '56px' }}>
-          <h2
-            className="reveal"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(2.4rem, 6vw, 5rem)',
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              color: 'var(--text-primary)',
-              marginBottom: '16px',
-            }}
-          >
-            {title}
-          </h2>
-          <p className="reveal" style={{
-            color: 'var(--text-muted)',
-            fontSize: '1rem',
-            lineHeight: 1.7,
-            maxWidth: '540px',
-          }}>
-            {subtitle}
-          </p>
-        </div>
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+        <span className="section-eyebrow reveal">Get in touch</span>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-            gap: '48px',
-            alignItems: 'start',
-          }}
-        >
-          {/* Left: Contact info */}
-          <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            {/* Email — big and prominent */}
+        {/* Big gradient heading */}
+        <h2 className="reveal" style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize: 'clamp(2.4rem, 6vw, 5rem)',
+          fontWeight: 800,
+          letterSpacing: '-0.04em',
+          lineHeight: 1.05,
+          marginBottom: '16px',
+          background: 'var(--hero-gradient)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+          maxWidth: '700px',
+        }}>
+          {title}
+        </h2>
+
+        <p className="reveal" style={{
+          color: 'var(--text-muted)',
+          fontSize: '1rem',
+          lineHeight: 1.75,
+          maxWidth: '520px',
+          marginBottom: '56px',
+        }}>
+          {subtitle}
+        </p>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '48px',
+          alignItems: 'start',
+        }}>
+          {/* Left: info */}
+          <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
             <div>
-              <div style={{
-                fontSize: '0.7rem',
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                fontFamily: '"Fira Code", Consolas, monospace',
-                marginBottom: '8px',
-              }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600, marginBottom: '8px' }}>
                 Email
               </div>
-              <a
-                href="mailto:joshtvr4@gmail.com"
-                style={{
-                  fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  textDecoration: 'none',
-                  transition: 'color var(--transition-mid)',
-                  display: 'inline-block',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+              <a href="mailto:joshtvr4@gmail.com" style={{
+                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                transition: 'color var(--transition-fast)',
+              }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent-light)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-primary)' }}
               >
                 joshtvr4@gmail.com
               </a>
             </div>
 
-            {/* Socials */}
             <div>
-              <div style={{
-                fontSize: '0.7rem',
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                fontFamily: '"Fira Code", Consolas, monospace',
-                marginBottom: '12px',
-              }}>
-                Find me
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600, marginBottom: '12px' }}>
+                Socials
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {[
-                  { href: 'https://github.com/JoshTVR', label: 'GitHub', display: 'github.com/JoshTVR' },
-                  { href: 'https://www.linkedin.com/in/joshtvr', label: 'LinkedIn', display: 'linkedin.com/in/joshtvr' },
-                ].map(({ href, label, display }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontSize: '0.9rem',
-                      color: 'var(--text-muted)',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      transition: 'color var(--transition-mid)',
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+                  { href: 'https://github.com/JoshTVR', label: 'github.com/JoshTVR' },
+                  { href: 'https://www.linkedin.com/in/joshtvr', label: 'linkedin.com/in/joshtvr' },
+                ].map(({ href, label }) => (
+                  <a key={href} href={href} target="_blank" rel="noopener noreferrer" style={{
+                    fontSize: '0.92rem',
+                    color: 'var(--text-muted)',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'color var(--transition-fast)',
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent-light)' }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)' }}
                   >
-                    <span style={{
-                      fontSize: '0.65rem',
-                      color: 'var(--accent)',
-                      fontFamily: '"Fira Code", Consolas, monospace',
-                    }}>→</span>
-                    {display}
+                    <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent)', display: 'inline-block', flexShrink: 0 }} />
+                    {label}
                   </a>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Right: Contact form */}
-          <div
-            className="reveal"
-            style={{
-              border: '1px solid var(--border-glass)',
-              borderRadius: '12px',
-              padding: '32px 28px',
-              background: 'var(--bg-secondary)',
-            }}
-          >
+          {/* Right: form */}
+          <div className="reveal" style={{
+            borderRadius: '16px',
+            border: '1px solid var(--border-glass)',
+            background: 'var(--bg-card)',
+            padding: '32px 28px',
+          }}>
             {status === 'success' ? (
-              <div style={{
-                textAlign: 'center',
-                color: '#22c55e',
-                padding: '32px 0',
-              }}>
+              <div style={{ textAlign: 'center', color: '#34d399', padding: '32px 0' }}>
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"
                   style={{ margin: '0 auto 12px', display: 'block' }}>
                   <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
@@ -210,54 +172,24 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
                 </p>
               </div>
             ) : (
-              <form
-                onSubmit={handleSubmit}
-                style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
-                noValidate
-              >
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  placeholder="Your name"
-                  style={inputStyle}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(250,204,21,0.4)' }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
-                />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Your email"
-                  style={inputStyle}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(250,204,21,0.4)' }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
-                />
-                <textarea
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="Your message"
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }} noValidate>
+                <input type="text" name="name" required placeholder="Your name" style={inputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)' }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-glass)' }} />
+                <input type="email" name="email" required placeholder="Your email" style={inputStyle}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)' }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-glass)' }} />
+                <textarea name="message" required rows={5} placeholder="Your message"
                   style={{ ...inputStyle, resize: 'vertical' }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(250,204,21,0.4)' }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
-                />
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)' }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-glass)' }} />
 
                 {status === 'error' && (
-                  <p style={{ color: '#ef4444', fontSize: '0.85rem', margin: 0 }}>
-                    {errorMessage}
-                  </p>
+                  <p style={{ color: '#f87171', fontSize: '0.85rem', margin: 0 }}>{errorMessage}</p>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={status === 'submitting'}
-                  className="btn btn-primary"
-                  style={{
-                    opacity: status === 'submitting' ? 0.7 : 1,
-                    cursor: status === 'submitting' ? 'not-allowed' : 'pointer',
-                  }}
-                >
+                <button type="submit" disabled={status === 'submitting'} className="btn btn-primary"
+                  style={{ opacity: status === 'submitting' ? 0.7 : 1, cursor: status === 'submitting' ? 'not-allowed' : 'pointer' }}>
                   {status === 'submitting' ? 'Sending…' : 'Send Message'}
                 </button>
               </form>

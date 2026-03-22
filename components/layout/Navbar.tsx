@@ -80,14 +80,13 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-1">
-          {NAV_SECTIONS.map(({ hash, key, num }) => (
+          {NAV_SECTIONS.map(({ hash, key }) => (
             <li key={key}>
               <a
                 href={href(hash)}
-                className="text-[0.9rem] font-medium px-3.5 py-2 rounded-lg transition-all duration-150 hover:text-[var(--text-primary)] hover:bg-white/5"
+                className="text-[0.88rem] font-medium px-3.5 py-2 rounded-lg transition-all duration-150 hover:text-[var(--text-primary)] hover:bg-white/5"
                 style={{ color: 'var(--text-muted)' }}
               >
-                <span style={{ fontFamily: '"Fira Code", Consolas, monospace', fontSize: '0.6rem', opacity: 0.45, marginRight: '3px', verticalAlign: 'middle' }}>{num}</span>
                 {t(key)}
               </a>
             </li>

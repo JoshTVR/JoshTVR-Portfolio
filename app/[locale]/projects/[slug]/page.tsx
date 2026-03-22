@@ -42,33 +42,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  vr: 'VR',
-  ar: 'AR',
-  data: 'Data Science',
-  backend: 'Backend',
+  vr:     'VR',
+  ar:     'AR',
+  data:   'Data Science',
+  backend:'Backend',
   design: 'Design',
-  '3d': '3D',
-  video: 'Video',
+  '3d':   '3D',
+  video:  'Video',
+  github: 'Open Source',
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  vr:      'rgba(250,204,21,0.85)',
-  ar:      'rgba(139,92,246,0.85)',
-  data:    'rgba(59,130,246,0.85)',
+  vr:      'rgba(139,92,246,0.85)',
+  ar:      'rgba(59,130,246,0.85)',
+  data:    'rgba(6,182,212,0.85)',
   backend: 'rgba(16,185,129,0.85)',
   design:  'rgba(236,72,153,0.85)',
   '3d':    'rgba(245,158,11,0.85)',
   video:   'rgba(239,68,68,0.85)',
+  github:  'rgba(30,41,59,0.9)',
 }
 
 const CATEGORY_TEXT: Record<string, string> = {
-  vr:      '#1a1a14',
+  vr:      '#fff',
   ar:      '#fff',
   data:    '#fff',
   backend: '#fff',
   design:  '#fff',
   '3d':    '#fff',
   video:   '#fff',
+  github:  '#94a3b8',
 }
 
 export default async function ProjectDetailPage({ params }: PageProps) {
@@ -255,7 +258,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               }}>
                 {isEs ? 'Galería' : 'Gallery'} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.9rem' }}>({galleryImages.length})</span>
               </h2>
-              <ProjectGallery images={galleryImages} title={title} />
+              <ProjectGallery images={galleryImages} title={title} videoUrl={project.video_url} />
             </div>
           )}
 
@@ -405,6 +408,7 @@ interface ProjectDetail {
   demo_url: string | null
   cover_image: string | null
   images: string[]
+  video_url: string | null
   is_published: boolean
   is_featured: boolean
 }

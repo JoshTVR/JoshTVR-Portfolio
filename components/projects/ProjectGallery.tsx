@@ -6,9 +6,10 @@ import { useState, useEffect, useCallback } from 'react'
 interface ProjectGalleryProps {
   images: string[]
   title: string
+  videoUrl?: string | null
 }
 
-export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
+export default function ProjectGallery({ images, title, videoUrl }: ProjectGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -36,10 +37,32 @@ export default function ProjectGallery({ images, title }: ProjectGalleryProps) {
     }
   }, [lightboxIndex, prev, next])
 
-  if (!images.length) return null
+  if (!images.length && !videoUrl) return null
 
   return (
     <>
+      {/* Video player — shown above gallery when present */}
+      {videoUrl && (
+        <div style={{ marginBottom: images.length ? '24px' : 0 }}>
+          <video
+            src={videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls
+            style={{
+              width: '100%',
+              borderRadius: '14px',
+              display: 'block',
+              maxHeight: '520px',
+              objectFit: 'cover',
+              background: '#000',
+            }}
+          />
+        </div>
+      )}
+
       {/* Instagram-style 3-column grid */}
       <div
         className="project-gallery-grid"

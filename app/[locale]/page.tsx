@@ -138,14 +138,13 @@ export default async function HomePage({
   const githubStats = showGitHubStats ? await getGitHubStats() : null
 
   const filterLabels: Record<string, string> = {
-    all:     tProjects('filter.all'),
-    vr:      tProjects('filter.vr'),
-    ar:      tProjects('filter.ar'),
-    data:    tProjects('filter.data'),
-    backend: tProjects('filter.backend'),
-    design:  tProjects('filter.design'),
-    '3d':    tProjects('filter.3d'),
-    video:   tProjects('filter.video'),
+    all:    tProjects('filter.all'),
+    '3d':   tProjects('filter.3d'),
+    video:  tProjects('filter.video'),
+    vr:     tProjects('filter.vr'),
+    data:   tProjects('filter.data'),
+    design: tProjects('filter.design'),
+    github: 'Open Source',
   }
 
   return (

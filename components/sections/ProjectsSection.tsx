@@ -26,7 +26,7 @@ interface ProjectsSectionProps {
   title?: string
 }
 
-const FILTER_KEYS = ['all', 'vr', 'ar', 'data', 'backend', 'design', '3d', 'video'] as const
+const FILTER_KEYS = ['all', '3d', 'video', 'vr', 'data', 'design', 'github'] as const
 
 const CATEGORY_COLORS: Record<string, string> = {
   vr: '#3b82f6', ar: '#8b5cf6', data: '#06b6d4',

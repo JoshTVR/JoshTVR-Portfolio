@@ -20,12 +20,12 @@ interface NavbarProps {
 }
 
 const NAV_SECTIONS = [
-  { hash: 'about',          key: 'about' },
-  { hash: 'skills',         key: 'skills' },
-  { hash: 'projects',       key: 'projects' },
-  { hash: 'experience',     key: 'experience' },
-  { hash: 'certifications', key: 'certifications' },
-  { hash: 'contact',        key: 'contact' },
+  { hash: 'about',          key: 'about',          num: '01' },
+  { hash: 'skills',         key: 'skills',         num: '02' },
+  { hash: 'projects',       key: 'projects',       num: '03' },
+  { hash: 'experience',     key: 'experience',     num: '04' },
+  { hash: 'certifications', key: 'certifications', num: '05' },
+  { hash: 'contact',        key: 'contact',        num: '06' },
 ] as const
 
 export function Navbar({ storeVisible = false }: NavbarProps) {
@@ -80,13 +80,14 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-1">
-          {NAV_SECTIONS.map(({ hash, key }) => (
+          {NAV_SECTIONS.map(({ hash, key, num }) => (
             <li key={key}>
               <a
                 href={href(hash)}
                 className="text-[0.9rem] font-medium px-3.5 py-2 rounded-lg transition-all duration-150 hover:text-[var(--text-primary)] hover:bg-white/5"
                 style={{ color: 'var(--text-muted)' }}
               >
+                <span style={{ fontFamily: '"Fira Code", Consolas, monospace', fontSize: '0.6rem', opacity: 0.45, marginRight: '3px', verticalAlign: 'middle' }}>{num}</span>
                 {t(key)}
               </a>
             </li>

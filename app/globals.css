@@ -372,6 +372,20 @@
   }
 }
 
+/* ── Hero two-column layout ── */
+.hero-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .hero-two-col {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
 /* ── Project detail ── */
 .project-detail-grid {
   display: grid;

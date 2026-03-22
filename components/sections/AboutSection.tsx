@@ -19,80 +19,91 @@ export default function AboutSection({ title, bio1, bio2, bio3, stats }: AboutSe
       style={{ background: 'var(--bg-secondary)' }}
     >
       <div className="container">
-        <h2 className="section-title reveal">{title}</h2>
+        {/* Section label */}
+        <div style={{ marginBottom: '16px' }}>
+          <span style={{
+            fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
+            fontSize: '0.75rem',
+            color: 'var(--text-muted)',
+            letterSpacing: '0.08em',
+          }}>
+            01 /
+          </span>
+        </div>
+
+        <h2
+          className="section-title reveal"
+          style={{ marginBottom: '56px' }}
+        >
+          {title}
+        </h2>
 
         <div
-          className="about-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
             gap: '64px',
             alignItems: 'start',
           }}
         >
-          {/* Left: Bio text */}
-          <div className="about-text">
-            <p className="reveal" style={{ color: 'var(--text-muted)', marginBottom: '18px', fontSize: '1rem', lineHeight: 1.8 }}>
+          {/* Left: Bio */}
+          <div>
+            <p className="reveal" style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '1rem', lineHeight: 1.85 }}>
               {bio1}
             </p>
-            <p className="reveal" style={{ color: 'var(--text-muted)', marginBottom: '18px', fontSize: '1rem', lineHeight: 1.8 }}>
+            <p className="reveal" style={{ color: 'var(--text-muted)', marginBottom: '20px', fontSize: '1rem', lineHeight: 1.85 }}>
               {bio2}
             </p>
-            <p className="reveal" style={{ color: 'var(--text-muted)', marginBottom: 0, fontSize: '1rem', lineHeight: 1.8 }}>
+            <p className="reveal" style={{ color: 'var(--text-muted)', marginBottom: 0, fontSize: '1rem', lineHeight: 1.85 }}>
               {bio3}
             </p>
           </div>
 
-          {/* Right: Stats grid */}
+          {/* Right: Flat stat grid */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: '16px',
+              border: '1px solid var(--border-glass)',
+              borderRadius: '12px',
+              overflow: 'hidden',
             }}
           >
-            {stats.map((stat, index) => {
-              // Split value into number part and suffix (last char if non-numeric)
+            {stats.map((stat, i) => {
               const match = stat.value.match(/^(\d+)([^\d]*)$/)
               const num = match ? match[1] : stat.value
               const suffix = match ? match[2] : ''
+              const isRight = i % 2 === 1
+              const isBottom = i >= stats.length - 2
 
               return (
                 <div
-                  key={index}
-                  className="stat-card glass reveal-stagger"
+                  key={i}
                   style={{
-                    padding: '28px 20px',
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    transition: 'transform var(--transition-mid), box-shadow var(--transition-mid)',
+                    padding: '32px 28px',
+                    borderRight: !isRight ? '1px solid var(--border-glass)' : 'none',
+                    borderBottom: !isBottom ? '1px solid var(--border-glass)' : 'none',
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: '2.4rem',
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    {num}
-                    <span style={{ color: 'var(--accent)' }}>{suffix}</span>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.82rem',
-                      color: 'var(--text-muted)',
-                      fontWeight: 500,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                    }}
-                  >
+                  <div style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    color: 'var(--text-primary)',
+                    marginBottom: '8px',
+                  }}>
+                    {num}<span style={{ color: 'var(--accent)' }}>{suffix}</span>
+                  </div>
+                  <div style={{
+                    fontSize: '0.72rem',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    fontWeight: 500,
+                  }}>
                     {stat.label}
-                  </span>
+                  </div>
                 </div>
               )
             })}

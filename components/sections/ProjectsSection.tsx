@@ -347,7 +347,7 @@ export default function ProjectsSection({
                       </a>
                     )}
                     <Link
-                      href={`/projects/${project.slug}`}
+                      href={`/${locale}/projects/${project.slug}`}
                       style={{
                         marginLeft: 'auto',
                         fontSize: '0.82rem',

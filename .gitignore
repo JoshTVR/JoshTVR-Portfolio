@@ -1,3 +1,6 @@
+# Local assets staging (never goes to git — sube a Supabase Storage)
+/_project-assets/
+
 # dependencies
 /node_modules
 /.pnp

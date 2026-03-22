@@ -1,3 +1,5 @@
+'use client'
+
 interface StatItem {
   value: string
   label: string

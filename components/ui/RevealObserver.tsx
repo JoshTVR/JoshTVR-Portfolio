@@ -4,31 +4,33 @@ import { useEffect } from 'react'
 
 export default function RevealObserver() {
   useEffect(() => {
+    const makeVisible = (el: Element) => el.classList.add('is-visible')
+
+    const revealInView = () => {
+      document.querySelectorAll('.reveal, .reveal-stagger').forEach((el) => {
+        const rect = el.getBoundingClientRect()
+        if (rect.top < window.innerHeight * 0.92) makeVisible(el)
+      })
+    }
+
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('is-visible')
-            io.unobserve(e.target)
-          }
-        })
-      },
-      { threshold: 0.08 }
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { makeVisible(e.target); io.unobserve(e.target) } }),
+      { threshold: 0.06 }
     )
 
-    const observe = () => {
+    const attach = () => {
       document.querySelectorAll('.reveal, .reveal-stagger').forEach((el) => io.observe(el))
+      revealInView()
     }
 
-    observe()
+    attach()
+    const t = setTimeout(attach, 300)
 
-    // Re-observe after short delay in case sections mount late
-    const t = setTimeout(observe, 400)
+    // Re-reveal when theme changes (data-theme attribute toggles)
+    const mo = new MutationObserver(revealInView)
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
 
-    return () => {
-      io.disconnect()
-      clearTimeout(t)
-    }
+    return () => { io.disconnect(); mo.disconnect(); clearTimeout(t) }
   }, [])
 
   return null

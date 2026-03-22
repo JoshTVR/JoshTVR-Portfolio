@@ -1,13 +1,20 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 
-const WORDS = ['VR experiences', 'AI solutions', '3D worlds', 'full-stack apps']
-
+const FALLBACK_WORDS = ['VR experiences', 'AI solutions', '3D worlds', 'full-stack apps']
 const TECH_PILLS = ['Next.js', 'Python', 'Blender', 'Unity', 'Three.js', 'TensorFlow']
 
 export default function HeroSection() {
   const typewriterRef = useRef<HTMLSpanElement>(null)
+  const t = useTranslations('hero')
+
+  let words: string[] = FALLBACK_WORDS
+  try {
+    const raw = t.raw('typewriter')
+    if (Array.isArray(raw) && raw.length > 0) words = raw as string[]
+  } catch { /* use fallback */ }
 
   useEffect(() => {
     let wi = 0, ci = 0, deleting = false
@@ -16,7 +23,7 @@ export default function HeroSection() {
     function tick() {
       const el = typewriterRef.current
       if (!el) return
-      const w = WORDS[wi % WORDS.length]
+      const w = words[wi % words.length]
       ci += deleting ? -1 : 1
       el.textContent = w.substring(0, ci)
       let delay = deleting ? 40 : 85
@@ -26,6 +33,7 @@ export default function HeroSection() {
     }
     tid = setTimeout(tick, 900)
     return () => clearTimeout(tid)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

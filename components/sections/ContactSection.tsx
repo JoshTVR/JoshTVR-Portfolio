@@ -32,7 +32,8 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error((body as { message?: string }).message ?? `HTTP ${res.status}`)
+        const b = body as { error?: string; message?: string }
+        throw new Error(b.error ?? b.message ?? `HTTP ${res.status}`)
       }
       setStatus('success')
       form.reset()
@@ -45,7 +46,7 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '12px 16px',
-    background: 'rgba(15,23,42,0.6)',
+    background: 'var(--bg-secondary)',
     border: '1px solid var(--border-glass)',
     borderRadius: '9px',
     color: 'var(--text-primary)',

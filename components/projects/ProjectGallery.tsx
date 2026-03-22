@@ -6,10 +6,10 @@ import { useState, useEffect, useCallback } from 'react'
 interface ProjectGalleryProps {
   images: string[]
   title: string
-  videoUrl?: string | null
+  videoUrls?: string[] | null
 }
 
-export default function ProjectGallery({ images, title, videoUrl }: ProjectGalleryProps) {
+export default function ProjectGallery({ images, title, videoUrls }: ProjectGalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -37,15 +37,16 @@ export default function ProjectGallery({ images, title, videoUrl }: ProjectGalle
     }
   }, [lightboxIndex, prev, next])
 
-  if (!images.length && !videoUrl) return null
+  const videos = videoUrls?.filter(Boolean) ?? []
+  if (!images.length && !videos.length) return null
 
   return (
     <>
-      {/* Video player — shown above gallery when present */}
-      {videoUrl && (
-        <div style={{ marginBottom: images.length ? '24px' : 0 }}>
+      {/* Video players — shown above gallery */}
+      {videos.map((url, vi) => (
+        <div key={vi} style={{ marginBottom: '16px' }}>
           <video
-            src={videoUrl}
+            src={url}
             autoPlay
             muted
             loop
@@ -61,7 +62,7 @@ export default function ProjectGallery({ images, title, videoUrl }: ProjectGalle
             }}
           />
         </div>
-      )}
+      ))}
 
       {/* Instagram-style 3-column grid */}
       <div

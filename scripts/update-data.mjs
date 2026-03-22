@@ -25,35 +25,42 @@ const supabase = createClient(
 
 // ── 1. Upload video ────────────────────────────────────────────────────────────
 async function uploadVideo() {
-  console.log('\n📹  Uploading Cells Animation video...')
+  console.log('\n📹  Uploading Cells Animation videos...')
 
-  const videoPath = join(__dirname, '../_project-assets/models/Cells-Animations/Imgs/Cells Animations.mp4')
-  if (!existsSync(videoPath)) {
-    console.log('    ⚠️  Video file not found, skipping.')
-    return null
+  // [0] Realistic Cycles render — shown FIRST (top)
+  // [1] EEVEE microscope panel — shown SECOND
+  const FILES = [
+    { local: 'Cells-Animations.mp4', storage: 'cells-animation/cells-realistic.mp4' },
+    { local: 'Cells Animations.mp4', storage: 'cells-animation/cells-eevee.mp4' },
+  ]
+
+  const videoUrls = []
+
+  for (const { local, storage } of FILES) {
+    const videoPath = join(__dirname, `../_project-assets/models/Cells-Animations/Imgs/${local}`)
+    if (!existsSync(videoPath)) { console.log(`    ⚠️  Not found: ${local}`); continue }
+
+    const buffer = readFileSync(videoPath)
+    const { error } = await supabase.storage
+      .from(BUCKET)
+      .upload(storage, buffer, { contentType: 'video/mp4', upsert: true })
+
+    if (error) { console.error(`    ✗ Upload failed [${local}]:`, error.message); continue }
+
+    const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(storage)
+    videoUrls.push(publicUrl)
+    console.log(`    ✓ Uploaded → ${storage}`)
   }
 
-  const buffer = readFileSync(videoPath)
-  const storagePath = 'cells-animation/cells-animation.mp4'
-
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(storagePath, buffer, { contentType: 'video/mp4', upsert: true })
-
-  if (error) { console.error('    ✗ Upload failed:', error.message); return null }
-
-  const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(storagePath)
-  console.log('    ✓ Uploaded →', storagePath)
+  if (!videoUrls.length) return
 
   const { error: updateErr } = await supabase
     .from('projects')
-    .update({ video_url: publicUrl })
+    .update({ video_url: videoUrls })
     .eq('slug', 'cells-animation')
 
   if (updateErr) console.error('    ✗ DB update failed:', updateErr.message)
-  else console.log('    ✓ cells-animation video_url updated')
-
-  return publicUrl
+  else console.log(`    ✓ cells-animation video_url set (${videoUrls.length} videos)`)
 }
 
 // ── 2. GitHub repo projects ────────────────────────────────────────────────────

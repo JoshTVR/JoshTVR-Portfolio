@@ -258,7 +258,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               }}>
                 {isEs ? 'Galería' : 'Gallery'} <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.9rem' }}>({galleryImages.length})</span>
               </h2>
-              <ProjectGallery images={galleryImages} title={title} videoUrl={project.video_url} />
+              <ProjectGallery images={galleryImages} title={title} videoUrls={project.video_url} />
             </div>
           )}
 
@@ -408,7 +408,7 @@ interface ProjectDetail {
   demo_url: string | null
   cover_image: string | null
   images: string[]
-  video_url: string | null
+  video_url: string[] | null
   is_published: boolean
   is_featured: boolean
 }

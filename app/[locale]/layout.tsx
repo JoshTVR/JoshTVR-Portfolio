@@ -5,6 +5,7 @@ import { routing } from '@/lib/i18n/routing'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { createClient } from '@/lib/supabase/server'
+import RevealObserver from '@/components/ui/RevealObserver'
 
 export default async function LocaleLayout({
   children,
@@ -38,6 +39,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <RevealObserver />
       <Navbar storeVisible={storeVisible} />
       <main>{children}</main>
       <Footer />

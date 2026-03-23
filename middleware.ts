@@ -65,6 +65,6 @@ export const config = {
   matcher: [
     '/admin/:path*',
     // next-intl matcher — skip static files and api routes
-    '/((?!_next|_vercel|api|.*\\..*).*)',
+    '/((?!_next|_vercel|api|og|.*\\..*).*)',
   ],
 }

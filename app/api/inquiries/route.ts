@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       metadata?: Record<string, unknown>
     }
 
-    const { name, email, message, budget, metadata } = body
+    const { name, email, message, budget } = body
 
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return NextResponse.json({ error: 'Name, email and message are required' }, { status: 400 })
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('inquiries')
-      .insert({ name: name.trim(), email: email.trim(), message: message.trim(), budget: budget ?? null, metadata: metadata ?? {} })
+      .insert({ name: name.trim(), email: email.trim(), message: message.trim(), budget: budget ?? null })
       .select('id')
       .single()
 

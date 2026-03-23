@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name, email and message are required' }, { status: 400 })
     }
 
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const { data, error } = await supabase
       .from('inquiries')
       .insert({ name: name.trim(), email: email.trim(), message: message.trim(), budget: budget ?? null, metadata: metadata ?? {} })

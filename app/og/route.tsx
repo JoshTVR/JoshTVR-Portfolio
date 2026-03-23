@@ -5,58 +5,60 @@ export const runtime = 'edge'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const title       = searchParams.get('title')       ?? 'JoshTVR'
+  const title       = searchParams.get('title')       ?? 'Joshua Hernandez'
   const description = searchParams.get('description') ?? 'VR & Digital Business Developer'
 
   return new ImageResponse(
     (
-      <div
-        style={{
-          width:      '100%',
-          height:     '100%',
-          display:    'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          justifyContent: 'flex-end',
-          background: 'linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 50%, #1a0a2e 100%)',
-          padding:    '64px',
-          fontFamily: 'system-ui, sans-serif',
-        }}
-      >
-        {/* Grid lines */}
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', opacity: 0.1 }}>
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#7c3aed" strokeWidth="1"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
+      <div style={{
+        width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
+        alignItems: 'flex-start', justifyContent: 'flex-end',
+        background: '#0f172a', padding: '64px', fontFamily: 'system-ui, sans-serif',
+        position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Blue orb */}
+        <div style={{
+          position: 'absolute', top: '-120px', right: '-120px', display: 'flex',
+          width: '520px', height: '520px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 65%)',
+        }} />
+        {/* Violet orb */}
+        <div style={{
+          position: 'absolute', bottom: '-100px', left: '-80px', display: 'flex',
+          width: '380px', height: '380px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 65%)',
+        }} />
 
-        {/* Accent glow */}
-        <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)', borderRadius: '50%' }} />
-
-        {/* Tag */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
-          <div style={{ background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.4)', borderRadius: '20px', padding: '6px 16px', color: '#9d5cf6', fontSize: '16px', fontWeight: 700 }}>
-            joshtvr.com
-          </div>
+        {/* Domain badge */}
+        <div style={{
+          display: 'flex', alignItems: 'center', marginBottom: '28px',
+          background: 'rgba(59,130,246,0.1)', borderRadius: '100px', padding: '6px 18px',
+          border: '1px solid rgba(59,130,246,0.25)',
+        }}>
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', marginRight: 10 }} />
+          <span style={{ color: '#86efac', fontSize: 16, fontWeight: 700, letterSpacing: '0.06em' }}>
+            joshtvr.com · Available for work
+          </span>
         </div>
 
         {/* Title */}
-        <div style={{ fontSize: '64px', fontWeight: 800, color: '#f0f0f0', lineHeight: 1.1, marginBottom: '20px', maxWidth: '900px', letterSpacing: '-2px' }}>
+        <div style={{
+          fontSize: 72, fontWeight: 800, lineHeight: 1.05, marginBottom: 20,
+          maxWidth: 900, letterSpacing: '-2px', color: '#f1f5f9', display: 'flex',
+        }}>
           {title}
         </div>
 
         {/* Description */}
-        <div style={{ fontSize: '24px', color: '#888899', maxWidth: '800px', lineHeight: 1.5 }}>
+        <div style={{ fontSize: 26, color: '#94a3b8', maxWidth: 820, lineHeight: 1.55, display: 'flex' }}>
           {description}
         </div>
 
-        {/* Bottom bar */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, #7c3aed, #9d5cf6, #7c3aed)' }} />
+        {/* Bottom gradient bar */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 4, display: 'flex',
+          background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+        }} />
       </div>
     ),
     { width: 1200, height: 630 }

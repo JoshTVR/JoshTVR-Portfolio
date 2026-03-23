@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     title: 'JoshTVR | VR & Digital Business Developer',
     description:
       'VR & Digital Business Application Developer — turning ideas into immersive realities across VR, AI, Backend, and Design.',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+    images: [{ url: '/og?title=Joshua+Hernandez&description=VR+%26+Digital+Business+Developer', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'JoshTVR | VR & Digital Business Developer',
     description:
       'VR & Digital Business Application Developer — turning ideas into immersive realities.',
-    images: ['/og-image.jpg'],
+    images: ['/og?title=Joshua+Hernandez&description=VR+%26+Digital+Business+Developer'],
   },
   robots: { index: true, follow: true },
 }

@@ -38,6 +38,7 @@ export default function ExperienceSection({
       style={{ background: 'var(--bg-secondary)' }}
     >
       <div className="container">
+        <span className="section-eyebrow reveal">Timeline</span>
         <h2 className="section-title reveal">{title}</h2>
 
         {/* Timeline wrapper */}
@@ -169,8 +170,8 @@ export default function ExperienceSection({
                             borderRadius: '16px',
                             fontSize: '0.76rem',
                             fontWeight: 500,
-                            background: 'rgba(124, 58, 237, 0.1)',
-                            border: '1px solid rgba(124, 58, 237, 0.2)',
+                            background: 'rgba(59,130,246,0.08)',
+                            border: '1px solid rgba(59,130,246,0.18)',
                             color: 'var(--accent-light)',
                           }}
                         >

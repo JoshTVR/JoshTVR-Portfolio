@@ -1,3 +1,5 @@
+'use client'
+
 interface TestimonialItem {
   id: string
   quote_en: string
@@ -40,6 +42,7 @@ export default function TestimonialsSection({
       style={{ background: 'var(--bg-secondary)' }}
     >
       <div className="container">
+        <span className="section-eyebrow reveal">What people say</span>
         <h2 className="section-title reveal">{title}</h2>
 
         <div

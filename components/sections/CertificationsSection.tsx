@@ -1,3 +1,5 @@
+'use client'
+
 interface CertItem {
   id: string
   name_en: string
@@ -42,6 +44,7 @@ export default function CertificationsSection({
       style={{ background: 'var(--bg-primary)' }}
     >
       <div className="container">
+        <span className="section-eyebrow reveal">Credentials</span>
         <h2 className="section-title reveal">{title}</h2>
 
         <div
@@ -120,8 +123,8 @@ export default function CertificationsSection({
                     color: 'var(--accent)',
                     padding: '3px 10px',
                     borderRadius: '16px',
-                    background: 'rgba(124, 58, 237, 0.12)',
-                    border: '1px solid rgba(124, 58, 237, 0.2)',
+                    background: 'rgba(59,130,246,0.1)',
+                    border: '1px solid rgba(59,130,246,0.2)',
                   }}
                 >
                   {cert.year}

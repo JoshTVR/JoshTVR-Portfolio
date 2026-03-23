@@ -30,8 +30,8 @@ async function uploadVideo() {
   // [0] Realistic Cycles render — shown FIRST (top)
   // [1] EEVEE microscope panel — shown SECOND
   const FILES = [
-    { local: 'Cells-Animations.mp4', storage: 'cells-animation/cells-realistic.mp4' },
-    { local: 'Cells Animations.mp4', storage: 'cells-animation/cells-eevee.mp4' },
+    { local: 'Cells Animations.mp4',  storage: 'cells-animation/cells-realistic.mp4' },
+    { local: 'Cells-Animations.mp4', storage: 'cells-animation/cells-eevee.mp4' },
   ]
 
   const videoUrls = []
@@ -224,8 +224,8 @@ async function updateServices() {
 
   for (const s of SERVICES) {
     const { error } = await supabase.from('services').insert(s)
-    if (error) console.error(`    ✗ ${s.slug}:`, error.message)
-    else console.log(`    ✓ ${s.title_en} ($${s.price_from}–$${s.price_to})`)
+    if (error) console.error(`    ✗ ${s.title_en}:`, error.message)
+    else console.log(`    ✓ ${s.title_en} ($${s.price_from / 100})`)
   }
 }
 

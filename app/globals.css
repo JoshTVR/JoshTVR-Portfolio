@@ -58,10 +58,10 @@
   }
 
   [data-theme="light"] {
-    --bg-primary:    #dce4ef;
-    --bg-secondary:  #cfd8e6;
-    --bg-card:       #e8eef7;
-    --bg-card-hover: #c8d5e8;
+    --bg-primary:    #c8d4e3;
+    --bg-secondary:  #bac8d9;
+    --bg-card:       #d4dce9;
+    --bg-card-hover: #b8c8db;
 
     --accent:        #2563eb;
     --accent-2:      #7c3aed;

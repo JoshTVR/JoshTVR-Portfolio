@@ -33,8 +33,8 @@ function Loader() {
       }}>
         <div style={{
           width: '16px', height: '16px',
-          border: '2px solid rgba(250,204,21,0.3)',
-          borderTopColor: '#facc15',
+          border: '2px solid rgba(59,130,246,0.3)',
+          borderTopColor: '#3b82f6',
           borderRadius: '50%',
           animation: 'spin 0.8s linear infinite',
         }} />
@@ -75,7 +75,7 @@ export function ModelViewer({ url, height = 420, autoRotate = true, className }:
       >
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 8, 5]} intensity={1.5} castShadow />
-        <pointLight position={[-5, 4, 4]} intensity={0.6} color="#facc15" />
+        <pointLight position={[-5, 4, 4]} intensity={0.6} color="#8b5cf6" />
 
         <Suspense fallback={<Loader />}>
           <Model url={url} />

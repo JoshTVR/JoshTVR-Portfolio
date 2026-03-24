@@ -2,8 +2,14 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/server'
 import ProjectGallery from '@/components/projects/ProjectGallery'
+
+const ModelViewer = dynamic(
+  () => import('@/components/three/ModelViewer').then(m => m.ModelViewer),
+  { ssr: false }
+)
 
 export const revalidate = 3600
 
@@ -192,8 +198,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.07em',
-              background: 'rgba(250,204,21,0.9)',
-              color: '#1a1a14',
+              background: 'var(--grad-accent)',
+              color: '#fff',
             }}>
               ★ Featured
             </span>
@@ -243,6 +249,27 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           }}>
             {description}
           </p>
+
+          {/* 3D Model Viewer */}
+          {project.model_url && (
+            <div style={{ marginBottom: '48px' }}>
+              <h2 style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                marginBottom: '16px',
+              }}>
+                {isEs ? 'Modelo 3D Interactivo' : 'Interactive 3D Model'}
+              </h2>
+              <ModelViewer url={project.model_url} height={480} autoRotate />
+              <p style={{ marginTop: '10px', fontSize: '0.8rem', color: 'var(--text-dim)', textAlign: 'center' }}>
+                {isEs ? 'Arrastra para rotar · Scroll para zoom' : 'Drag to rotate · Scroll to zoom'}
+              </p>
+            </div>
+          )}
 
           {/* Gallery */}
           {galleryImages.length > 0 && (
@@ -372,8 +399,8 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             <div style={{
               padding: '14px 18px',
               borderRadius: '10px',
-              background: 'rgba(250,204,21,0.06)',
-              border: '1px solid rgba(250,204,21,0.15)',
+              background: 'rgba(59,130,246,0.06)',
+              border: '1px solid rgba(59,130,246,0.15)',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
@@ -409,6 +436,7 @@ interface ProjectDetail {
   cover_image: string | null
   images: string[]
   video_url: string[] | null
+  model_url: string | null
   is_published: boolean
   is_featured: boolean
 }

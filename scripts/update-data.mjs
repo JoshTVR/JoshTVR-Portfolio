@@ -27,11 +27,11 @@ const supabase = createClient(
 async function uploadVideo() {
   console.log('\n📹  Uploading Cells Animation videos...')
 
-  // [0] Realistic Cycles render — shown FIRST (top)
-  // [1] EEVEE microscope panel — shown SECOND
+  // [0] Realistic Cycles render (Cells-Animations.mp4, 23MB) — shown FIRST (top)
+  // [1] EEVEE microscope panel (Cells Animations.mp4, 17MB) — shown SECOND
   const FILES = [
-    { local: 'Cells Animations.mp4',  storage: 'cells-animation/cells-realistic.mp4' },
-    { local: 'Cells-Animations.mp4', storage: 'cells-animation/cells-eevee.mp4' },
+    { local: 'Cells-Animations.mp4', storage: 'cells-animation/cells-realistic.mp4' },
+    { local: 'Cells Animations.mp4',  storage: 'cells-animation/cells-eevee.mp4' },
   ]
 
   const videoUrls = []

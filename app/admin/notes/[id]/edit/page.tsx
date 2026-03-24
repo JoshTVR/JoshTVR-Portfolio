@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -7,7 +8,7 @@ interface PageProps { params: Promise<{ id: string }> }
 
 export const dynamic = 'force-dynamic'
 
-const labelStyle: React.CSSProperties = {
+const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.78rem',
   fontWeight: 700,
@@ -17,7 +18,7 @@ const labelStyle: React.CSSProperties = {
   marginBottom: '8px',
 }
 
-const inputStyle: React.CSSProperties = {
+const inputStyle: CSSProperties = {
   width: '100%',
   padding: '10px 14px',
   borderRadius: '8px',

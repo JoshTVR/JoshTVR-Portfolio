@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { createNote } from '../actions'
 
@@ -64,7 +65,7 @@ function NoteForm({ defaults }: { defaults?: { title?: string; body?: string; st
 
 export { NoteForm }
 
-const labelStyle: React.CSSProperties = {
+const labelStyle: CSSProperties = {
   display: 'block',
   fontSize: '0.78rem',
   fontWeight: 700,
@@ -74,7 +75,7 @@ const labelStyle: React.CSSProperties = {
   marginBottom: '8px',
 }
 
-const inputStyle: React.CSSProperties = {
+const inputStyle: CSSProperties = {
   width: '100%',
   padding: '10px 14px',
   borderRadius: '8px',

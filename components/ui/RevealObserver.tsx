@@ -33,12 +33,40 @@ export default function RevealObserver() {
     attach()
     const t1 = setTimeout(attach, 150)
     const t2 = setTimeout(attach, 500)
+    const t3 = setTimeout(attach, 1500)
 
-    // Re-reveal when theme changes
-    const mo = new MutationObserver(revealInView)
+    // Watch for .reveal elements added after async page loads (Suspense / streaming)
+    let debounce: ReturnType<typeof setTimeout>
+    const mo = new MutationObserver((mutations) => {
+      // Theme change → re-check visibility
+      if (mutations.some(m => m.type === 'attributes')) { revealInView(); return }
+
+      // DOM change → debounced attach (only if new .reveal elements exist)
+      const hasNewReveal = mutations.some(m =>
+        Array.from(m.addedNodes).some(n => {
+          if (!(n instanceof Element)) return false
+          return n.classList.contains('reveal') ||
+            n.classList.contains('reveal-stagger') ||
+            n.querySelector('.reveal, .reveal-stagger') !== null
+        })
+      )
+      if (hasNewReveal) {
+        clearTimeout(debounce)
+        debounce = setTimeout(attach, 60)
+      }
+    })
+
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    mo.observe(document.body, { childList: true, subtree: true })
 
-    return () => { io.disconnect(); mo.disconnect(); clearTimeout(t1); clearTimeout(t2) }
+    return () => {
+      io.disconnect()
+      mo.disconnect()
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
+      clearTimeout(debounce)
+    }
   }, [pathname])
 
   return null

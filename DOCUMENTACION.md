@@ -2072,3 +2072,1017 @@ export default withNextIntl(nextConfig)
 
 *Documentación generada para JoshTVR Portfolio — March 2026*
 *Stack: Next.js 14 + Supabase + Stripe + Three.js + Vercel*
+
+---
+
+## 20. ACTUALIZACIÓN: Rediseño Midnight — Sistema de Diseño Actual
+
+> ⚠️ **NOTA:** La sección 6 de este documento describe el sistema de diseño original (tema amarillo/negro). **Ese tema ya no existe.** El diseño actual es el tema "Midnight" — implementado en marzo de 2026. Esta sección documenta el estado REAL del sistema de diseño.
+
+### 20.1 ¿Por qué se rediseñó?
+
+El primer diseño usaba un fondo negro profundo (`#0a0a0a`) con acentos amarillos (`#facc15`). Si bien era llamativo, no comunicaba el perfil técnico/creativo de Joshua con suficiente sofisticación. El rediseño "Midnight" adopta una paleta **slate azul-pizarra + gradiente azul-violeta** que es más profesional y menos genérica.
+
+```
+ANTES (Direction B — ya no existe):
+  --bg-primary:  #0a0a0a    (negro)
+  --accent:      #facc15    (amarillo)
+
+AHORA (Midnight — actual):
+  --bg-primary:  #0f172a    (slate-900)
+  --accent:      #3b82f6    (blue-500)
+  --accent-2:    #8b5cf6    (violet-500)
+```
+
+### 20.2 Variables CSS actuales completas
+
+```css
+/* app/globals.css — Estado actual (Midnight theme) */
+
+:root {
+  /* ── Backgrounds (modo oscuro — default) ── */
+  --bg-primary:    #0f172a;    /* slate-900: fondo principal */
+  --bg-secondary:  #1e293b;    /* slate-800: fondo secundario */
+  --bg-card:       #1e293b;    /* fondo de tarjetas */
+  --bg-card-hover: #263350;    /* tarjetas al hacer hover */
+
+  /* ── Acentos: gradiente azul → violeta ── */
+  --accent:        #3b82f6;    /* blue-500: color principal */
+  --accent-2:      #8b5cf6;    /* violet-500: color secundario */
+  --accent-light:  #60a5fa;    /* blue-400: versión clara */
+  --accent-dark:   #2563eb;    /* blue-600: versión oscura */
+  --accent-glow:   rgba(59, 130, 246, 0.22);   /* resplandor azul */
+  --accent-glow-2: rgba(139, 92, 246, 0.18);   /* resplandor violeta */
+  --grad-accent:   linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+
+  /* ── Texto ── */
+  --text-primary:  #f1f5f9;    /* slate-100: texto principal */
+  --text-muted:    #94a3b8;    /* slate-400: texto secundario */
+  --text-dim:      #64748b;    /* slate-500: texto terciario */
+
+  /* ── Bordes ── */
+  --border-glass:  rgba(148, 163, 184, 0.1);
+  --border-hover:  rgba(59, 130, 246, 0.35);
+
+  /* ── Tipografía ── */
+  --font-body:     var(--font-inter), system-ui, sans-serif;
+  --font-heading:  var(--font-space-grotesk), system-ui, sans-serif;
+
+  /* ── Spacing ── */
+  --section-pad:   clamp(80px, 10vw, 140px);
+  --container-max: 1200px;
+
+  /* ── Transiciones ── */
+  --transition-fast: 150ms ease;
+  --transition-mid:  280ms ease;
+  --transition-slow: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Glassmorphism ── */
+  --glass-bg:     rgba(30, 41, 59, 0.6);
+  --glass-border: 1px solid rgba(148, 163, 184, 0.1);
+  --glass-blur:   blur(16px);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --radius:       14px;
+
+  /* ── Navbar ── */
+  --navbar-bg:     rgba(15, 23, 42, 0.9);
+  --hero-gradient: linear-gradient(135deg, #f1f5f9 20%, #3b82f6 60%, #8b5cf6 100%);
+}
+
+/* ── Modo claro (light mode) ── */
+[data-theme="light"] {
+  --bg-primary:    #c8d4e3;    /* azul-grisáceo suave */
+  --bg-secondary:  #bac8d9;
+  --bg-card:       #d4dce9;
+  --bg-card-hover: #b8c8db;
+
+  --accent:        #2563eb;    /* blue-600 (más oscuro para contraste en claro) */
+  --accent-2:      #7c3aed;    /* violet-600 */
+  --accent-light:  #3b82f6;
+  --accent-dark:   #1d4ed8;
+  --accent-glow:   rgba(37, 99, 235, 0.2);
+  --accent-glow-2: rgba(124, 58, 237, 0.15);
+
+  --text-primary:  #0f172a;    /* slate-900 en claro */
+  --text-muted:    #334155;    /* slate-700 */
+  --text-dim:      #64748b;
+
+  --border-glass:  rgba(15, 23, 42, 0.1);
+  --border-hover:  rgba(37, 99, 235, 0.3);
+
+  --glass-bg:     rgba(238, 242, 247, 0.85);
+  --glass-border: 1px solid rgba(15, 23, 42, 0.1);
+  --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+
+  --navbar-bg:     rgba(238, 242, 247, 0.95);
+  --hero-gradient: linear-gradient(135deg, #0f172a 20%, #2563eb 60%, #7c3aed 100%);
+}
+```
+
+### 20.3 Clases utilitarias del tema Midnight
+
+```css
+/* Estas clases están definidas en globals.css y se usan en toda la app */
+
+.glass {
+  background:    var(--glass-bg);
+  border:        var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  box-shadow:    var(--glass-shadow);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--grad-accent);
+  color: white;
+  border: none;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-glass);
+}
+
+.skill-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-light);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.container-site {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 clamp(16px, 5vw, 48px);
+}
+
+.section-eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+```
+
+### 20.4 RevealObserver — animaciones de entrada
+
+**Archivo:** `components/ui/RevealObserver.tsx`
+
+Este componente es cliente y usa `IntersectionObserver` para detectar cuando los elementos entran al viewport. Cuando un elemento con clase `reveal` entra a la pantalla, se le agrega la clase `visible` que activa la animación CSS.
+
+```tsx
+'use client'
+// Se monta una sola vez al cargar la app (en layout.tsx)
+// Usa MutationObserver para re-observar elementos nuevos cuando cambia la ruta
+
+useEffect(() => {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible')
+        io.unobserve(e.target)
+      }
+    })
+  }, { threshold: 0.08 })
+
+  // Observa elementos .reveal existentes y nuevos (mutaciones)
+  const observe = () => document.querySelectorAll('.reveal:not(.visible)').forEach(el => io.observe(el))
+  observe()
+
+  const mo = new MutationObserver(observe)
+  mo.observe(document.body, { childList: true, subtree: true })
+
+  return () => { io.disconnect(); mo.disconnect() }
+}, [])
+```
+
+```css
+/* En globals.css */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+```
+
+**¿Por qué usar MutationObserver además de IntersectionObserver?**
+
+En Next.js App Router, cuando navegas de página (ej: de `/projects/clubit-vr` de regreso a `/`), React no destruye y recrea el DOM completo — simplemente monta los nuevos componentes. Esto significa que los elementos `.reveal` nuevos no son observados por el `IntersectionObserver` inicial. El `MutationObserver` detecta cuando se agregan nodos nuevos al DOM y los observa inmediatamente.
+
+---
+
+## 21. ESQUEMA REAL DE BASE DE DATOS (Estado actual)
+
+> ⚠️ **NOTA:** La sección 10 de este documento tiene el esquema original. Las tablas han cambiado significativamente. Este esquema refleja el estado REAL actual.
+
+### 21.1 Tabla: `projects` (esquema actual)
+
+```sql
+CREATE TABLE projects (
+  id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  slug         text UNIQUE NOT NULL,           -- URL amigable: "clubit-vr"
+  title_en     text NOT NULL,
+  title_es     text NOT NULL,
+  description_en text,
+  description_es text,
+  content_en   text,                           -- HTML rico (TipTap) en inglés
+  content_es   text,                           -- HTML rico (TipTap) en español
+  category     text,                           -- 'vr','3d','data','design','github','video'
+  tech_tags    text[] DEFAULT '{}',            -- ['Unity','C#','Blender']
+  github_url   text,
+  demo_url     text,
+  model_url    text,                           -- URL de archivo .glb para visor 3D
+  cover_image  text,                           -- URL imagen portada
+  images       text[] DEFAULT '{}',            -- URLs galería de imágenes
+  video_url    text[] DEFAULT '{}',            -- URLs de videos (soporte multi-video)
+  is_published boolean NOT NULL DEFAULT false,
+  is_featured  boolean NOT NULL DEFAULT false,
+  sort_order   integer NOT NULL DEFAULT 0,
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now()
+);
+```
+
+**Cambios importantes respecto al esquema original:**
+- `image_url` → reemplazado por `cover_image` (una imagen) + `images[]` (galería)
+- `video_url` cambió de `TEXT` a `TEXT[]` para soportar múltiples videos
+- Se agregó `model_url TEXT` para el visor 3D interactivo
+- `tech_stack` → renombrado a `tech_tags`
+- `featured` / `published` → renombrado a `is_featured` / `is_published`
+- Se agregaron `content_en`, `content_es`, `sort_order`
+
+### 21.2 Tabla: `services`
+
+```sql
+CREATE TABLE services (
+  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title_en      text NOT NULL,
+  title_es      text NOT NULL,
+  description_en text,
+  description_es text,
+  price_usd     numeric,
+  delivery_days integer,
+  features_en   text[],
+  features_es   text[],
+  category      text,
+  is_active     boolean DEFAULT true,
+  sort_order    integer DEFAULT 0,
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+```
+
+**Los servicios actuales del portafolio:**
+| Servicio | Precio USD | Días entrega |
+|----------|-----------|--------------|
+| 3D Modeling | $80 | 7 días |
+| 3D Animation | $150 | 10 días |
+| VR Experience Prototype | $500 | 21 días |
+| Data Dashboard & Analysis | $150 | 7 días |
+| Custom Python Visualization | $80 | 5 días |
+| UI Design (Figma) | $100 | 5 días |
+
+### 21.3 Tabla: `experience` (esquema actual)
+
+```sql
+CREATE TABLE experience (
+  id             uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company        text NOT NULL,
+  role_en        text NOT NULL,
+  role_es        text NOT NULL,
+  description_en text,
+  description_es text,
+  tags           text[] DEFAULT '{}',    -- tecnologías/habilidades
+  start_date     date,
+  end_date       date,                   -- NULL = "present" (trabajo actual)
+  sort_order     integer DEFAULT 0,
+  created_at     timestamptz NOT NULL DEFAULT now()
+);
+```
+
+**Diferencias con el esquema original:**
+- `period TEXT` → reemplazado por `start_date DATE` + `end_date DATE` (más preciso)
+- `skills TEXT[]` → renombrado a `tags TEXT[]`
+
+**Entradas actuales:**
+
+| Empresa | Rol | Periodo |
+|---------|-----|---------|
+| Universidad Tecnológica de Zimapán | VR Developer — Internship | Ene 2024 – Jun 2024 |
+| Vortex Editorial / Plandi | Pixel Art Game Developer (Internship) | Ene 2026 – Present |
+| Roboarts Club | VR Game Developer (Internship) | Feb 24, 2026 – Mar 21, 2026 |
+
+### 21.4 Tabla: `certifications` (esquema actual)
+
+```sql
+CREATE TABLE certifications (
+  id         uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name_en    text NOT NULL,
+  name_es    text,
+  issuer     text NOT NULL,
+  year       integer,
+  sort_order integer DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+**Diferencias con el esquema original:**
+- `title` → renombrado a `name_en`
+- Se agregó `name_es` para el nombre en español
+- `date TEXT` → reemplazado por `year INTEGER`
+- `image_url` y `verify_url` → eliminados
+- Se agregó `sort_order`
+
+**Certificaciones actuales:**
+| Nombre | Emisor | Año |
+|--------|--------|-----|
+| Python Essentials 1 | Cisco Networking Academy / Python Institute (via UTT) | 2025 |
+
+### 21.5 Tabla: `inquiries` (esquema actual)
+
+```sql
+CREATE TABLE inquiries (
+  id         uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name       text NOT NULL,
+  email      text NOT NULL,
+  message    text,
+  budget     text,
+  status     text DEFAULT 'new',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+-- RLS DESACTIVADO: ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY;
+```
+
+**Cambios importantes:**
+- `metadata JSONB` → **eliminada** (causaba errores 500 en el API route)
+- Se agregó `budget TEXT` para el presupuesto del cliente
+- RLS desactivado para permitir inserts anónimos del formulario de contacto
+
+### 21.6 Tabla: `notes` (nueva — marzo 2026)
+
+```sql
+CREATE TABLE notes (
+  id         uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title      text NOT NULL,
+  body       text,                   -- Contenido en texto plano
+  status     text NOT NULL DEFAULT 'idea'
+             CHECK (status IN ('idea', 'planning', 'in-progress', 'done')),
+  tags       text[] DEFAULT '{}',
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE notes DISABLE ROW LEVEL SECURITY;
+```
+
+Esta tabla es exclusiva del admin — no tiene presencia pública. Se usa para planificación personal y seguimiento de ideas de negocio.
+
+### 21.7 Tabla: `products` (sin cambios significativos)
+
+```sql
+CREATE TABLE products (
+  id                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name              text NOT NULL,
+  description       text,
+  price_cents       integer NOT NULL,  -- 2500 = $25.00 USD
+  type              text DEFAULT 'digital',
+  image_url         text,
+  stock             integer DEFAULT -1,  -- -1 = ilimitado
+  active            boolean DEFAULT true,
+  stripe_product_id text,
+  stripe_price_id   text,
+  created_at        timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### 21.8 RLS — Estado actual
+
+```
+projects      → RLS activo    (anon puede leer publicados, admin usa service_role)
+services      → RLS activo
+products      → RLS activo
+orders        → RLS activo    (usuario solo ve sus propias órdenes)
+inquiries     → RLS DESACTIVADO (para permitir inserts del formulario de contacto)
+experience    → RLS activo
+certifications → RLS activo
+notes         → RLS DESACTIVADO (solo accesible desde admin con service_role)
+```
+
+---
+
+## 22. SISTEMA DE SCRIPTS DE DATOS
+
+Esta es una parte crucial del proyecto que no existía en la documentación original. En lugar de ingresar datos manualmente al admin, se usan scripts de Node.js que leen variables de entorno y operan directamente sobre Supabase con la `SUPABASE_SERVICE_ROLE_KEY`.
+
+### 22.1 Cómo ejecutar scripts
+
+```bash
+# Sintaxis general
+node --env-file=.env.local scripts/nombre-del-script.mjs
+
+# --env-file=.env.local  → carga las variables de entorno desde .env.local
+# scripts/               → directorio donde viven los scripts
+```
+
+### 22.2 `scripts/update-data.mjs`
+
+**Propósito:** Sube videos de la animación de células, actualiza proyectos de GitHub, y actualiza servicios.
+
+**Lo que hace:**
+1. **Videos de Cells Animation** — lee `_project-assets/cells-animation/` y sube dos archivos MP4 a Supabase Storage:
+   - `Cells Animations.mp4` (17MB, EEVEE) → `cells-animation/cells-eevee.mp4`
+   - `Cells-Animations.mp4` (23MB, Cycles realista) → `cells-animation/cells-realistic.mp4`
+   - Actualiza `video_url` del proyecto en BD como `[realistic_url, eevee_url]` (realista primero)
+
+2. **Proyectos de GitHub** — hace upsert de tres proyectos de repos:
+   - `business-intelligence`
+   - `matplotlib-zero-to-hero`
+   - `data-analytics-digital-business`
+
+3. **Servicios** — hace upsert de los 6 servicios con precios, días de entrega y características.
+
+```bash
+# Ejecutar:
+node --env-file=.env.local scripts/update-data.mjs
+```
+
+### 22.3 `scripts/add-content.mjs`
+
+**Propósito:** Agregar contenido inicial al portafolio (certificación, experiencias, proyectos nuevos).
+
+**Lo que hace:**
+1. **Certificación Python Essentials 1** — insert en tabla `certifications`
+2. **Experiencias de internship** — insert de Vortex/Plandi y Roboarts Club en tabla `experience`
+3. **Proyectos nuevos** — upsert de Clubit VR y Alien Mothership en tabla `projects`
+
+> ⚠️ **IMPORTANTE:** Este script usa `upsert` con `onConflict: 'slug'` para proyectos (evita duplicados), pero usa `insert` directo para certificaciones y experiencias. Si se ejecuta más de una vez, puede crear duplicados en esas tablas. Verificar antes de ejecutar.
+
+### 22.4 Patrón de los scripts
+
+Todos los scripts siguen el mismo patrón:
+
+```javascript
+import { createClient } from '@supabase/supabase-js'
+
+// 1. Crear cliente con service_role (bypasea RLS)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false } }
+)
+
+// 2. Verificar conexión
+const { error: pingError } = await supabase.from('projects').select('id').limit(1)
+if (pingError) { console.error('Conexión fallida'); process.exit(1) }
+
+// 3. Operaciones
+// Para subir archivos:
+const buffer = readFileSync('ruta/al/archivo.mp4')
+await supabase.storage.from('project-images').upload('carpeta/archivo.mp4', buffer, {
+  contentType: 'video/mp4',
+  upsert: true  // Sobreescribe si ya existe
+})
+
+// Para obtener URL pública:
+const { data: { publicUrl } } = supabase.storage
+  .from('project-images')
+  .getPublicUrl('carpeta/archivo.mp4')
+
+// Para actualizar BD:
+await supabase.from('projects').update({ video_url: [publicUrl] }).eq('slug', 'cells-animation')
+```
+
+### 22.5 Estructura de Supabase Storage
+
+```
+bucket: project-images/
+├── cells-animation/
+│   ├── cells-realistic.mp4    (video Cycles realista)
+│   └── cells-eevee.mp4        (video EEVEE)
+├── cubit-vr/
+│   ├── cover.png
+│   ├── gallery-01-piano-displays.png
+│   ├── gallery-02-polyrhythm-gameplay.png
+│   ├── gallery-03-unity-piano-scene.png
+│   ├── gallery-04-song-selection.png
+│   ├── gallery-05-unity-editor.png
+│   ├── gallery-06-poly-game-manager.png
+│   └── cubit-demo.mp4
+└── alien-mothership/
+    ├── cover.png              (Final-Render.jpg — el render más potente)
+    ├── gallery-01-ring-interior.png
+    ├── gallery-02-hull-spires.png
+    ├── gallery-03-concentric-rings.png
+    ├── gallery-04-curved-hull.png
+    └── gallery-05-clay-overview.png
+```
+
+**Nota sobre el bucket name:** El bucket se llama `project-images` aunque almacena también videos y modelos 3D.
+
+---
+
+## 23. VISOR 3D INTERACTIVO EN PÁGINAS DE PROYECTO
+
+### 23.1 El componente ModelViewer
+
+**Archivo:** `components/three/ModelViewer.tsx`
+
+```tsx
+'use client'  // Requiere cliente porque usa WebGL
+
+import { Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { useGLTF, OrbitControls, Environment, Center, Html } from '@react-three/drei'
+
+function Model({ url }: { url: string }) {
+  const { scene } = useGLTF(url)   // Carga el archivo .glb
+  // Activa sombras en todas las mallas del modelo
+  scene.traverse(child => {
+    if (child.isMesh) { child.castShadow = true; child.receiveShadow = true }
+  })
+  return <Center><primitive object={scene} dispose={null} /></Center>
+}
+
+export function ModelViewer({ url, height = 420, autoRotate = true }) {
+  return (
+    <Canvas camera={{ position: [0, 0, 4], fov: 50 }} shadows dpr={[1, 2]}>
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[5, 8, 5]} intensity={1.5} castShadow />
+      <pointLight position={[-5, 4, 4]} intensity={0.6} color="#8b5cf6" />  {/* Violeta Midnight */}
+
+      <Suspense fallback={<Html center>Cargando modelo...</Html>}>
+        <Model url={url} />
+        <Environment preset="city" />  {/* Iluminación ambiental */}
+      </Suspense>
+
+      <OrbitControls
+        autoRotate={autoRotate}
+        autoRotateSpeed={2.5}
+        enableZoom
+        enablePan={false}
+        minDistance={1.5}
+        maxDistance={10}
+      />
+    </Canvas>
+  )
+}
+```
+
+### 23.2 Integración en la página de proyecto
+
+**Archivo:** `app/[locale]/projects/[slug]/page.tsx`
+
+El ModelViewer se carga con `dynamic import` para evitar errores de SSR (Three.js requiere el navegador para acceder a WebGL):
+
+```tsx
+import dynamic from 'next/dynamic'
+
+// SSR: false — No renderizar en el servidor (WebGL no existe allí)
+const ModelViewer = dynamic(
+  () => import('@/components/three/ModelViewer').then(m => m.ModelViewer),
+  { ssr: false }
+)
+
+// En el JSX, aparece automáticamente si el proyecto tiene model_url:
+{project.model_url && (
+  <div>
+    <h2>Interactive 3D Model</h2>
+    <ModelViewer url={project.model_url} height={480} autoRotate />
+    <p>Drag to rotate · Scroll to zoom</p>
+  </div>
+)}
+```
+
+### 23.3 Formato del archivo 3D
+
+El ModelViewer acepta archivos **GLB** (binary glTF). El GLB es el formato estándar para modelos 3D en la web porque:
+- Es binario (más compacto que GLTF JSON)
+- Embebe texturas dentro del mismo archivo
+- Compatible con Three.js directamente
+
+**Limitaciones de tamaño:**
+- Supabase Storage: máximo 50MB por archivo (plan gratuito)
+- El modelo Alien Mothership original (1.4M triángulos) pesa 104MB — excede el límite
+- Solución: decimarlo en Blender con Decimate modifier (ratio ~0.05) + exportar con compresión Draco
+
+**Cómo exportar desde Blender:**
+```
+File → Export → glTF 2.0 (.glb/.gltf)
+Opciones:
+  ✓ Draco mesh compression  ← Reduce el tamaño drásticamente
+  ✓ Apply modifiers
+Guardar como: Alien-Mothership-optimized.glb
+```
+
+---
+
+## 24. PANEL ADMIN — MÓDULO NOTAS Y PLANES
+
+### 24.1 ¿Qué es y para qué sirve?
+
+El módulo **Notes & Plans** es una sección privada del admin para que Joshua pueda documentar, planificar y dar seguimiento a ideas de negocio, estrategias de contenido, y cualquier concepto que quiera desarrollar. No tiene presencia pública.
+
+**Acceso:** `/admin/notes`
+
+### 24.2 Estructura de archivos
+
+```
+app/admin/notes/
+├── page.tsx              ← Lista de todas las notas
+├── actions.ts            ← Server Actions (crear, actualizar, eliminar)
+├── NoteRowActions.tsx    ← Botón de eliminar (cliente)
+├── new/
+│   └── page.tsx          ← Formulario para crear nota nueva
+└── [id]/edit/
+    └── page.tsx          ← Formulario para editar nota existente
+```
+
+### 24.3 Los estados de una nota
+
+```
+💡 idea          → Idea inicial, sin desarrollar
+📋 planning      → En proceso de planificación
+🚀 in-progress   → Siendo ejecutada activamente
+✅ done          → Completada
+```
+
+### 24.4 Server Actions del módulo
+
+```tsx
+// app/admin/notes/actions.ts
+'use server'
+
+export async function createNote(formData: FormData) {
+  // Extrae: title, body, status, tags (comma-separated → array)
+  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean)
+  await supabase.from('notes').insert({ title, body, status, tags })
+  revalidatePath('/admin/notes')
+  redirect('/admin/notes')
+}
+
+export async function updateNote(id: string, formData: FormData) {
+  await supabase.from('notes').update({
+    title, body, status, tags,
+    updated_at: new Date().toISOString()
+  }).eq('id', id)
+  redirect('/admin/notes')
+}
+
+export async function deleteNote(id: string) {
+  await supabase.from('notes').delete().eq('id', id)
+  revalidatePath('/admin/notes')
+}
+```
+
+---
+
+## 25. MAPA COMPLETO DE RUTAS DEL PROYECTO
+
+### 25.1 Rutas públicas
+
+```
+Dominio base: joshtvr.com (en producción) | localhost:3000 (en desarrollo)
+
+/                          → Redirige a /{locale} según el navegador
+/{locale}                  → Página de inicio (all-in-one: Hero, About, Skills,
+                             Projects, Experience, GitHub Stats, Certifications,
+                             Testimonials, Contact)
+  Ejemplo: /es, /en
+
+/{locale}/projects/{slug}  → Página de detalle de proyecto
+  Ejemplos:
+    /es/projects/clubit-vr
+    /es/projects/alien-mothership
+    /es/projects/cells-animation
+    /es/projects/torturama
+    /es/projects/business-intelligence
+    /es/projects/matplotlib-zero-to-hero
+    /es/projects/data-analytics-digital-business
+    /es/projects/steam-train
+    /es/projects/filtration-process-animation
+    /es/projects/zgen-freasky
+    /es/projects/tie-fighter
+    /es/projects/mr-meeseek
+    /es/projects/cartoon-bread
+
+/{locale}/services          → Página de servicios con formulario de contacto
+/{locale}/services/track/{id} → Seguimiento de servicio contratado
+/{locale}/store             → Tienda de productos digitales
+/{locale}/store/success     → Página de confirmación de compra
+/{locale}/orders            → Historial de órdenes del usuario (requiere auth)
+
+/og                         → Generación de imagen OG (Open Graph)
+                              (excluido del i18n middleware para evitar /es/og 404)
+```
+
+### 25.2 Rutas de API
+
+```
+POST /api/inquiries                → Guarda mensaje del formulario de contacto
+GET  /api/auth/callback            → Callback OAuth para el ADMIN (GitHub → JoshTVR)
+GET  /api/auth/user-callback       → Callback OAuth para USUARIOS normales
+POST /api/stripe/checkout          → Inicia sesión de pago en Stripe
+POST /api/stripe/webhook           → Recibe confirmación de pago de Stripe
+GET  /api/github/stats             → Estadísticas de GitHub (con caché)
+```
+
+### 25.3 Rutas del admin (requieren autenticación como JoshTVR)
+
+```
+/admin                         → Dashboard (stats + inquiries recientes)
+/admin/login                   → Login con GitHub OAuth
+
+/admin/projects                → Lista de todos los proyectos
+/admin/projects/new            → Crear proyecto nuevo
+/admin/projects/{id}/edit      → Editar proyecto existente
+
+/admin/services                → Lista de servicios
+/admin/services/new            → Crear servicio nuevo
+/admin/services/{id}/edit      → Editar servicio existente
+
+/admin/store                   → Lista de productos de la tienda
+/admin/store/new               → Crear producto nuevo
+/admin/store/{id}/edit         → Editar producto existente
+
+/admin/orders                  → Lista de órdenes de clientes
+/admin/inquiries               → Lista de consultas del formulario de contacto
+
+/admin/notes                   → Lista de notas y planes personales
+/admin/notes/new               → Crear nota nueva
+/admin/notes/{id}/edit         → Editar nota existente
+
+/admin/settings                → Configuración global del sitio
+```
+
+### 25.4 Cómo funciona el middleware (guardián de rutas)
+
+**Archivo:** `middleware.ts`
+
+El middleware se ejecuta en CADA petición HTTP antes de que llegue a la página. Hace tres cosas:
+
+```
+Petición entrante
+        │
+        ▼
+¿La ruta está en la lista de exclusiones?
+  (/_next/*, /api/*, /og, /favicon.ico, /imgs/*)
+        │
+   SÍ ─┼─ Pasa directamente (sin tocar)
+        │
+   NO ──┼──▶ ¿Empieza con /admin?
+              │
+         NO ──┼──▶ Aplica middleware de i18n (agrega /es o /en al path)
+              │
+         SÍ ──┼──▶ ¿Es exactamente /admin/login?
+                   │
+              SÍ ──┼──▶ Pasa (no requiere auth)
+                   │
+              NO ──┼──▶ Verifica sesión en Supabase
+                         │
+                    Sin sesión ──▶ Redirige a /admin/login
+                         │
+                    Con sesión ──▶ Verifica username === "JoshTVR"
+                                   │
+                              No match ──▶ Redirige a /?error=unauthorized
+                                   │
+                              Match ──▶ Acceso permitido ✅
+```
+
+---
+
+## 26. TIMELINE DE CAMBIOS (Historia del proyecto)
+
+Esta sección documenta cronológicamente todos los cambios significativos realizados al proyecto. Es especialmente útil para entender cómo evolucionó el sistema y qué decisiones se tomaron en cada momento.
+
+---
+
+### Fase 0 — Configuración inicial (Antes de enero 2026)
+- Creación del proyecto Next.js 14 con App Router + TypeScript + Tailwind
+- Configuración de Supabase (PostgreSQL + Auth + Storage)
+- Integración de Stripe para pagos
+- Sistema de autenticación dual (admin vía GitHub OAuth, usuarios vía email/Google/GitHub)
+- Three.js + @react-three/fiber para gráficos 3D
+- next-intl para internacionalización EN/ES
+- Deploy inicial en Vercel
+
+---
+
+### Fase 1 — Primer diseño: Direction B (Enero–Febrero 2026)
+
+**Commit:** `feat: Direction B redesign — developer portfolio premium aesthetic`
+
+Primer diseño completo. Tema oscuro con fondo negro profundo (`#0a0a0a`) y acentos amarillos (`#facc15`).
+
+**Componentes creados:**
+- HeroSection con canvas 3D orbital (HeroCanvas.tsx)
+- AboutSection, SkillsSection, ProjectsSection
+- ExperienceSection, CertificationsSection, TestimonialsSection
+- ContactSection con formulario funcional
+- Navbar con toggle de idioma y modo claro/oscuro
+
+---
+
+### Fase 2 — Rediseño completo: Tema Midnight (Febrero–Marzo 2026)
+
+**Commit:** `redesign: Midnight theme — slate/blue-violet palette, orb hero, editorial sections`
+
+El usuario solicitó un rediseño total desde cero. Nuevo sistema de colores:
+- Fondo: `#0f172a` (slate-900)
+- Acento primario: `#3b82f6` (blue-500)
+- Acento secundario: `#8b5cf6` (violet-500)
+
+**Cambios técnicos:**
+- Reescritura completa de `app/globals.css` con nuevo sistema de variables CSS
+- Nuevo HeroSection con efecto de orbes flotantes y typewriter animado
+- HeroCanvas simplificado (partículas flotantes en lugar de orbital)
+- Sections rediseñadas con nueva tipografía (Space Grotesk + Inter)
+
+---
+
+### Fase 3 — Corrección de bugs críticos (Marzo 2026)
+
+**Bug 1: Light mode**
+`Commit: fix: reveal on theme change, Spanish typewriter, softer light mode background`
+
+El modo claro tenía fondo `#fafaf0` (crema) que contrastaba brutalmente con el tema oscuro.
+- Solución: cambiar a `#dce4ef` → posteriormente a `#c8d4e3` (azul-grisáceo)
+- También se corrigió el typewriter para leer palabras desde `messages/es.json`
+
+**Bug 2: Secciones con opacity:0 permanente**
+`Commits: fix: global RevealObserver + softer light mode background`
+`fix: RevealObserver re-runs on route change, fixing blank sections after navigation`
+
+Las secciones tenían clase `reveal` (opacity:0) pero el IntersectionObserver no las detectaba tras la navegación entre rutas.
+- Solución: crear `RevealObserver.tsx` como Client Component global montado en `layout.tsx`
+- Agregar `MutationObserver` para re-observar elementos nuevos cuando cambia el DOM tras navegación
+
+**Bug 3: OG Image 404**
+`Commits: feat: update OG image to Midnight theme, fix metadata URL`
+`fix: exclude /og route from i18n middleware, disable inquiries RLS`
+
+La ruta `/og` generaba 404 porque el middleware de i18n la convertía a `/es/og` o `/en/og`.
+- Solución: agregar `/og` a la lista de exclusiones del matcher del middleware
+
+**Bug 4: Formulario de contacto "Failed to save inquiry"**
+`Commit: fix: remove metadata field from inquiries insert (column doesn't exist)`
+`fix: use server client for inquiries API instead of admin client`
+`Supabase SQL: ALTER TABLE inquiries DISABLE ROW LEVEL SECURITY`
+
+Dos causas simultáneas:
+1. RLS bloqueaba inserts anónimos → Solución: `DISABLE ROW LEVEL SECURITY` en tabla `inquiries`
+2. El API route intentaba insertar campo `metadata` que no existe en la tabla → Solución: eliminar `metadata` del `.insert()`
+
+---
+
+### Fase 4 — Contenido y base de datos (Marzo 2026)
+
+**Migración de video_url a TEXT[]**
+
+El proyecto cells-animation necesitaba dos videos. La columna era `TEXT`, se migró a `TEXT[]`:
+```sql
+ALTER TABLE projects ALTER COLUMN video_url TYPE TEXT[]
+USING CASE WHEN video_url IS NULL THEN NULL ELSE ARRAY[video_url] END;
+```
+
+**Corrección de mapeo de videos**
+
+Los dos videos de células estaban con etiquetas invertidas:
+- `Cells Animations.mp4` (17MB) → es EEVEE (más ligero, menos detallado)
+- `Cells-Animations.mp4` (23MB) → es Cycles realista (más pesado, más detallado)
+
+El script `update-data.mjs` los tenía al revés. Se corrigió para que el realista aparezca primero.
+
+**Adición de columna `delivery_days` y `features_en` en `services`**
+```sql
+ALTER TABLE services ADD COLUMN IF NOT EXISTS delivery_days INTEGER;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS features_en TEXT[];
+```
+
+**Actualización de años de proyectos**
+
+Se verificó mediante la API de GitHub que los repos de Business Intelligence, Matplotlib y Data Analytics fueron creados en 2025. Torturama y Clubit son proyectos de 2026.
+
+---
+
+### Fase 5 — Nuevos proyectos y contenido (Marzo 2026)
+
+**Clubit VR (cubit-vr)**
+
+Proyecto de internship en Roboarts Club. Juego VR de polirritmo standalone para Meta Quest 3S.
+
+Detalles técnicos:
+- Motor: Unity 6 (URP), XR Interaction Toolkit 3.4.0
+- Lenguaje: C#
+- Piano 3D interactivo de 88 teclas (modelo Blender, teclas nombradas WhiteKey_X/BlackKey_X)
+- Motor de polirritmo: 4 patrones simultáneos (triángulo/3, cuadrado/4, pentágono/5, hexágono/6) dibujados en Texture2D
+- Modos: FreePlay (15-30s) y SongPlay (20 canciones en JSON en StreamingAssets/Songs/)
+- Integración n8n webhook para captura de sesiones
+- Deploy: SideQuest + ADB a Meta Quest 3S
+
+Imágenes subidas a Supabase Storage. Video demo de 39MB subido.
+
+**Alien Mothership**
+
+Modelo 3D hard-surface original creado en Blender. 1,413,366 triángulos (sin texturas).
+- GLB original: 104MB (demasiado para web, pendiente optimización)
+- Renders finales subidos: Final-Render.jpg como portada, 5 vistas adicionales
+- Estado: publicado
+- Visor 3D: pendiente de GLB optimizado
+
+**Python Essentials 1 (certificación)**
+
+Emitida por Cisco Networking Academy / Python Institute (vía UTT). Completada el 2 de septiembre de 2025.
+
+**Experiencias de internship**
+
+1. Vortex Editorial / Plandi — Pixel Art Game Developer (Ene 2026 – presente)
+   - Proyecto: Torturama (videojuego voxel en desarrollo)
+
+2. Roboarts Club — VR Game Developer (Feb 24 – Mar 21, 2026)
+   - Proyecto: Clubit VR
+
+---
+
+### Fase 6 — Admin Notes & Plans + mejoras (Marzo 2026)
+
+**Módulo de Notas y Planes**
+
+Nueva sección del admin para planificación personal. Permite crear, editar y eliminar notas con:
+- Título, contenido (texto plano), estado y tags
+- Estados: idea → planning → in-progress → done
+- Primera nota creada: Plan de Marca Personal (estrategia de cursos y contenido)
+
+**Visor 3D integrado en páginas de proyecto**
+
+`model_url TEXT` agregado a la tabla `projects`:
+```sql
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS model_url TEXT;
+```
+
+`ModelViewer` integrado en `app/[locale]/projects/[slug]/page.tsx` con `dynamic import` (ssr: false). Aparece automáticamente cuando el proyecto tiene `model_url`.
+
+**Corrección del nombre "Clubit"**
+
+El nombre correcto del proyecto VR es **Clubit**, no "Cubit". Se corrigió en:
+- Tabla `projects` (title_en, title_es, description_en, description_es)
+- Tabla `experience` (description_en, description_es de la entrada Roboarts Club)
+- Script `scripts/add-content.mjs`
+
+**Corrección de duplicado en certificaciones**
+
+El script `add-content.mjs` se ejecutó dos veces, creando dos entradas de "Python Essentials 1". Se eliminó el duplicado y se corrigió el nombre en español a "Fundamentos de Python 1".
+
+**Corrección de fechas de experiencia**
+
+- Roboarts Club / Clubit: `2026-02-24` → `2026-03-21`
+- Vortex Editorial / Plandi (Torturama): `2026-01-01` → presente (end_date = NULL)
+
+---
+
+## 27. GLOSARIO ADICIONAL
+
+| Término | Definición en contexto del proyecto |
+|---------|-------------------------------------|
+| **GLB** | Binary glTF — formato estándar para modelos 3D en web. Embebe geometría + texturas en un solo archivo binario |
+| **Draco** | Algoritmo de compresión para mallas 3D. Reduce el tamaño de GLBs entre 60-90% sin pérdida visual notable |
+| **Decimate** | Modificador de Blender que reduce el número de polígonos de un modelo. Ratio 0.05 = 5% de los triángulos originales |
+| **URP** | Universal Render Pipeline de Unity. Pipeline de renderizado moderno, optimizado para VR y móvil |
+| **XR Interaction Toolkit** | Paquete de Unity para VR/AR. Maneja controllers, ray casting, grab/poke interactions |
+| **Polyrhythm** | Superposición de múltiples ritmos simultáneos con diferentes divisiones (ej: 3 contra 4 contra 5) |
+| **n8n** | Plataforma de automatización de flujos (como Zapier). Recibe webhooks y ejecuta acciones |
+| **SideQuest** | Tienda alternativa para Meta Quest. Permite instalar APKs sin pasar por la Meta Store |
+| **ADB** | Android Debug Bridge. Herramienta de línea de comandos para comunicarse con dispositivos Android (y Quest) |
+| **MutationObserver** | API del navegador que detecta cambios en el DOM (agregar/quitar nodos) |
+| **IntersectionObserver** | API del navegador que detecta cuando un elemento entra o sale del viewport |
+| **upsert** | Operación de BD: inserta si no existe, actualiza si ya existe (INSERT OR UPDATE) |
+| **service_role_key** | Llave maestra de Supabase que bypasea todas las políticas RLS. Solo usar en el servidor |
+| **revalidatePath** | Función de Next.js que invalida el caché de una ruta, forzando que se regenere |
+| **dynamic import** | Importación lazy en JavaScript. Con `{ ssr: false }` evita que un módulo se ejecute en el servidor |
+| **OG Image** | Open Graph image — la imagen que aparece cuando compartes un link en redes sociales |
+| **Slug** | Versión URL-friendly de un nombre: "Alien Mothership" → "alien-mothership" |
+
+---
+
+*Documentación actualizada — Marzo 2026. Secciones 1–19 reflejan el estado inicial del proyecto. Secciones 20–27 documentan el estado actual y todos los cambios realizados.*

@@ -3059,6 +3059,22 @@ El script `add-content.mjs` se ejecutó dos veces, creando dos entradas de "Pyth
 - Roboarts Club / Clubit: `2026-02-24` → `2026-03-21`
 - Vortex Editorial / Plandi (Torturama): `2026-01-01` → presente (end_date = NULL)
 
+**Errores de producción y sus causas raíz (Marzo 2026)**
+
+Los siguientes bugs impidieron el deploy durante varios commits consecutivos (ccca7a1 → 40687c3). Se documentan para referencia futura:
+
+| # | Commit donde apareció | Error | Causa raíz | Solución |
+|---|---|---|---|---|
+| 1 | 40687c3 | Build error: `Type does not satisfy constraint { [x: string]: never }` en `/admin/notes/new` | `NoteForm` exportado como named export desde un archivo `page.tsx` — Next.js solo permite `default` en páginas | Mover `NoteForm` a `app/admin/notes/NoteForm.tsx` separado |
+| 2 | Anterior a ccca7a1 | Application error (digest: 2438100093) al entrar a `/admin/projects` | `onMouseEnter`/`onMouseLeave` en un Server Component — React no puede serializar funciones en componentes de servidor | Reemplazar handlers por clase CSS `.admin-table-row:hover` |
+| 3 | 40687c3 | TypeScript: `React.CSSProperties` usado sin importar React | Archivos `notes/new/page.tsx` y `notes/[id]/edit/page.tsx` referenciaban el namespace `React` sin importarlo | Cambiar a `import type { CSSProperties } from 'react'` y usar `CSSProperties` directamente |
+| 4 | Múltiples commits | Secciones del portfolio invisibles al regresar desde admin | `RevealObserver` corre su `useEffect` antes de que los elementos `.reveal` estén en el DOM (la página pública pasa por Suspense mientras carga) | Agregar `MutationObserver` en `document.body` que detecta cuando se agregan elementos `.reveal` y los observa con debounce de 60ms |
+
+**Regla derivada de estos bugs:**
+- Nunca poner event handlers (`onClick`, `onMouseEnter`, etc.) en Server Components — usar clases CSS o extraer a un Client Component separado
+- Nunca exportar componentes con nombre desde archivos `page.tsx` en Next.js App Router
+- Siempre correr `npm run build` localmente antes de hacer push
+
 ---
 
 ## 27. GLOSARIO ADICIONAL

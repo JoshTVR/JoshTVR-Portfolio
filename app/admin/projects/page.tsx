@@ -83,8 +83,7 @@ export default async function AdminProjectsPage() {
                 alignItems: 'center',
                 transition: 'background 150ms ease',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+              className="admin-table-row"
             >
               <div>
                 <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '2px' }}>

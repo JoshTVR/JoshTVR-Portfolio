@@ -3059,6 +3059,17 @@ El script `add-content.mjs` se ejecutó dos veces, creando dos entradas de "Pyth
 - Roboarts Club / Clubit: `2026-02-24` → `2026-03-21`
 - Vortex Editorial / Plandi (Torturama): `2026-01-01` → presente (end_date = NULL)
 
+**Página pública de servicios — conectada a DB y agrupada por categoría**
+
+`app/[locale]/services/page.tsx` convertido a Server Component. Ya no usa un array estático hardcodeado — lee directamente de Supabase y agrupa los servicios por `category`. Arquitectura:
+
+- `page.tsx` (Server): fetch a Supabase → agrupa por `category` → pasa `groups` + `groupOrder` a `ServicesClient`
+- `ServicesClient.tsx` (Client): recibe los datos, renderiza secciones por categoría, gestiona el formulario multi-step de propuesta
+
+Para crear sub-servicios/variantes (ej: "Modelado Realista" y "Low Poly Game Art"): crear dos servicios en `/admin/services` con la misma `category` (ej: `3d-art`). Aparecerán agrupados bajo la misma sección en el sitio público con heading "3D Art & Modeling".
+
+Sin cambios de schema — se aprovecha el campo `category` existente.
+
 **Errores de producción y sus causas raíz (Marzo 2026)**
 
 Los siguientes bugs impidieron el deploy durante varios commits consecutivos (ccca7a1 → 40687c3). Se documentan para referencia futura:

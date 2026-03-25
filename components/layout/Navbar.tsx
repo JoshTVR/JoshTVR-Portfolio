@@ -109,6 +109,11 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
         <div className="flex items-center gap-3 flex-shrink-0">
           <ThemeToggle />
           <LanguageToggle />
+          {hasUser && (
+            <a href="/admin" className="btn btn-ghost" style={{ padding: '8px 14px', fontSize: '0.82rem' }}>
+              Admin
+            </a>
+          )}
           {hasUser
             ? <UserMenu />
             : (
@@ -150,6 +155,11 @@ export function Navbar({ storeVisible = false }: NavbarProps) {
           {storeVisible && (
             <a href={`/${locale}/store`} onClick={closeMenu} className="block py-3 px-4 rounded-lg text-[0.9rem] font-medium transition-colors hover:bg-white/5" style={{ color: 'var(--text-muted)' }}>
               {t('store')}
+            </a>
+          )}
+          {hasUser && (
+            <a href="/admin" onClick={closeMenu} className="block py-3 px-4 rounded-lg text-[0.9rem] font-medium transition-colors hover:bg-white/5" style={{ color: 'var(--accent)' }}>
+              Admin Panel
             </a>
           )}
         </div>

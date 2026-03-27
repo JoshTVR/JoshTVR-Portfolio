@@ -156,6 +156,63 @@ export async function fetchGitHubStats(username: string): Promise<GitHubStats> {
   }
 }
 
+// ---- Public repos (REST) ----
+
+export interface GitHubRepo {
+  name:        string
+  description: string | null
+  url:         string
+  homepage:    string | null
+  language:    string | null
+  languageColor: string | null
+  stars:       number
+  topics:      string[]
+  pushedAt:    string
+}
+
+interface RestRepo {
+  name:         string
+  description:  string | null
+  html_url:     string
+  homepage:     string | null
+  language:     string | null
+  stargazers_count: number
+  topics:       string[]
+  pushed_at:    string
+  fork:         boolean
+  archived:     boolean
+}
+
+// Language → approximate color (GitHub colors subset)
+const LANG_COLORS: Record<string, string> = {
+  TypeScript: '#3178c6', JavaScript: '#f1e05a', Python: '#3572A5',
+  'C#': '#178600', HTML: '#e34c26', CSS: '#563d7c', Rust: '#dea584',
+  Go: '#00ADD8', Java: '#b07219', Kotlin: '#A97BFF',
+}
+
+export async function fetchPublicRepos(username: string): Promise<GitHubRepo[]> {
+  const res = await fetch(
+    `${GH_REST}/users/${username}/repos?type=owner&sort=pushed&per_page=20`,
+    { headers: authHeaders(), cache: 'no-store' }
+  )
+  if (!res.ok) throw new Error(`GitHub repos HTTP ${res.status}`)
+  const raw = (await res.json()) as RestRepo[]
+  return raw
+    .filter(r => !r.fork && !r.archived)
+    .slice(0, 12)
+    .map(r => ({
+      name:          r.name,
+      description:   r.description,
+      url:           r.html_url,
+      homepage:      r.homepage || null,
+      language:      r.language,
+      languageColor: r.language ? (LANG_COLORS[r.language] ?? '#7c3aed') : null,
+      stars:         r.stargazers_count,
+      topics:        r.topics ?? [],
+      pushedAt:      r.pushed_at,
+    }))
+}
+
 // ---- GQL type helpers ----
 interface GQLUser {
   followers: { totalCount: number }

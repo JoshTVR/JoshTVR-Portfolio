@@ -42,7 +42,7 @@ export default async function LocaleLayout({
       <RevealObserver />
       <Navbar storeVisible={storeVisible} />
       <main>{children}</main>
-      <Footer />
+      <Footer locale={locale} />
     </NextIntlClientProvider>
   )
 }

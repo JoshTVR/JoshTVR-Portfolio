@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Joshua Hernandez — Científico de Datos</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --accent: #d97706; --accent2: #b45309; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --bg: #ffffff; }
+  html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 10.5px; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 794px; min-height: 1123px; margin: 0 auto; padding: 40px 48px 36px; display: flex; flex-direction: column; gap: 18px; }
+  .header { border-bottom: 2px solid var(--accent); padding-bottom: 14px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-end; }
+  .name { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .role-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: #fef3c7; padding: 3px 10px; border-radius: 20px; }
+  .contact { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; font-size: 9.5px; color: var(--muted); }
+  .contact a { color: var(--muted); text-decoration: none; }
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-title { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .entry { display: flex; flex-direction: column; gap: 3px; }
+  .entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .entry-title { font-size: 11px; font-weight: 700; color: var(--text); }
+  .entry-company { font-size: 10.5px; font-weight: 500; color: var(--accent2); }
+  .entry-date { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  .entry ul { padding-left: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .entry li { font-size: 10px; color: #374151; line-height: 1.55; }
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .skill { font-size: 9.5px; font-weight: 500; padding: 3px 9px; border-radius: 4px; background: #f3f4f6; color: #374151; border: 1px solid var(--border); }
+  .skill.highlight { background: #fef3c7; color: var(--accent2); border-color: #fcd34d; }
+  .project { display: flex; gap: 6px; align-items: baseline; }
+  .project-name { font-size: 10.5px; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .project-desc { font-size: 10px; color: var(--muted); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .edu-title { font-size: 10.5px; font-weight: 700; color: var(--text); }
+  .edu-sub { font-size: 10px; color: var(--muted); }
+  .langs { display: flex; gap: 24px; }
+  .lang { font-size: 10px; }
+  .lang strong { color: var(--text); font-weight: 700; }
+  .lang span { color: var(--muted); }
+  @media print { html, body { font-size: 10.5px; } .page { padding: 32px 44px; margin: 0; width: 100%; min-height: unset; } a { color: inherit !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div class="header-top">
+      <h1 class="name">Joshua Hernandez</h1>
+      <span class="role-tag">Científico de Datos</span>
+    </div>
+    <div class="contact">
+      <span>Tula de Allende, Hidalgo, México</span>
+      <span>773 111 0361</span>
+      <a href="mailto:joshtvr4@gmail.com">joshtvr4@gmail.com</a>
+      <a href="https://joshtvr.com">joshtvr.com</a>
+      <a href="https://github.com/JoshTVR">github.com/JoshTVR</a>
+      <a href="https://linkedin.com/in/joshtvr">linkedin.com/in/joshtvr</a>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2 class="section-title">Habilidades</h2>
+    <div class="skills-grid">
+      <span class="skill highlight">Python</span>
+      <span class="skill highlight">TensorFlow</span>
+      <span class="skill highlight">Pandas</span>
+      <span class="skill highlight">NumPy</span>
+      <span class="skill highlight">Scikit-Learn</span>
+      <span class="skill highlight">Matplotlib</span>
+      <span class="skill">Seaborn</span>
+      <span class="skill">Jupyter</span>
+      <span class="skill">SQL Server</span>
+      <span class="skill">Power BI</span>
+      <span class="skill">SSIS</span>
+      <span class="skill">Docker</span>
+      <span class="skill">Git</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Experiencia</h2>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">Ingeniero de Datos y Business Intelligence</div><div class="entry-company">Proyectos Académicos e Independientes</div></div>
+        <span class="entry-date">2023 – Presente</span>
+      </div>
+      <ul>
+        <li>Diseñé e implementé un pipeline de Business Intelligence con metodología Kimball de modelado dimensional usando SQL Server y SSIS.</li>
+        <li>Construí dashboards interactivos en Power BI para visualización de datos y soporte a la toma de decisiones.</li>
+        <li>Desarrollé modelos de ML con TensorFlow, Scikit-Learn y Pandas para tareas de clasificación y regresión.</li>
+        <li>Autor de <em>Matplotlib Zero to Hero</em>, currículum de visualización de datos bilingüe (EN/ES) de código abierto publicado en GitHub.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">Desarrollador de Videojuego y Contribuidor Técnico</div><div class="entry-company">Vortex Editorial / Plandi — Torturama</div></div>
+        <span class="entry-date">Ene 2026 – Presente</span>
+      </div>
+      <ul>
+        <li>Scripting y lógica de juego en Unity con C# junto con producción 3D del proyecto.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">Estancia</div><div class="entry-company">Universidad Tecnológica de Zimapán (UTZ)</div></div>
+        <span class="entry-date">2024</span>
+      </div>
+      <ul>
+        <li>Contribuí a una simulación de capacitación basada en VR que redujo el tiempo de onboarding en un 30%.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Proyectos</h2>
+    <div class="project"><span class="project-name">Pipeline de Business Intelligence —</span><span class="project-desc">Pipeline ETL con modelado dimensional Kimball, SQL Server + SSIS + Power BI. Arquitectura completa de data warehouse.</span></div>
+    <div class="project"><span class="project-name">Matplotlib Zero to Hero —</span><span class="project-desc">Curso de visualización de datos bilingüe (EN/ES) de código abierto. Cubre 20+ tipos de gráficas con datasets reales. github.com/JoshTVR</span></div>
+    <div class="project"><span class="project-name">Analítica de Datos para Negocios Digitales —</span><span class="project-desc">Analítica aplicada: EDA, modelado predictivo y segmentación con Python, Pandas y Scikit-Learn.</span></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Educación y Certificaciones</h2>
+    <div class="two-col">
+      <div><div class="edu-title">Ing. Entornos Virtuales y Negocios Digitales</div><div class="edu-sub">Universidad Tecnológica de Tula-Tepeji (UTT) · 2021 – 2026</div></div>
+      <div><div class="edu-title">Python Essentials 1 — Cisco Networking Academy</div><div class="edu-sub">Python Institute · Sep 2025</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Idiomas</h2>
+    <div class="langs">
+      <div class="lang"><strong>Español</strong> <span>— Nativo</span></div>
+      <div class="lang"><strong>Inglés</strong> <span>— B2 · Nivel profesional de trabajo</span></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Joshua Hernandez — 3D Artist</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --accent: #2563eb; --accent2: #1d4ed8; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --bg: #ffffff; }
+  html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 10.5px; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 794px; min-height: 1123px; margin: 0 auto; padding: 40px 48px 36px; display: flex; flex-direction: column; gap: 18px; }
+  .header { border-bottom: 2px solid var(--accent); padding-bottom: 14px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-end; }
+  .name { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .role-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: #dbeafe; padding: 3px 10px; border-radius: 20px; }
+  .contact { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; font-size: 9.5px; color: var(--muted); }
+  .contact a { color: var(--muted); text-decoration: none; }
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-title { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .entry { display: flex; flex-direction: column; gap: 3px; }
+  .entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .entry-title { font-size: 11px; font-weight: 700; color: var(--text); }
+  .entry-company { font-size: 10.5px; font-weight: 500; color: var(--accent2); }
+  .entry-date { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  .entry ul { padding-left: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .entry li { font-size: 10px; color: #374151; line-height: 1.55; }
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .skill { font-size: 9.5px; font-weight: 500; padding: 3px 9px; border-radius: 4px; background: #f3f4f6; color: #374151; border: 1px solid var(--border); }
+  .skill.highlight { background: #dbeafe; color: var(--accent2); border-color: #93c5fd; }
+  .project { display: flex; gap: 6px; align-items: baseline; }
+  .project-name { font-size: 10.5px; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .project-desc { font-size: 10px; color: var(--muted); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .edu-title { font-size: 10.5px; font-weight: 700; color: var(--text); }
+  .edu-sub { font-size: 10px; color: var(--muted); }
+  .langs { display: flex; gap: 24px; }
+  .lang { font-size: 10px; }
+  .lang strong { color: var(--text); font-weight: 700; }
+  .lang span { color: var(--muted); }
+  @media print { html, body { font-size: 10.5px; } .page { padding: 32px 44px; margin: 0; width: 100%; min-height: unset; } a { color: inherit !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div class="header-top">
+      <h1 class="name">Joshua Hernandez</h1>
+      <span class="role-tag">3D Artist & Animator</span>
+    </div>
+    <div class="contact">
+      <span>Tula de Allende, Hidalgo, México</span>
+      <span>773 111 0361</span>
+      <a href="mailto:joshtvr4@gmail.com">joshtvr4@gmail.com</a>
+      <a href="https://joshtvr.com">joshtvr.com</a>
+      <a href="https://github.com/JoshTVR">github.com/JoshTVR</a>
+      <a href="https://linkedin.com/in/joshtvr">linkedin.com/in/joshtvr</a>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-grid">
+      <span class="skill highlight">Blender</span>
+      <span class="skill highlight">MagicaVoxel</span>
+      <span class="skill highlight">Unity</span>
+      <span class="skill">Adobe Photoshop</span>
+      <span class="skill">Premiere Pro</span>
+      <span class="skill">After Effects</span>
+      <span class="skill">Illustrator</span>
+      <span class="skill">Figma</span>
+      <span class="skill">Python</span>
+      <span class="skill">C#</span>
+      <span class="skill">Git</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Experience</h2>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">3D Artist, Animator & Game Developer</div><div class="entry-company">Vortex Editorial / Plandi — Torturama</div></div>
+        <span class="entry-date">Jan 2026 – Present</span>
+      </div>
+      <ul>
+        <li>Creating all 3D assets for <em>Torturama</em> — character models, environments, animations, PBR textures and skybox environments.</li>
+        <li>Producing cinematic cutscenes and in-engine animations to support the game's narrative.</li>
+        <li>Handling game programming alongside art production as sole technical contributor.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">VR Developer</div><div class="entry-company">Roboarts Club — Clubit</div></div>
+        <span class="entry-date">Feb 2026 – Mar 2026</span>
+      </div>
+      <ul>
+        <li>Modeled and textured all 3D props and environments for Clubit VR — a Meta Quest music experience.</li>
+        <li>Optimized assets for real-time VR performance within Unity's render pipeline.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">3D Artist — Intern</div><div class="entry-company">Universidad Tecnológica de Zimapán (UTZ)</div></div>
+        <span class="entry-date">2024</span>
+      </div>
+      <ul>
+        <li>Produced 3D models and animations for a VR employee onboarding application.</li>
+        <li>Contributed to a project that reduced onboarding time by 30% through immersive simulation.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Projects</h2>
+    <div class="project"><span class="project-name">Alien Mothership —</span><span class="project-desc">Original hard-surface model, 1.4M polygons. Blender Cycles + HDRI lighting. Available for commercial licensing (FBX).</span></div>
+    <div class="project"><span class="project-name">Cells Animation —</span><span class="project-desc">Cinematic animation produced in both Blender Cycles (photorealistic) and EEVEE (stylized). Dual render comparison.</span></div>
+    <div class="project"><span class="project-name">Torturama Scene —</span><span class="project-desc">Full game environment: character, props, terrain and skybox. Built for real-time rendering in Unity URP.</span></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Education & Certifications</h2>
+    <div class="two-col">
+      <div><div class="edu-title">B.Eng. Virtual Environments & Digital Business</div><div class="edu-sub">Universidad Tecnológica de Tula-Tepeji (UTT) · 2021 – 2026</div></div>
+      <div><div class="edu-title">Python Essentials 1</div><div class="edu-sub">Cisco Networking Academy / Python Institute · Sep 2025</div></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Languages</h2>
+    <div class="langs">
+      <div class="lang"><strong>Spanish</strong> <span>— Native</span></div>
+      <div class="lang"><strong>English</strong> <span>— B2 · Professional working proficiency</span></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

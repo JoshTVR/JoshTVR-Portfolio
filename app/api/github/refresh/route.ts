@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { invalidateGitHubCache, getGitHubStats } from '@/lib/github/cache'
+import { invalidateGitHubCache, getGitHubStats, invalidateGitHubReposCache, getPublicRepos } from '@/lib/github/cache'
 
 export async function POST(request: Request) {
   // Verify admin session
@@ -32,9 +32,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    await invalidateGitHubCache()
-    const stats = await getGitHubStats()
-    return NextResponse.json({ success: true, contributions: stats?.contributions ?? 0, fetchedAt: stats?.fetchedAt })
+    await Promise.all([invalidateGitHubCache(), invalidateGitHubReposCache()])
+    const [stats, repos] = await Promise.all([getGitHubStats(), getPublicRepos()])
+    return NextResponse.json({ success: true, contributions: stats?.contributions ?? 0, repos: repos.length, fetchedAt: stats?.fetchedAt })
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 })
   }

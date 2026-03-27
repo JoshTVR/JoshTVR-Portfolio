@@ -1,7 +1,25 @@
 import { useTranslations } from 'next-intl'
+import { createAdminClient } from '@/lib/supabase/admin'
 
-export function Footer() {
+async function getFeaturedCvUrl(locale: string): Promise<string | null> {
+  try {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('cvs')
+      .select('file_url')
+      .eq('locale', locale)
+      .eq('is_featured', true)
+      .eq('is_active', true)
+      .single()
+    return data?.file_url ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function Footer({ locale = 'en' }: { locale?: string }) {
   const t = useTranslations('footer')
+  const cvUrl = await getFeaturedCvUrl(locale)
 
   return (
     <footer style={{ background: '#05050a', borderTop: 'var(--glass-border)' }} className="pt-12 pb-8">
@@ -10,19 +28,21 @@ export function Footer() {
           <span className="text-[1.5rem] font-bold tracking-tight" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
             JoshTVR<span style={{ color: 'var(--accent)' }}>.</span>
           </span>
-          <a
-            href="/assets/cv-joshua-hernandez.pdf"
-            download="CV-Joshua-Hernandez.pdf"
-            className="inline-flex items-center gap-2 px-7 py-3 rounded-[10px] font-semibold text-[0.95rem] text-white transition-all duration-300 hover:-translate-y-0.5"
-            style={{ background: 'var(--accent)', boxShadow: '0 0 24px var(--accent-glow)', fontFamily: 'var(--font-body)' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            {t('cv')}
-          </a>
+          {cvUrl && (
+            <a
+              href={cvUrl}
+              download
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-[10px] font-semibold text-[0.95rem] text-white transition-all duration-300 hover:-translate-y-0.5"
+              style={{ background: 'var(--accent)', boxShadow: '0 0 24px var(--accent-glow)', fontFamily: 'var(--font-body)' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              {t('cv')}
+            </a>
+          )}
         </div>
 
         <div className="flex justify-center gap-5 mb-8">

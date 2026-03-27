@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Joshua Hernandez — VR/XR Developer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent:  #7c3aed;
+    --accent2: #5b21b6;
+    --text:    #111827;
+    --muted:   #6b7280;
+    --border:  #e5e7eb;
+    --bg:      #ffffff;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 10.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    margin: 0 auto;
+    padding: 40px 48px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* ── Header ── */
+  .header { border-bottom: 2px solid var(--accent); padding-bottom: 14px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-end; }
+  .name { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .role-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); background: #ede9fe; padding: 3px 10px; border-radius: 20px;
+  }
+  .contact {
+    display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px;
+    font-size: 9.5px; color: var(--muted);
+  }
+  .contact a { color: var(--muted); text-decoration: none; }
+  .contact span::before { content: '·'; margin-right: 18px; display: none; }
+
+  /* ── Section ── */
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px;
+  }
+
+  /* ── Experience entry ── */
+  .entry { display: flex; flex-direction: column; gap: 3px; }
+  .entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .entry-title { font-size: 11px; font-weight: 700; color: var(--text); }
+  .entry-company { font-size: 10.5px; font-weight: 500; color: var(--accent2); }
+  .entry-date { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  .entry ul { padding-left: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .entry li { font-size: 10px; color: #374151; line-height: 1.55; }
+
+  /* ── Skills ── */
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .skill {
+    font-size: 9.5px; font-weight: 500; padding: 3px 9px; border-radius: 4px;
+    background: #f3f4f6; color: #374151; border: 1px solid var(--border);
+  }
+  .skill.highlight { background: #ede9fe; color: var(--accent2); border-color: #c4b5fd; }
+
+  /* ── Projects ── */
+  .project { display: flex; gap: 6px; align-items: baseline; }
+  .project-name { font-size: 10.5px; font-weight: 700; color: var(--text); white-space: nowrap; }
+  .project-desc { font-size: 10px; color: var(--muted); }
+
+  /* ── Education + Certs ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .edu-title { font-size: 10.5px; font-weight: 700; color: var(--text); }
+  .edu-sub { font-size: 10px; color: var(--muted); }
+
+  /* ── Languages ── */
+  .langs { display: flex; gap: 24px; }
+  .lang { font-size: 10px; }
+  .lang strong { color: var(--text); font-weight: 700; }
+  .lang span { color: var(--muted); }
+
+  /* ── Print ── */
+  @media print {
+    html, body { font-size: 10.5px; }
+    .page { padding: 32px 44px; margin: 0; width: 100%; min-height: unset; }
+    a { color: inherit !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <h1 class="name">Joshua Hernandez</h1>
+      <span class="role-tag">VR / XR Developer</span>
+    </div>
+    <div class="contact">
+      <span>Tula de Allende, Hidalgo, México</span>
+      <span>773 111 0361</span>
+      <a href="mailto:joshtvr4@gmail.com">joshtvr4@gmail.com</a>
+      <a href="https://joshtvr.com">joshtvr.com</a>
+      <a href="https://github.com/JoshTVR">github.com/JoshTVR</a>
+      <a href="https://linkedin.com/in/joshtvr">linkedin.com/in/joshtvr</a>
+    </div>
+  </header>
+
+  <!-- SKILLS -->
+  <section class="section">
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-grid">
+      <span class="skill highlight">Unity</span>
+      <span class="skill highlight">C#</span>
+      <span class="skill highlight">XR Interaction Toolkit</span>
+      <span class="skill highlight">Oculus SDK</span>
+      <span class="skill highlight">Meta Quest</span>
+      <span class="skill">Blender</span>
+      <span class="skill">MagicaVoxel</span>
+      <span class="skill">Python</span>
+      <span class="skill">Next.js</span>
+      <span class="skill">TypeScript</span>
+      <span class="skill">Supabase</span>
+      <span class="skill">Git</span>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section">
+    <h2 class="section-title">Experience</h2>
+
+    <div class="entry">
+      <div class="entry-header">
+        <div>
+          <div class="entry-title">VR Developer</div>
+          <div class="entry-company">Roboarts Club</div>
+        </div>
+        <span class="entry-date">Feb 2026 – Mar 2026</span>
+      </div>
+      <ul>
+        <li>Developed <em>Clubit</em>, a polyrhythmic VR music experience built with Unity and deployed on Meta Quest via SideQuest.</li>
+        <li>Implemented spatial interaction systems using XR Interaction Toolkit and Oculus SDK — piano keys, collision detection, real-time audio feedback.</li>
+        <li>Delivered a fully playable XR application within a 4-week sprint, accessible to end users without PC setup.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <div>
+          <div class="entry-title">Game Developer</div>
+          <div class="entry-company">Vortex Editorial / Plandi — Torturama</div>
+        </div>
+        <span class="entry-date">Jan 2026 – Present</span>
+      </div>
+      <ul>
+        <li>Contributing to <em>Torturama</em>, a video game in active development — covering 3D modeling, animation, texture work, skybox environments and game programming.</li>
+        <li>Operating as sole technical contributor across multiple disciplines in an early-stage indie studio.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <div>
+          <div class="entry-title">3D Artist & Intern</div>
+          <div class="entry-company">Universidad Tecnológica de Zimapán (UTZ)</div>
+        </div>
+        <span class="entry-date">2024</span>
+      </div>
+      <ul>
+        <li>Created 3D assets and animations for a VR-based employee onboarding training application.</li>
+        <li>Project achieved a 30% reduction in onboarding time through immersive simulation.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section">
+    <h2 class="section-title">Projects</h2>
+    <div class="project">
+      <span class="project-name">Clubit VR —</span>
+      <span class="project-desc">Polyrhythmic music experience for Meta Quest. Built with Unity, C# and XR Interaction Toolkit. Distributed via SideQuest.</span>
+    </div>
+    <div class="project">
+      <span class="project-name">Alien Mothership —</span>
+      <span class="project-desc">Original hard-surface 3D model with 1.4M polygons rendered in Blender Cycles. Available for commercial licensing.</span>
+    </div>
+    <div class="project">
+      <span class="project-name">JoshTVR Portfolio —</span>
+      <span class="project-desc">Production full-stack web app: Next.js 14, Supabase, TypeScript, Stripe, bilingual EN/ES. Live at joshtvr.com.</span>
+    </div>
+  </section>
+
+  <!-- EDUCATION + CERTIFICATIONS -->
+  <section class="section">
+    <h2 class="section-title">Education & Certifications</h2>
+    <div class="two-col">
+      <div>
+        <div class="edu-title">B.Eng. Virtual Environments & Digital Business</div>
+        <div class="edu-sub">Universidad Tecnológica de Tula-Tepeji (UTT) · 2021 – 2026</div>
+      </div>
+      <div>
+        <div class="edu-title">Python Essentials 1</div>
+        <div class="edu-sub">Cisco Networking Academy / Python Institute · Sep 2025</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LANGUAGES -->
+  <section class="section">
+    <h2 class="section-title">Languages</h2>
+    <div class="langs">
+      <div class="lang"><strong>Spanish</strong> <span>— Native</span></div>
+      <div class="lang"><strong>English</strong> <span>— B2 · Professional working proficiency</span></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

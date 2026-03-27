@@ -3088,6 +3088,84 @@ Los siguientes bugs impidieron el deploy durante varios commits consecutivos (cc
 
 ---
 
+## 28. SISTEMA DE CVS
+
+### Arquitectura
+
+El portfolio incluye un sistema completo para gestionar múltiples versiones de CV, con links públicos únicos por versión, módulo admin para subir PDFs, y Footer dinámico.
+
+**Versiones disponibles (8 archivos HTML en `public/cv/`):**
+
+| Archivo | Rol | Color accent |
+|---|---|---|
+| `vr-developer-en.html` | VR/XR Developer | Violeta `#7c3aed` |
+| `vr-developer-es.html` | Desarrollador VR/XR | Violeta `#7c3aed` |
+| `3d-artist-en.html` | 3D Artist & Animator | Azul `#2563eb` |
+| `3d-artist-es.html` | Artista 3D y Animador | Azul `#2563eb` |
+| `data-scientist-en.html` | Data Scientist | Ámbar `#d97706` |
+| `data-scientist-es.html` | Científico de Datos | Ámbar `#d97706` |
+| `general-en.html` | Developer & Digital Creator | Slate `#334155` |
+| `general-es.html` | Desarrollador y Creador Digital | Slate `#334155` |
+
+**Diseño:** Fondo blanco, ATS-friendly, sin JS, ancho 794px (A4), `@media print` optimizado para 1 página exacta. Para generar el PDF: abrir el HTML en browser → Ctrl+P → Guardar como PDF → Subir en `/admin/cvs`.
+
+### Flujo de trabajo
+
+1. Abrir `public/cv/[version].html` en el navegador
+2. Ctrl+P → "Save as PDF" (sin márgenes, escala 100%)
+3. Ir a `/admin/cvs` → "Upload CV" → seleccionar el PDF
+4. El sistema sube el PDF a Supabase Storage bucket `cvs`
+5. Se crea un registro en la tabla `cvs` con el slug y locale
+6. El CV queda disponible en `/{locale}/cv/{slug}` (ej: `/en/cv/vr-developer`)
+
+### Schema SQL (`cvs`)
+
+```sql
+CREATE TABLE cvs (
+  id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title       text NOT NULL,
+  role        text NOT NULL,
+  locale      text NOT NULL DEFAULT 'en',
+  slug        text NOT NULL,
+  file_url    text NOT NULL,
+  is_featured boolean NOT NULL DEFAULT false,
+  is_active   boolean NOT NULL DEFAULT true,
+  sort_order  integer NOT NULL DEFAULT 0,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE cvs DISABLE ROW LEVEL SECURITY;
+```
+
+### URLs públicas
+
+| Slug | EN | ES |
+|---|---|---|
+| VR Developer | `/en/cv/vr-developer` | `/es/cv/vr-developer` |
+| 3D Artist | `/en/cv/3d-artist` | `/es/cv/3d-artist` |
+| Data Scientist | `/en/cv/data-scientist` | `/es/cv/data-scientist` |
+| General | `/en/cv/general` | `/es/cv/general` |
+
+### Footer dinámico
+
+`components/layout/Footer.tsx` recibe el `locale` desde `app/[locale]/layout.tsx` y consulta el CV con `is_featured = true` para ese locale. Si existe, muestra el botón de descarga apuntando al PDF en Supabase Storage. Si no existe ningún CV featured, el botón simplemente no se muestra.
+
+Para marcar un CV como featured: ir a `/admin/cvs` → click en "☆ Feature" del CV deseado. Solo puede haber un featured por locale a la vez.
+
+### Archivos del sistema
+
+| Archivo | Descripción |
+|---|---|
+| `public/cv/*.html` | 8 CVs HTML/CSS listos para imprimir a PDF |
+| `app/admin/cvs/page.tsx` | Tabla admin con lista de CVs subidos |
+| `app/admin/cvs/actions.ts` | Server actions: create, delete, toggleFeatured, toggleActive |
+| `app/admin/cvs/CvRowActions.tsx` | Botones de toggle/delete (Client Component) |
+| `app/admin/cvs/CvUploadForm.tsx` | Formulario de upload a Supabase Storage (Client Component) |
+| `app/[locale]/cv/[slug]/page.tsx` | Página pública minimalista con botón de descarga |
+| `components/layout/Footer.tsx` | Footer con botón CV dinámico según featured |
+| `components/layout/AdminSidebar.tsx` | Sidebar admin con enlace a /admin/cvs |
+
+---
+
 ## 27. GLOSARIO ADICIONAL
 
 | Término | Definición en contexto del proyecto |

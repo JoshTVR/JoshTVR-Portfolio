@@ -30,11 +30,12 @@ import AboutSection from '@/components/sections/AboutSection'
 import SkillsSection from '@/components/sections/SkillsSection'
 import ProjectsSection from '@/components/sections/ProjectsSection'
 import GitHubStatsSection from '@/components/sections/GitHubStatsSection'
+import GitHubReposSection from '@/components/sections/GitHubReposSection'
 import ExperienceSection from '@/components/sections/ExperienceSection'
 import CertificationsSection from '@/components/sections/CertificationsSection'
 import TestimonialsSection from '@/components/sections/TestimonialsSection'
 import ContactSection from '@/components/sections/ContactSection'
-import { getGitHubStats } from '@/lib/github/cache'
+import { getGitHubStats, getPublicRepos } from '@/lib/github/cache'
 
 export default async function HomePage({
   params,
@@ -134,8 +135,11 @@ export default async function HomePage({
     // Supabase not configured yet — render with empty data
   }
 
-  // Fetch GitHub stats (uses cache, returns null if not configured)
-  const githubStats = showGitHubStats ? await getGitHubStats() : null
+  // Fetch GitHub stats + repos (use cache, returns null/[] if not configured)
+  const [githubStats, githubRepos] = await Promise.all([
+    showGitHubStats ? getGitHubStats() : Promise.resolve(null),
+    getPublicRepos(),
+  ])
 
   const filterLabels: Record<string, string> = {
     all:    tProjects('filter.all'),
@@ -174,6 +178,7 @@ export default async function HomePage({
           heatmapLabel={tGh('heatmapLabel')}
         />
       )}
+      <GitHubReposSection repos={githubRepos} locale={locale} />
       <ExperienceSection
         items={experience}
         title={tExp('title')}

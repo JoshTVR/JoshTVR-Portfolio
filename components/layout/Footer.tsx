@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 async function getFeaturedCvUrl(locale: string): Promise<string | null> {
@@ -18,7 +18,7 @@ async function getFeaturedCvUrl(locale: string): Promise<string | null> {
 }
 
 export async function Footer({ locale = 'en' }: { locale?: string }) {
-  const t = useTranslations('footer')
+  const t = await getTranslations('footer')
   const cvUrl = await getFeaturedCvUrl(locale)
 
   return (

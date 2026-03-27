@@ -40,7 +40,7 @@ export default function OrdersPage() {
       supabase
         .from('orders')
         .select('*')
-        .eq('user_id', data.user.id)
+        .or(`user_id.eq.${data.user.id},customer_email.eq.${data.user.email}`)
         .order('created_at', { ascending: false })
         .then(({ data: rows }) => {
           setOrders((rows as Order[]) ?? [])

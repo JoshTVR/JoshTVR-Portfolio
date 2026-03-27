@@ -1,8 +1,15 @@
 import type { GitHubRepo } from '@/lib/github/api'
 
+interface LinkedProject {
+  slug:     string
+  title_en: string
+  title_es: string
+}
+
 interface Props {
-  repos:  GitHubRepo[]
-  locale: string
+  repos:          GitHubRepo[]
+  locale:         string
+  linkedProjects?: Record<string, LinkedProject>
 }
 
 function timeAgo(isoDate: string, locale: string): string {
@@ -16,7 +23,7 @@ function timeAgo(isoDate: string, locale: string): string {
   return locale === 'es' ? `hace ${years}a` : `${years}y ago`
 }
 
-export default function GitHubReposSection({ repos, locale }: Props) {
+export default function GitHubReposSection({ repos, locale, linkedProjects = {} }: Props) {
   if (repos.length === 0) return null
   const isEs = locale === 'es'
 
@@ -60,16 +67,39 @@ export default function GitHubReposSection({ repos, locale }: Props) {
             gap: '16px',
           }}
         >
-          {repos.map((repo) => (
+          {repos.map((repo) => {
+            const linked = linkedProjects[repo.name]
+            return (
             <div
               key={repo.name}
               className="glass"
               style={{
                 display: 'flex', flexDirection: 'column', gap: '12px',
                 padding: '20px', borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.07)',
+                border: linked
+                  ? '1px solid rgba(124,58,237,0.3)'
+                  : '1px solid rgba(255,255,255,0.07)',
               }}
             >
+              {/* Linked project badge */}
+              {linked && (
+                <a
+                  href={`#projects`}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '5px', alignSelf: 'flex-start',
+                    fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: '20px',
+                    background: 'rgba(124,58,237,0.15)', color: 'var(--accent-light)',
+                    border: '1px solid rgba(124,58,237,0.3)', textDecoration: 'none',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M7 17L17 7M7 7h10v10"/>
+                  </svg>
+                  {isEs ? `Ver proyecto: ${linked.title_es}` : `See project: ${linked.title_en}`}
+                </a>
+              )}
+
               {/* Name + stars */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                 <a
@@ -131,7 +161,7 @@ export default function GitHubReposSection({ repos, locale }: Props) {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </div>
     </section>

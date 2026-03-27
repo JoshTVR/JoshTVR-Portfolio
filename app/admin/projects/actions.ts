@@ -17,6 +17,7 @@ export interface ProjectFormData {
   github_url: string
   demo_url: string
   cover_image: string
+  github_repo: string        // repo name for auto-linking (e.g. "JoshTVR-Portfolio")
   is_published: boolean
   is_featured: boolean
   sort_order: number
@@ -38,6 +39,7 @@ function parseFormData(raw: ProjectFormData) {
     github_url:   raw.github_url.trim() || null,
     demo_url:     raw.demo_url.trim() || null,
     cover_image:  raw.cover_image.trim() || null,
+    github_repo:  raw.github_repo.trim() || null,
     is_published: raw.is_published,
     is_featured:  raw.is_featured,
     sort_order:   raw.sort_order,

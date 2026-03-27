@@ -31,6 +31,7 @@ export function ProjectForm({ initial }: ProjectFormProps) {
   )
   const [githubUrl,     setGithubUrl]     = useState(initial?.github_url     ?? '')
   const [demoUrl,       setDemoUrl]       = useState(initial?.demo_url       ?? '')
+  const [githubRepo,    setGithubRepo]    = useState((initial as { github_repo?: string })?.github_repo ?? '')
   const [coverImage,    setCoverImage]    = useState(initial?.cover_image    ?? '')
   const [isPublished,   setIsPublished]   = useState(initial?.is_published   ?? false)
   const [isFeatured,    setIsFeatured]    = useState(initial?.is_featured    ?? false)
@@ -76,6 +77,7 @@ export function ProjectForm({ initial }: ProjectFormProps) {
       github_url:     githubUrl,
       demo_url:       demoUrl,
       cover_image:    coverImage,
+      github_repo:    githubRepo,
       is_published:   isPublished,
       is_featured:    isFeatured,
       sort_order:     sortOrder,
@@ -230,6 +232,19 @@ export function ProjectForm({ initial }: ProjectFormProps) {
               onChange={e => setDemoUrl(e.target.value)}
               placeholder="https://demo.example.com"
             />
+          </div>
+
+          <div>
+            <label style={fieldLabel}>GitHub Repo (auto-sync)</label>
+            <input
+              className="admin-input"
+              value={githubRepo}
+              onChange={e => setGithubRepo(e.target.value)}
+              placeholder="JoshTVR-Portfolio"
+            />
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+              Solo el nombre del repo (sin usuario ni URL). Los repos vinculados mostrarán &quot;Ver proyecto&quot; en la sección Open Source.
+            </p>
           </div>
         </div>
       </section>

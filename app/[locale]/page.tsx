@@ -79,7 +79,7 @@ export default async function HomePage({
       await Promise.all([
         supabase
           .from('projects')
-          .select('id,slug,title_en,title_es,description_en,description_es,category,tech_tags,github_url,demo_url,cover_image,is_featured')
+          .select('id,slug,title_en,title_es,description_en,description_es,category,tech_tags,github_url,demo_url,cover_image,is_featured,github_repo')
           .eq('is_published', true)
           .order('sort_order', { ascending: true }),
         supabase
@@ -141,6 +141,14 @@ export default async function HomePage({
     getPublicRepos(),
   ])
 
+  // Build map: repoName → { slug, title_en, title_es } for repos linked to projects
+  const linkedProjects: Record<string, { slug: string; title_en: string; title_es: string }> = {}
+  for (const p of projects) {
+    if (p.github_repo) {
+      linkedProjects[p.github_repo] = { slug: p.slug, title_en: p.title_en, title_es: p.title_es }
+    }
+  }
+
   const filterLabels: Record<string, string> = {
     all:    tProjects('filter.all'),
     '3d':   tProjects('filter.3d'),
@@ -178,7 +186,7 @@ export default async function HomePage({
           heatmapLabel={tGh('heatmapLabel')}
         />
       )}
-      <GitHubReposSection repos={githubRepos} locale={locale} />
+      <GitHubReposSection repos={githubRepos} locale={locale} linkedProjects={linkedProjects} />
       <ExperienceSection
         items={experience}
         title={tExp('title')}
@@ -219,6 +227,7 @@ interface ProjectRow {
   demo_url: string | null
   cover_image: string | null
   is_featured: boolean
+  github_repo: string | null
 }
 
 interface ExperienceRow {

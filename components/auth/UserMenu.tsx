@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { useLocale } from 'next-intl'
 import type { User } from '@supabase/supabase-js'
 
 const supabase = createBrowserClient(
@@ -14,6 +15,7 @@ export function UserMenu() {
   const [open,     setOpen]     = useState(false)
   const [loading,  setLoading]  = useState(true)
   const menuRef = useRef<HTMLDivElement>(null)
+  const locale  = useLocale()
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -32,6 +34,26 @@ export function UserMenu() {
     document.addEventListener('mousedown', onClick)
     return () => document.removeEventListener('mousedown', onClick)
   }, [])
+
+  function menuItem(href: string, onClick: () => void, icon: React.ReactNode, label: string) {
+    return (
+      <a
+        href={href}
+        onClick={onClick}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          padding: '9px 12px', borderRadius: '8px', fontSize: '0.875rem',
+          color: 'var(--text-primary)', textDecoration: 'none',
+          transition: 'background 0.1s',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-primary)')}
+        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+      >
+        {icon}
+        {label}
+      </a>
+    )
+  }
 
   if (loading) return <div style={{ width: 36, height: 36 }} />
 
@@ -86,23 +108,16 @@ export function UserMenu() {
             </p>
           </div>
 
-          <a
-            href="/en/orders"
-            onClick={() => setOpen(false)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '9px 12px', borderRadius: '8px', fontSize: '0.875rem',
-              color: 'var(--text-primary)', textDecoration: 'none',
-              transition: 'background 0.1s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-primary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
-            </svg>
-            My Orders
-          </a>
+          {menuItem(`/${locale}/orders`, () => setOpen(false),
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>,
+            'My Orders'
+          )}
+          {menuItem(`/${locale}/downloads`, () => setOpen(false),
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+            'My Downloads'
+          )}
+
+          <div style={{ height: '1px', background: 'var(--border-glass)', margin: '4px 0' }} />
 
           <button
             onClick={async () => { await supabase.auth.signOut(); setOpen(false); window.location.reload() }}

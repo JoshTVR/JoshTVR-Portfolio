@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { createProduct, updateProduct, type ProductFormData } from './actions'
 
 const PRODUCT_TYPES = ['physical', 'digital', 'commission'] as const
@@ -24,6 +24,30 @@ export function ProductForm({ initial }: ProductFormProps) {
   const [stripePriceId, setStripePriceId] = useState(initial?.stripe_price_id ?? '')
   const [stock,       setStock]       = useState<string>(initial?.stock != null ? String(initial.stock) : '')
   const [isActive,    setIsActive]    = useState(initial?.is_active     ?? false)
+  const [fileUrl,     setFileUrl]     = useState((initial as { file_url?: string | null })?.file_url ?? '')
+  const [uploading,   setUploading]   = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setUploadError(null)
+    const form = new FormData()
+    form.append('file', file)
+    form.append('bucket', 'product-files')
+    try {
+      const res  = await fetch('/api/admin/upload', { method: 'POST', body: form })
+      const json = await res.json() as { url?: string; error?: string }
+      if (!res.ok || !json.url) throw new Error(json.error ?? 'Upload failed')
+      setFileUrl(json.url)
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -38,6 +62,7 @@ export function ProductForm({ initial }: ProductFormProps) {
       currency,
       stripe_price_id: stripePriceId,
       stock:          stock !== '' ? parseInt(stock, 10) : null,
+      file_url:       fileUrl.trim() || null,
       is_active:      isActive,
     }
     startTransition(async () => {
@@ -74,6 +99,38 @@ export function ProductForm({ initial }: ProductFormProps) {
         {field('Currency', <input className="admin-input" value={currency} onChange={e => setCurrency(e.target.value)} placeholder="usd" />)}
         {field('Stock (blank = unlimited)', <input type="number" className="admin-input" value={stock} onChange={e => setStock(e.target.value)} min="0" placeholder="Unlimited" />)}
         {field('Stripe Price ID (optional)', <input className="admin-input" value={stripePriceId} onChange={e => setStripePriceId(e.target.value)} placeholder="price_..." style={{ gridColumn: '1 / -1' }} />)}
+      </section>
+
+      <section className="glass" style={{ padding: '24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Downloadable File</h3>
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+          For digital products — the file customers can download after purchase. Supports any format (ZIP, PDF, GLB, MP4, etc.).
+        </p>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <input
+            className="admin-input"
+            value={fileUrl}
+            onChange={e => setFileUrl(e.target.value)}
+            placeholder="File URL (or upload below)"
+            style={{ flex: 1, minWidth: '200px' }}
+          />
+          <input ref={fileInputRef} type="file" onChange={handleFileUpload} style={{ display: 'none' }} />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="btn btn-ghost"
+            style={{ fontSize: '0.85rem', padding: '8px 16px', whiteSpace: 'nowrap' }}
+          >
+            {uploading ? 'Uploading…' : 'Upload File'}
+          </button>
+        </div>
+        {fileUrl && !uploading && (
+          <p style={{ fontSize: '0.75rem', color: '#10b981' }}>
+            ✓ File set — customers will see a download button after purchase
+          </p>
+        )}
+        {uploadError && <p style={{ fontSize: '0.78rem', color: '#f87171' }}>{uploadError}</p>}
       </section>
 
       <section className="glass" style={{ padding: '24px', borderRadius: '12px' }}>

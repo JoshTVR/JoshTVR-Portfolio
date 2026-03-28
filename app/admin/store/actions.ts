@@ -14,6 +14,7 @@ export interface ProductFormData {
   currency:         string
   stripe_price_id:  string
   stock:            number | null
+  file_url:         string | null
   is_active:        boolean
 }
 

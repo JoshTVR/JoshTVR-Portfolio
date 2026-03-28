@@ -34,6 +34,7 @@ import GitHubReposSection from '@/components/sections/GitHubReposSection'
 import ExperienceSection from '@/components/sections/ExperienceSection'
 import CertificationsSection from '@/components/sections/CertificationsSection'
 import TestimonialsSection from '@/components/sections/TestimonialsSection'
+import { PostsFeedSection } from '@/components/sections/PostsFeedSection'
 import ContactSection from '@/components/sections/ContactSection'
 import { getGitHubStats, getPublicRepos } from '@/lib/github/cache'
 
@@ -68,6 +69,7 @@ export default async function HomePage({
   let experience: ExperienceRow[] = []
   let certifications: CertRow[] = []
   let testimonials: TestimonialRow[] = []
+  let latestPosts: PostPreview[] = []
   let aboutStats = defaultStats
   let showGitHubStats = true
   let showTestimonials = true
@@ -75,7 +77,7 @@ export default async function HomePage({
   try {
     const supabase = await createClient()
 
-    const [projectsRes, expRes, certsRes, testimonialsRes, settingsRes] =
+    const [projectsRes, expRes, certsRes, testimonialsRes, settingsRes, postsRes] =
       await Promise.all([
         supabase
           .from('projects')
@@ -99,12 +101,19 @@ export default async function HomePage({
           .from('settings')
           .select('key,value')
           .in('key', ['about_stat1_value', 'about_stat2_value', 'about_stat3_value', 'about_stat4_value']),
+        supabase
+          .from('posts')
+          .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,youtube_url,type,published_at')
+          .eq('is_published', true)
+          .order('published_at', { ascending: false })
+          .limit(3),
       ])
 
     projects      = (projectsRes.data ?? []) as ProjectRow[]
     experience    = (expRes.data ?? []) as ExperienceRow[]
     certifications = (certsRes.data ?? []) as CertRow[]
     testimonials  = (testimonialsRes.data ?? []) as TestimonialRow[]
+    latestPosts   = (postsRes.data ?? []) as PostPreview[]
 
     if (settingsRes.data && settingsRes.data.length > 0) {
       const map: Record<string, string> = {}
@@ -204,6 +213,7 @@ export default async function HomePage({
           locale={locale}
         />
       )}
+      <PostsFeedSection posts={latestPosts} locale={locale} />
       <ContactSection
         title={tContact('title')}
         subtitle={tContact('subtitle')}
@@ -257,4 +267,17 @@ interface TestimonialRow {
   author_name: string
   author_role_en: string
   author_role_es: string
+}
+
+interface PostPreview {
+  id: string
+  slug: string
+  title_en: string
+  title_es: string
+  excerpt_en: string | null
+  excerpt_es: string | null
+  cover_image: string | null
+  youtube_url: string | null
+  type: string
+  published_at: string | null
 }

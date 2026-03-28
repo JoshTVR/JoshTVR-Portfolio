@@ -1,19 +1,48 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { saveSettings } from './actions'
 
 interface Props {
   storeVisible: boolean
   sectionsVisible: Record<string, boolean>
+  linkedinConnected: boolean
+  linkedinName: string
+  linkedinExpiresAt: string
+  instagramConnected: boolean
+  instagramUsername: string
+  instagramExpiresAt: string
 }
 
-export function SettingsForm({ storeVisible, sectionsVisible }: Props) {
+export function SettingsForm({
+  storeVisible,
+  sectionsVisible,
+  linkedinConnected,
+  linkedinName,
+  linkedinExpiresAt,
+  instagramConnected,
+  instagramUsername,
+  instagramExpiresAt,
+}: Props) {
   const [store,       setStore]       = useState(storeVisible)
   const [ghStats,     setGhStats]     = useState(sectionsVisible.github_stats ?? true)
   const [testimonials,setTestimonials]= useState(sectionsVisible.testimonials ?? true)
   const [saved,       setSaved]       = useState(false)
   const [isPending,   startTransition]= useTransition()
+  const [socialMsg,   setSocialMsg]   = useState('')
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const connected = searchParams.get('social_connected')
+    const error = searchParams.get('social_error')
+    if (connected === 'linkedin') setSocialMsg('✓ LinkedIn connected successfully')
+    else if (connected === 'instagram') setSocialMsg('✓ Instagram connected successfully')
+    else if (error === 'linkedin_denied') setSocialMsg('LinkedIn connection was cancelled')
+    else if (error === 'instagram_denied') setSocialMsg('Instagram connection was cancelled')
+    else if (error === 'instagram_no_account') setSocialMsg('No Instagram Business/Creator account found on your Facebook pages')
+    else if (error) setSocialMsg('Connection error — try again')
+  }, [searchParams])
 
   function handleSave() {
     setSaved(false)
@@ -28,6 +57,15 @@ export function SettingsForm({ storeVisible, sectionsVisible }: Props) {
       })
       setSaved(true)
     })
+  }
+
+  function formatExpiry(iso: string) {
+    if (!iso) return ''
+    const d = new Date(iso)
+    const days = Math.round((d.getTime() - Date.now()) / 86400000)
+    if (days < 0) return ' (expired)'
+    if (days === 0) return ' (expires today)'
+    return ` (expires in ${days}d)`
   }
 
   return (
@@ -79,6 +117,98 @@ export function SettingsForm({ storeVisible, sectionsVisible }: Props) {
             ✓ Saved
           </span>
         )}
+      </div>
+
+      {/* Social Connections */}
+      <div id="social" className="glass" style={{ padding: '24px', borderRadius: '12px' }}>
+        <h2 style={sectionTitle}>Social Connections</h2>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '20px', lineHeight: 1.5 }}>
+          Connect your accounts to publish posts directly from the admin panel. Tokens expire every ~60 days — reconnect when needed.
+        </p>
+
+        {socialMsg && (
+          <div style={{
+            marginBottom: '16px',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            fontSize: '0.85rem',
+            background: socialMsg.startsWith('✓') ? 'rgba(16,185,129,0.1)' : 'rgba(248,113,113,0.1)',
+            color: socialMsg.startsWith('✓') ? '#10b981' : '#f87171',
+            border: `1px solid ${socialMsg.startsWith('✓') ? 'rgba(16,185,129,0.25)' : 'rgba(248,113,113,0.25)'}`,
+          }}>
+            {socialMsg}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* LinkedIn */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <div>
+              <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.92rem', marginBottom: '2px' }}>
+                LinkedIn
+                {linkedinConnected && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>✓ Connected</span>
+                )}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {linkedinConnected
+                  ? `${linkedinName}${formatExpiry(linkedinExpiresAt)}`
+                  : 'Not connected — posts will open a share dialog instead'}
+              </p>
+            </div>
+            <a
+              href="/api/auth/linkedin"
+              style={{
+                flexShrink: 0,
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                background: linkedinConnected ? 'rgba(255,255,255,0.07)' : 'rgba(124,58,237,0.15)',
+                color: linkedinConnected ? 'var(--text-muted)' : 'var(--accent-light)',
+                border: `1px solid ${linkedinConnected ? 'rgba(255,255,255,0.1)' : 'rgba(124,58,237,0.3)'}`,
+              }}
+            >
+              {linkedinConnected ? 'Reconnect' : 'Connect LinkedIn'}
+            </a>
+          </div>
+
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+
+          {/* Instagram */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <div>
+              <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.92rem', marginBottom: '2px' }}>
+                Instagram
+                {instagramConnected && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>✓ Connected</span>
+                )}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {instagramConnected
+                  ? `@${instagramUsername}${formatExpiry(instagramExpiresAt)}`
+                  : 'Not connected — requires Instagram Business or Creator account'}
+              </p>
+            </div>
+            <a
+              href="/api/auth/instagram"
+              style={{
+                flexShrink: 0,
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                background: instagramConnected ? 'rgba(255,255,255,0.07)' : 'rgba(124,58,237,0.15)',
+                color: instagramConnected ? 'var(--text-muted)' : 'var(--accent-light)',
+                border: `1px solid ${instagramConnected ? 'rgba(255,255,255,0.1)' : 'rgba(124,58,237,0.3)'}`,
+              }}
+            >
+              {instagramConnected ? 'Reconnect' : 'Connect Instagram'}
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   )

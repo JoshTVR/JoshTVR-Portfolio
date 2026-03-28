@@ -1,7 +1,7 @@
 'use client'
 
 import { useTransition, useState } from 'react'
-import { togglePublish, deletePost, markShared } from './actions'
+import { togglePublish, deletePost } from './actions'
 
 const TYPE_EMOJI: Record<string, string> = {
   devlog:       '🎮',
@@ -41,51 +41,71 @@ export function PublishToggle({ id, published }: { id: string; published: boolea
   )
 }
 
-export function ShareButtons({ post, siteUrl }: { post: PostRow; siteUrl: string }) {
-  const [isPending, startTransition] = useTransition()
-  const [igCopied, setIgCopied] = useState(false)
+export function ShareButtons({ post }: { post: PostRow; siteUrl: string }) {
+  const [sharing,  setSharing]  = useState<'linkedin' | 'instagram' | null>(null)
+  const [liShared, setLiShared] = useState(post.shared_linkedin)
+  const [igShared, setIgShared] = useState(post.shared_instagram)
+  const [toast,    setToast]    = useState('')
 
-  const postUrl = `${siteUrl}/es/posts/${post.slug}`
-
-  function handleLinkedIn() {
-    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${siteUrl}/en/posts/${post.slug}`)}`
-    window.open(shareUrl, '_blank', 'noopener,noreferrer')
-    startTransition(async () => { await markShared(post.id, 'linkedin') })
+  function showToast(msg: string) {
+    setToast(msg)
+    setTimeout(() => setToast(''), 3000)
   }
 
-  async function handleInstagram() {
-    const emoji  = TYPE_EMOJI[post.type] ?? '✍️'
-    const tags   = post.tags.map(t => `#${t}`).join(' ')
-    const caption = `${emoji} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n👉 ${postUrl}\n\n${tags} #joshtvr`
-    await navigator.clipboard.writeText(caption)
-    setIgCopied(true)
-    setTimeout(() => setIgCopied(false), 2500)
-    startTransition(async () => { await markShared(post.id, 'instagram') })
+  async function handleShare(network: 'linkedin' | 'instagram') {
+    setSharing(network)
+    try {
+      const res  = await fetch('/api/social/post', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ network, postId: post.id }),
+      })
+      const json = await res.json()
+      if (json.ok) {
+        if (network === 'linkedin') setLiShared(true)
+        else setIgShared(true)
+        showToast('¡Publicado! ✓')
+      } else {
+        showToast(json.error ?? 'Error al publicar')
+      }
+    } catch {
+      showToast('Error de red')
+    }
+    setSharing(null)
   }
 
   return (
     <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-      {post.shared_linkedin
+      {toast && (
+        <span style={{
+          fontSize: '0.7rem', padding: '3px 10px', borderRadius: '20px',
+          background: toast.startsWith('¡') ? 'rgba(16,185,129,0.12)' : 'rgba(248,113,113,0.12)',
+          color: toast.startsWith('¡') ? '#10b981' : '#f87171', fontWeight: 600,
+        }}>
+          {toast}
+        </span>
+      )}
+      {liShared
         ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(0,119,181,0.12)', color: '#0077b5', fontWeight: 700 }}>✓ LinkedIn</span>
         : (
           <button
-            onClick={handleLinkedIn}
-            disabled={isPending}
-            style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', background: 'rgba(0,119,181,0.1)', color: '#0077b5', border: '1px solid rgba(0,119,181,0.25)', cursor: 'pointer', fontWeight: 600 }}
+            onClick={() => handleShare('linkedin')}
+            disabled={sharing !== null}
+            style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', background: 'rgba(0,119,181,0.1)', color: '#0077b5', border: '1px solid rgba(0,119,181,0.25)', cursor: sharing ? 'default' : 'pointer', fontWeight: 600 }}
           >
-            LinkedIn ↗
+            {sharing === 'linkedin' ? '…' : 'LinkedIn'}
           </button>
         )
       }
-      {post.shared_instagram
+      {igShared
         ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(225,48,108,0.12)', color: '#e1306c', fontWeight: 700 }}>✓ Instagram</span>
         : (
           <button
-            onClick={handleInstagram}
-            disabled={isPending}
-            style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', background: 'rgba(225,48,108,0.1)', color: '#e1306c', border: '1px solid rgba(225,48,108,0.25)', cursor: 'pointer', fontWeight: 600 }}
+            onClick={() => handleShare('instagram')}
+            disabled={sharing !== null}
+            style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', background: 'rgba(225,48,108,0.1)', color: '#e1306c', border: '1px solid rgba(225,48,108,0.25)', cursor: sharing ? 'default' : 'pointer', fontWeight: 600 }}
           >
-            {igCopied ? '¡Copiado! ✓' : 'Copy IG'}
+            {sharing === 'instagram' ? '…' : 'Instagram'}
           </button>
         )
       }

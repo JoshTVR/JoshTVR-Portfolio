@@ -3,13 +3,22 @@ import { SettingsForm } from './SettingsForm'
 
 export const dynamic = 'force-dynamic'
 
+interface TokenValue {
+  access_token: string
+  expires_at: string
+  person_urn?: string
+  name?: string
+  user_id?: string
+  username?: string
+}
+
 async function getSettings() {
   try {
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('settings')
       .select('key,value')
-      .in('key', ['store_visible', 'sections_visible'])
+      .in('key', ['store_visible', 'sections_visible', 'linkedin_token', 'instagram_token'])
     const map: Record<string, unknown> = {}
     for (const row of data ?? []) map[row.key] = row.value
     return map
@@ -28,6 +37,12 @@ export default async function SettingsPage() {
     store_nav: false,
   }
 
+  const linkedinToken = settings['linkedin_token'] as TokenValue | null | undefined
+  const instagramToken = settings['instagram_token'] as TokenValue | null | undefined
+
+  const linkedinConnected = !!(linkedinToken?.access_token)
+  const instagramConnected = !!(instagramToken?.access_token)
+
   return (
     <div>
       <div style={{ marginBottom: '32px' }}>
@@ -45,7 +60,16 @@ export default async function SettingsPage() {
         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Control visibility and site-wide options.</p>
       </div>
 
-      <SettingsForm storeVisible={storeVisible} sectionsVisible={sectionsVisible} />
+      <SettingsForm
+        storeVisible={storeVisible}
+        sectionsVisible={sectionsVisible}
+        linkedinConnected={linkedinConnected}
+        linkedinName={linkedinToken?.name ?? ''}
+        linkedinExpiresAt={linkedinToken?.expires_at ?? ''}
+        instagramConnected={instagramConnected}
+        instagramUsername={instagramToken?.username ?? ''}
+        instagramExpiresAt={instagramToken?.expires_at ?? ''}
+      />
     </div>
   )
 }

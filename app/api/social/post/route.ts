@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (network === 'linkedin') {
-      return await postToLinkedIn(post, accessToken, tokenValue.person_urn)
+      return await postToLinkedIn(post, accessToken, tokenValue.person_urn, tokenValue.org_urn)
     } else {
       return await postToInstagram(post, accessToken, tokenValue.user_id)
     }
@@ -66,42 +66,47 @@ export async function POST(req: NextRequest) {
     post: { title_en: string; excerpt_en: string | null; slug: string },
     token: string,
     personUrn: string,
+    orgUrn?: string,
   ) {
     const postUrl = `${SITE_URL}/en/posts/${post.slug}`
     const text = [post.title_en, post.excerpt_en, postUrl].filter(Boolean).join('\n\n')
 
-    const res = await fetch('https://api.linkedin.com/v2/ugcPosts', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0',
-      },
-      body: JSON.stringify({
-        author: personUrn,
-        lifecycleState: 'PUBLISHED',
-        specificContent: {
-          'com.linkedin.ugc.ShareContent': {
-            shareCommentary: { text },
-            shareMediaCategory: 'ARTICLE',
-            media: [
-              {
-                status: 'READY',
-                originalUrl: postUrl,
-                title: { text: post.title_en },
-              },
-            ],
+    async function publishAs(author: string) {
+      return fetch('https://api.linkedin.com/v2/ugcPosts', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'X-Restli-Protocol-Version': '2.0.0',
+        },
+        body: JSON.stringify({
+          author,
+          lifecycleState: 'PUBLISHED',
+          specificContent: {
+            'com.linkedin.ugc.ShareContent': {
+              shareCommentary: { text },
+              shareMediaCategory: 'ARTICLE',
+              media: [{ status: 'READY', originalUrl: postUrl, title: { text: post.title_en } }],
+            },
           },
-        },
-        visibility: {
-          'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
-        },
-      }),
-    })
+          visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
+        }),
+      })
+    }
 
-    if (!res.ok) {
-      const errBody = await res.text()
+    const personalRes = await publishAs(personUrn)
+    if (!personalRes.ok) {
+      const errBody = await personalRes.text()
       return NextResponse.json({ error: `LinkedIn API error: ${errBody}` }, { status: 500 })
+    }
+
+    if (orgUrn) {
+      const orgRes = await publishAs(orgUrn)
+      if (!orgRes.ok) {
+        // Personal post succeeded — don't fail, just note the org error
+        const errBody = await orgRes.text()
+        console.error('LinkedIn org post failed:', errBody)
+      }
     }
 
     await markShared(postId, 'linkedin')

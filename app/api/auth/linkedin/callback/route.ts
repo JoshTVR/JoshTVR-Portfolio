@@ -52,7 +52,21 @@ export async function GET(req: NextRequest) {
     name = userInfo.name ?? ''
   }
 
-  // 3. Store token in settings table
+  // 3. Fetch organizations where user is admin
+  let orgUrn = ''
+  const orgRes = await fetch(
+    'https://api.linkedin.com/v2/organizationalEntityAcls?q=roleAssignee&role=ADMINISTRATOR&state=APPROVED&count=1',
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  )
+  if (orgRes.ok) {
+    const orgData = await orgRes.json()
+    const firstOrg = orgData.elements?.[0]
+    if (firstOrg?.organizationalTarget) {
+      orgUrn = firstOrg.organizationalTarget
+    }
+  }
+
+  // 4. Store token in settings table
   const supabase = createAdminClient()
   await supabase.from('settings').upsert(
     {
@@ -62,6 +76,7 @@ export async function GET(req: NextRequest) {
         expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
         person_urn: personUrn,
         name,
+        org_urn: orgUrn,
       },
     },
     { onConflict: 'key' },

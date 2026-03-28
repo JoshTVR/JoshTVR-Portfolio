@@ -7,6 +7,7 @@ interface TokenValue {
   access_token: string
   expires_at: string
   person_urn?: string
+  org_urn?: string
   name?: string
   user_id?: string
   username?: string

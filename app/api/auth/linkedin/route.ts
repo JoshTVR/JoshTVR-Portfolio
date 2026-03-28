@@ -8,7 +8,7 @@ export function GET(_req: NextRequest) {
     response_type: 'code',
     client_id: process.env.LINKEDIN_CLIENT_ID!,
     redirect_uri: `${siteUrl}/api/auth/linkedin/callback`,
-    scope: 'openid profile w_member_social',
+    scope: 'openid profile w_member_social w_organization_social',
     state: 'linkedin-connect',
   })
   return Response.redirect(

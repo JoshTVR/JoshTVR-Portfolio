@@ -3,8 +3,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
-const GRAPH = 'https://graph.facebook.com/v19.0'
-
 export async function GET(req: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? ''
   const { searchParams } = new URL(req.url)
@@ -16,27 +14,31 @@ export async function GET(req: NextRequest) {
   }
 
   // 1. Exchange code for short-lived token
-  const shortRes = await fetch(`${GRAPH}/oauth/access_token`, {
+  const shortRes = await fetch('https://api.instagram.com/oauth/access_token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       client_id: process.env.META_APP_ID!,
       client_secret: process.env.META_APP_SECRET!,
+      grant_type: 'authorization_code',
       redirect_uri: `${siteUrl}/api/auth/instagram/callback`,
       code,
     }),
   })
 
   if (!shortRes.ok) {
+    const err = await shortRes.text()
+    console.error('Instagram short token error:', err)
     return Response.redirect(`${siteUrl}/admin/settings?social_error=instagram_token#social`)
   }
 
   const shortData = await shortRes.json()
   const shortToken: string = shortData.access_token
+  const userId: string = String(shortData.user_id)
 
   // 2. Exchange for long-lived token (~60 days)
   const longRes = await fetch(
-    `${GRAPH}/oauth/access_token?grant_type=fb_exchange_token&client_id=${process.env.META_APP_ID}&client_secret=${process.env.META_APP_SECRET}&fb_exchange_token=${shortToken}`,
+    `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.META_APP_SECRET}&access_token=${shortToken}`,
   )
 
   let accessToken = shortToken
@@ -47,41 +49,14 @@ export async function GET(req: NextRequest) {
     expiresIn = longData.expires_in ?? expiresIn
   }
 
-  // 3. Get Facebook pages to find Instagram Business account
-  const pagesRes = await fetch(`${GRAPH}/me/accounts?access_token=${accessToken}`)
-  let igUserId = ''
-  let igUsername = ''
-
-  if (pagesRes.ok) {
-    const pagesData = await pagesRes.json()
-    const pages: Array<{ id: string; access_token: string }> = pagesData.data ?? []
-
-    // Check each page for a linked Instagram Business account
-    for (const page of pages) {
-      const igRes = await fetch(
-        `${GRAPH}/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`,
-      )
-      if (igRes.ok) {
-        const igData = await igRes.json()
-        if (igData.instagram_business_account?.id) {
-          igUserId = igData.instagram_business_account.id
-
-          // Get Instagram username
-          const usernameRes = await fetch(
-            `${GRAPH}/${igUserId}?fields=username&access_token=${accessToken}`,
-          )
-          if (usernameRes.ok) {
-            const usernameData = await usernameRes.json()
-            igUsername = usernameData.username ?? ''
-          }
-          break
-        }
-      }
-    }
-  }
-
-  if (!igUserId) {
-    return Response.redirect(`${siteUrl}/admin/settings?social_error=instagram_no_account#social`)
+  // 3. Get Instagram username
+  let username = ''
+  const userRes = await fetch(
+    `https://graph.instagram.com/me?fields=username&access_token=${accessToken}`,
+  )
+  if (userRes.ok) {
+    const userData = await userRes.json()
+    username = userData.username ?? ''
   }
 
   // 4. Store in settings table
@@ -92,8 +67,8 @@ export async function GET(req: NextRequest) {
       value: {
         access_token: accessToken,
         expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
-        user_id: igUserId,
-        username: igUsername,
+        user_id: userId,
+        username,
       },
     },
     { onConflict: 'key' },

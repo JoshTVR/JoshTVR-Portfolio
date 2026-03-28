@@ -125,14 +125,16 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Create media container
     const containerRes = await fetch(
-      `https://graph.facebook.com/v19.0/${userId}/media`,
+      `https://graph.instagram.com/v21.0/${userId}/media`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           image_url: post.cover_image,
           caption,
-          access_token: token,
         }),
       },
     )
@@ -147,14 +149,14 @@ export async function POST(req: NextRequest) {
 
     // Step 2: Publish
     const publishRes = await fetch(
-      `https://graph.facebook.com/v19.0/${userId}/media_publish`,
+      `https://graph.instagram.com/v21.0/${userId}/media_publish`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          creation_id: creationId,
-          access_token: token,
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ creation_id: creationId }),
       },
     )
 

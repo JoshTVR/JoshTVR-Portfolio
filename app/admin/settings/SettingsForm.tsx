@@ -38,6 +38,7 @@ export function SettingsForm({
     const error = searchParams.get('social_error')
     if (connected === 'linkedin') setSocialMsg('✓ LinkedIn connected successfully')
     else if (connected === 'instagram') setSocialMsg('✓ Instagram connected successfully')
+    else if (error === 'linkedin_token') setSocialMsg(`LinkedIn token error: ${searchParams.get('detail') ?? 'unknown'}`)
     else if (error === 'linkedin_denied') setSocialMsg('LinkedIn connection was cancelled')
     else if (error === 'instagram_denied') setSocialMsg('Instagram connection was cancelled')
     else if (error === 'instagram_no_account') setSocialMsg('No Instagram Business/Creator account found on your Facebook pages')

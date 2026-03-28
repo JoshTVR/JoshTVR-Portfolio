@@ -34,6 +34,11 @@ export async function GET(req: NextRequest) {
   const accessToken: string = tokenData.access_token
   const expiresIn: number = tokenData.expires_in ?? 5183944 // ~60 days
 
+  if (!accessToken) {
+    const detail = encodeURIComponent(tokenData.error_description ?? tokenData.error ?? 'no_access_token')
+    return Response.redirect(`${siteUrl}/admin/settings?social_error=linkedin_token&detail=${detail}#social`)
+  }
+
   // 2. Fetch OpenID userinfo (sub = person id, name)
   const userRes = await fetch('https://api.linkedin.com/v2/userinfo', {
     headers: { Authorization: `Bearer ${accessToken}` },

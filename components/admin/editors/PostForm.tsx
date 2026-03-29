@@ -14,6 +14,7 @@ import { LogicCard } from '@/components/content-cards/LogicCard'
 import { StudyCard } from '@/components/content-cards/StudyCard'
 import { AnnouncementCard } from '@/components/content-cards/AnnouncementCard'
 import { getYouTubeMeta, extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
+import { SocialPreview } from './SocialPreview'
 
 const POST_TYPES = ['post', 'devlog', 'announcement', 'tutorial'] as const
 const CARD_TYPES = [
@@ -32,12 +33,15 @@ interface Project { id: string; title_en: string }
 interface PostFormProps {
   initial?: Partial<PostFormData> & {
     id?: string
+    slug?: string
     card_data?: Record<string, unknown>
     card_images?: string[]
     color_theme?: string
     scheduled_at?: string
     is_ai_generated?: boolean
     card_type?: string
+    shared_linkedin?: boolean
+    shared_instagram?: boolean
   }
   projects: Project[]
 }
@@ -92,6 +96,8 @@ export function PostForm({ initial, projects }: PostFormProps) {
   )
   const [ytMeta,      setYtMeta]      = useState<{ thumbnailUrl: string; title: string } | null>(null)
   const [fetchingYt,  setFetchingYt]  = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewIdx,  setPreviewIdx]  = useState(0)
 
   // Auto-fetch YouTube metadata when youtubeUrl or card type changes
   useEffect(() => {
@@ -446,19 +452,35 @@ export function PostForm({ initial, projects }: PostFormProps) {
         {/* Preview + Export */}
         {hasCard && (
           <div style={{ marginTop: '8px' }}>
-            {/* Mini preview (first slide) */}
+            {/* Slide thumbnails row */}
             <div style={{ marginBottom: '12px' }}>
-              <span style={label('Preview (first slide)')}>Preview (first slide)</span>
-              <div style={{ width: '270px', height: '270px', overflow: 'hidden', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <div style={{ transform: 'scale(0.25)', transformOrigin: 'top left', width: '1080px', height: '1080px' }}>
-                  {slides[0]}
-                </div>
+              <span style={label('Preview — click to enlarge')}>Preview — click to enlarge</span>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
+                {slides.map((_, i) => (
+                  <div
+                    key={i}
+                    onClick={() => { setPreviewIdx(i); setPreviewOpen(true) }}
+                    style={{
+                      width: '120px', height: '120px', overflow: 'hidden',
+                      borderRadius: '8px', border: '1px solid rgba(255,255,255,0.12)',
+                      cursor: 'pointer', position: 'relative', flexShrink: 0,
+                      transition: 'border-color 150ms',
+                    }}
+                    title={`Slide ${i + 1} — click to preview`}
+                  >
+                    <div style={{ transform: 'scale(0.111)', transformOrigin: 'top left', width: '1080px', height: '1080px', pointerEvents: 'none' }}>
+                      {slides[i]}
+                    </div>
+                    <div style={{
+                      position: 'absolute', bottom: '4px', right: '6px',
+                      fontSize: '0.6rem', background: 'rgba(0,0,0,0.6)',
+                      color: '#fff', padding: '1px 5px', borderRadius: '4px',
+                    }}>
+                      {i + 1}/{slides.length}
+                    </div>
+                  </div>
+                ))}
               </div>
-              {slides.length > 1 && (
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                  +{slides.length - 1} more slide{slides.length > 2 ? 's' : ''}
-                </p>
-              )}
             </div>
 
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -475,6 +497,65 @@ export function PostForm({ initial, projects }: PostFormProps) {
                   ✓ {cardImages.length} image{cardImages.length > 1 ? 's' : ''} generated
                 </span>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Fullscreen preview modal */}
+        {previewOpen && hasCard && (
+          <div
+            onClick={() => setPreviewOpen(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              background: 'rgba(0,0,0,0.85)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            {/* Card preview scaled to fit screen */}
+            <div onClick={e => e.stopPropagation()} style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <div style={{
+                width: '540px',
+                height: '540px',
+                overflow: 'hidden',
+                borderRadius: '16px',
+                flexShrink: 0,
+              }}>
+                <div style={{
+                  transform: 'scale(0.5)',
+                  transformOrigin: 'top left',
+                  width: '1080px',
+                  height: '1080px',
+                }}>
+                  {slides[previewIdx]}
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <button
+                  onClick={() => setPreviewIdx(i => Math.max(0, i - 1))}
+                  disabled={previewIdx === 0}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', cursor: previewIdx === 0 ? 'not-allowed' : 'pointer', opacity: previewIdx === 0 ? 0.3 : 1, fontSize: '1rem' }}
+                >
+                  ←
+                </button>
+                <span style={{ color: '#fff', fontSize: '0.9rem', minWidth: '60px', textAlign: 'center' }}>
+                  {previewIdx + 1} / {slides.length}
+                </span>
+                <button
+                  onClick={() => setPreviewIdx(i => Math.min(slides.length - 1, i + 1))}
+                  disabled={previewIdx === slides.length - 1}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', cursor: previewIdx === slides.length - 1 ? 'not-allowed' : 'pointer', opacity: previewIdx === slides.length - 1 ? 0.3 : 1, fontSize: '1rem' }}
+                >
+                  →
+                </button>
+                <button
+                  onClick={() => setPreviewOpen(false)}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', cursor: 'pointer', fontSize: '0.85rem', marginLeft: '8px' }}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -571,6 +652,24 @@ export function PostForm({ initial, projects }: PostFormProps) {
             ⏰ Scheduled — will auto-publish at {new Date(scheduledAt).toLocaleString()}
           </p>
         )}
+      </section>
+
+      {/* Social Preview */}
+      <section className="glass" style={{ padding: '24px', borderRadius: '12px' }}>
+        <h3 style={heading}>Social Preview</h3>
+        <SocialPreview
+          titleEn={titleEn}
+          titleEs={titleEs}
+          excerptEn={excerptEn}
+          excerptEs={excerptEs}
+          coverImage={cardImages[0] || coverImage}
+          slug={initial?.slug as string ?? ''}
+          tags={tags}
+          type={type}
+          postId={isEdit ? initial?.id : undefined}
+          sharedLinkedin={initial?.shared_linkedin}
+          sharedInstagram={initial?.shared_instagram}
+        />
       </section>
 
       <div style={{ display: 'flex', gap: '12px' }}>

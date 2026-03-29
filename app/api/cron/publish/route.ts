@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { postToLinkedIn } from '@/lib/linkedin'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,36 +66,21 @@ export async function GET(req: NextRequest) {
     const liToken = tokenMap['linkedin_token']
     if (liToken?.access_token && (!liToken.expires_at || new Date(liToken.expires_at) > new Date())) {
       try {
-        const postUrl = `${SITE_URL}/en/posts/${post.slug}`
-        const text = [post.title_en, post.excerpt_en, postUrl].filter(Boolean).join('\n\n')
-
-        const liRes = await fetch('https://api.linkedin.com/v2/ugcPosts', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${liToken.access_token}`,
-            'Content-Type': 'application/json',
-            'X-Restli-Protocol-Version': '2.0.0',
-          },
-          body: JSON.stringify({
-            author: liToken.person_urn,
-            lifecycleState: 'PUBLISHED',
-            specificContent: {
-              'com.linkedin.ugc.ShareContent': {
-                shareCommentary: { text },
-                shareMediaCategory: 'ARTICLE',
-                media: [{ status: 'READY', originalUrl: postUrl, title: { text: post.title_en } }],
-              },
-            },
-            visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
-          }),
+        const imageUrl = post.card_images?.[0] ?? post.cover_image ?? null
+        const liResult = await postToLinkedIn({
+          title:     post.title_en,
+          excerpt:   post.excerpt_en,
+          slug:      post.slug,
+          imageUrl,
+          token:     liToken.access_token,
+          personUrn: liToken.person_urn,
+          siteUrl:   SITE_URL,
         })
-
-        if (liRes.ok) {
+        if (liResult.ok) {
           await supabase.from('posts').update({ shared_linkedin: true }).eq('id', post.id)
           result.linkedin = 'ok'
         } else {
-          const err = await liRes.text()
-          result.linkedin = `error: ${err.slice(0, 120)}`
+          result.linkedin = `error: ${liResult.error}`
         }
       } catch (e) {
         result.linkedin = `error: ${e instanceof Error ? e.message : 'unknown'}`

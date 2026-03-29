@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { postToLinkedIn } from '@/lib/linkedin'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   // 1. Fetch post
   const { data: post, error: postErr } = await supabase
     .from('posts')
-    .select('title_en,title_es,excerpt_en,excerpt_es,cover_image,slug,type,tags,card_images')
+    .select('title_en,title_es,excerpt_en,excerpt_es,cover_image,slug,type,tags,card_images,card_type')
     .eq('id', postId)
     .single()
 
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (network === 'linkedin') {
-      return await postToLinkedIn(post, accessToken, tokenValue.person_urn)
+      return await handleLinkedIn(post, accessToken, tokenValue.person_urn)
     } else {
       return await postToInstagram(post, accessToken, tokenValue.user_id)
     }
@@ -62,40 +63,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 })
   }
 
-  async function postToLinkedIn(
-    post: { title_en: string; excerpt_en: string | null; slug: string },
+  async function handleLinkedIn(
+    post: { title_en: string; excerpt_en: string | null; slug: string; cover_image: string | null; card_images: string[] | null },
     token: string,
     personUrn: string,
   ) {
-    const postUrl = `${SITE_URL}/en/posts/${post.slug}`
-    const text = [post.title_en, post.excerpt_en, postUrl].filter(Boolean).join('\n\n')
-
-    const res = await fetch('https://api.linkedin.com/v2/ugcPosts', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0',
-      },
-      body: JSON.stringify({
-        author: personUrn,
-        lifecycleState: 'PUBLISHED',
-        specificContent: {
-          'com.linkedin.ugc.ShareContent': {
-            shareCommentary: { text },
-            shareMediaCategory: 'ARTICLE',
-            media: [{ status: 'READY', originalUrl: postUrl, title: { text: post.title_en } }],
-          },
-        },
-        visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
-      }),
+    const imageUrl = post.card_images?.[0] ?? post.cover_image ?? null
+    const result = await postToLinkedIn({
+      title:     post.title_en,
+      excerpt:   post.excerpt_en,
+      slug:      post.slug,
+      imageUrl,
+      token,
+      personUrn,
+      siteUrl:   SITE_URL,
     })
-
-    if (!res.ok) {
-      const errBody = await res.text()
-      return NextResponse.json({ error: `LinkedIn API error: ${errBody}` }, { status: 500 })
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: 500 })
     }
-
     await markShared(postId, 'linkedin')
     return NextResponse.json({ ok: true })
   }

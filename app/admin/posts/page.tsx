@@ -18,7 +18,7 @@ async function getPosts() {
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('posts')
-      .select('id,slug,title_en,title_es,excerpt_es,type,tags,is_published,shared_linkedin,shared_instagram,published_at,created_at')
+      .select('id,slug,title_en,title_es,excerpt_es,type,tags,is_published,shared_linkedin,shared_instagram,published_at,scheduled_at,is_ai_generated,card_type,created_at')
       .order('created_at', { ascending: false })
     return data ?? []
   } catch {
@@ -35,7 +35,7 @@ export default async function AdminPostsPage() {
         <div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Posts</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            {posts.length} total · {posts.filter((p: PostRow) => p.is_published).length} published
+            {posts.length} total · {posts.filter((p: PostRow) => p.is_published).length} published · {posts.filter((p: PostRow) => !p.is_published && p.scheduled_at).length} scheduled
           </p>
         </div>
         <Link href="/admin/posts/new" className="btn btn-primary" style={{ fontSize: '0.88rem', padding: '10px 20px' }}>
@@ -58,6 +58,21 @@ export default async function AdminPostsPage() {
                     <span style={{ fontSize: '0.7rem', padding: '2px 9px', borderRadius: '20px', fontWeight: 700, background: tc.bg, color: tc.color }}>
                       {post.type}
                     </span>
+                    {post.card_type && (
+                      <span style={{ fontSize: '0.68rem', padding: '2px 7px', borderRadius: '20px', background: 'rgba(56,189,248,0.12)', color: '#38bdf8', fontWeight: 600 }}>
+                        {post.card_type}
+                      </span>
+                    )}
+                    {post.is_ai_generated && (
+                      <span style={{ fontSize: '0.68rem', padding: '2px 7px', borderRadius: '20px', background: 'rgba(167,139,250,0.12)', color: '#a78bfa', fontWeight: 600 }}>
+                        🤖 AI
+                      </span>
+                    )}
+                    {!post.is_published && post.scheduled_at && (
+                      <span style={{ fontSize: '0.68rem', padding: '2px 7px', borderRadius: '20px', background: 'rgba(251,191,36,0.12)', color: '#fbbf24', fontWeight: 600 }}>
+                        ⏰ {new Date(post.scheduled_at).toLocaleString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
                     <p style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)', margin: 0 }}>
                       {post.title_en}
                     </p>
@@ -89,5 +104,7 @@ interface PostRow {
   id: string; slug: string; title_en: string; title_es: string
   excerpt_es: string | null; type: string; tags: string[]
   is_published: boolean; shared_linkedin: boolean; shared_instagram: boolean
-  published_at: string | null; created_at: string
+  published_at: string | null; scheduled_at: string | null
+  is_ai_generated: boolean; card_type: string | null
+  created_at: string
 }

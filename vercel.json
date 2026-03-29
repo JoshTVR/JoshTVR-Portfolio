@@ -1,4 +1,7 @@
 {
+  "crons": [
+    { "path": "/api/cron/publish", "schedule": "*/15 * * * *" }
+  ],
   "headers": [
     {
       "source": "/api/stripe/webhook",

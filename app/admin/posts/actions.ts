@@ -18,6 +18,14 @@ export interface PostFormData {
   type:        string
   tags:        string   // comma-separated
   is_published: boolean
+  // Content automation fields
+  scheduled_at?:    string | null   // ISO datetime
+  card_type?:       string | null
+  card_data?:       Record<string, unknown> | null
+  card_images?:     string[]        // carousel slide URLs
+  color_theme?:     string | null
+  is_ai_generated?: boolean
+  burst_group_id?:  string | null
 }
 
 function parseFormData(raw: PostFormData) {
@@ -35,6 +43,14 @@ function parseFormData(raw: PostFormData) {
     tags:        raw.tags.split(',').map(t => t.trim()).filter(Boolean),
     is_published: raw.is_published,
     published_at: raw.is_published ? new Date().toISOString() : null,
+    // Content automation
+    scheduled_at:    raw.scheduled_at?.trim() || null,
+    card_type:       raw.card_type || null,
+    card_data:       raw.card_data ?? null,
+    card_images:     raw.card_images?.length ? raw.card_images : null,
+    color_theme:     raw.color_theme || null,
+    is_ai_generated: raw.is_ai_generated ?? false,
+    burst_group_id:  raw.burst_group_id || null,
   }
 }
 

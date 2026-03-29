@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   // 1. Fetch post
   const { data: post, error: postErr } = await supabase
     .from('posts')
-    .select('title_en,title_es,excerpt_en,excerpt_es,cover_image,slug,type,tags')
+    .select('title_en,title_es,excerpt_en,excerpt_es,cover_image,slug,type,tags,card_images')
     .eq('id', postId)
     .single()
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (network === 'linkedin') {
-      return await postToLinkedIn(post, accessToken, tokenValue.person_urn, tokenValue.org_urn)
+      return await postToLinkedIn(post, accessToken, tokenValue.person_urn)
     } else {
       return await postToInstagram(post, accessToken, tokenValue.user_id)
     }
@@ -66,47 +66,34 @@ export async function POST(req: NextRequest) {
     post: { title_en: string; excerpt_en: string | null; slug: string },
     token: string,
     personUrn: string,
-    orgUrn?: string,
   ) {
     const postUrl = `${SITE_URL}/en/posts/${post.slug}`
     const text = [post.title_en, post.excerpt_en, postUrl].filter(Boolean).join('\n\n')
 
-    async function publishAs(author: string) {
-      return fetch('https://api.linkedin.com/v2/ugcPosts', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'X-Restli-Protocol-Version': '2.0.0',
-        },
-        body: JSON.stringify({
-          author,
-          lifecycleState: 'PUBLISHED',
-          specificContent: {
-            'com.linkedin.ugc.ShareContent': {
-              shareCommentary: { text },
-              shareMediaCategory: 'ARTICLE',
-              media: [{ status: 'READY', originalUrl: postUrl, title: { text: post.title_en } }],
-            },
+    const res = await fetch('https://api.linkedin.com/v2/ugcPosts', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-Restli-Protocol-Version': '2.0.0',
+      },
+      body: JSON.stringify({
+        author: personUrn,
+        lifecycleState: 'PUBLISHED',
+        specificContent: {
+          'com.linkedin.ugc.ShareContent': {
+            shareCommentary: { text },
+            shareMediaCategory: 'ARTICLE',
+            media: [{ status: 'READY', originalUrl: postUrl, title: { text: post.title_en } }],
           },
-          visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
-        }),
-      })
-    }
+        },
+        visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
+      }),
+    })
 
-    const personalRes = await publishAs(personUrn)
-    if (!personalRes.ok) {
-      const errBody = await personalRes.text()
+    if (!res.ok) {
+      const errBody = await res.text()
       return NextResponse.json({ error: `LinkedIn API error: ${errBody}` }, { status: 500 })
-    }
-
-    if (orgUrn) {
-      const orgRes = await publishAs(orgUrn)
-      if (!orgRes.ok) {
-        // Personal post succeeded — don't fail, just note the org error
-        const errBody = await orgRes.text()
-        console.error('LinkedIn org post failed:', errBody)
-      }
     }
 
     await markShared(postId, 'linkedin')
@@ -114,11 +101,17 @@ export async function POST(req: NextRequest) {
   }
 
   async function postToInstagram(
-    post: { title_es: string; excerpt_es: string | null; cover_image: string | null; slug: string; tags: string[] },
+    post: { title_es: string; excerpt_es: string | null; cover_image: string | null; slug: string; tags: string[]; card_images: string[] | null },
     token: string,
     userId: string,
   ) {
-    if (!post.cover_image) {
+    const images: string[] = post.card_images?.length
+      ? post.card_images
+      : post.cover_image
+      ? [post.cover_image]
+      : []
+
+    if (images.length === 0) {
       return NextResponse.json(
         { error: 'Instagram requiere imagen de portada para publicar' },
         { status: 400 },
@@ -128,46 +121,65 @@ export async function POST(req: NextRequest) {
     const tags = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
     const caption = `${typeEmoji(body.type ?? 'post')} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n👉 ${SITE_URL}/es/posts/${post.slug}\n\n${tags} #joshtvr`.trim()
 
-    // Step 1: Create media container
-    const containerRes = await fetch(
-      `https://graph.instagram.com/v21.0/${userId}/media`,
-      {
+    if (images.length === 1) {
+      // Single image post
+      const containerRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          image_url: post.cover_image,
-          caption,
-        }),
-      },
-    )
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ image_url: images[0], caption }),
+      })
+      if (!containerRes.ok) {
+        const errBody = await containerRes.text()
+        return NextResponse.json({ error: `Instagram container error: ${errBody}` }, { status: 500 })
+      }
+      const { id: creationId } = await containerRes.json()
 
-    if (!containerRes.ok) {
-      const errBody = await containerRes.text()
-      return NextResponse.json({ error: `Instagram container error: ${errBody}` }, { status: 500 })
-    }
-
-    const containerData = await containerRes.json()
-    const creationId: string = containerData.id
-
-    // Step 2: Publish
-    const publishRes = await fetch(
-      `https://graph.instagram.com/v21.0/${userId}/media_publish`,
-      {
+      const publishRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ creation_id: creationId }),
-      },
-    )
+      })
+      if (!publishRes.ok) {
+        const errBody = await publishRes.text()
+        return NextResponse.json({ error: `Instagram publish error: ${errBody}` }, { status: 500 })
+      }
+    } else {
+      // Carousel: N item containers → carousel container → publish
+      const itemIds: string[] = []
+      for (const imageUrl of images) {
+        const itemRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ image_url: imageUrl, is_carousel_item: true }),
+        })
+        if (!itemRes.ok) {
+          const errBody = await itemRes.text()
+          return NextResponse.json({ error: `Carousel item error: ${errBody}` }, { status: 500 })
+        }
+        const { id } = await itemRes.json()
+        itemIds.push(id)
+      }
 
-    if (!publishRes.ok) {
-      const errBody = await publishRes.text()
-      return NextResponse.json({ error: `Instagram publish error: ${errBody}` }, { status: 500 })
+      const carouselRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ media_type: 'CAROUSEL', children: itemIds.join(','), caption }),
+      })
+      if (!carouselRes.ok) {
+        const errBody = await carouselRes.text()
+        return NextResponse.json({ error: `Carousel container error: ${errBody}` }, { status: 500 })
+      }
+      const { id: carouselId } = await carouselRes.json()
+
+      const publishRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ creation_id: carouselId }),
+      })
+      if (!publishRes.ok) {
+        const errBody = await publishRes.text()
+        return NextResponse.json({ error: `Carousel publish error: ${errBody}` }, { status: 500 })
+      }
     }
 
     await markShared(postId, 'instagram')

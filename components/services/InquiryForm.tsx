@@ -46,6 +46,7 @@ export function InquiryForm({ services, preselectedId, t, onClose }: InquiryForm
       message:    get('message'),
       budget:     get('budget') || null,
       service_id: service || null,
+      website:    get('website'),
     }
 
     try {
@@ -81,6 +82,8 @@ export function InquiryForm({ services, preselectedId, t, onClose }: InquiryForm
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Honeypot — hidden from humans, filled by bots */}
+      <input type="text" name="website" aria-hidden="true" tabIndex={-1} autoComplete="off" style={{ display: 'none' }} />
       <h3
         style={{
           fontFamily: 'var(--font-heading)',

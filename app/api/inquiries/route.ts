@@ -12,6 +12,12 @@ export async function POST(request: Request) {
     }
 
     const { name, email, message, budget } = body
+    const honeypot = (body as Record<string, unknown>).website
+
+    // Honeypot: bots fill this hidden field, humans don't
+    if (honeypot) {
+      return NextResponse.json({ ok: true })
+    }
 
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return NextResponse.json({ error: 'Name, email and message are required' }, { status: 400 })

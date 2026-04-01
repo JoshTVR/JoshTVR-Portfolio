@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const githubUsername = user.user_metadata?.user_name as string | undefined
-    if (githubUsername?.toLowerCase() !== (process.env.ADMIN_GITHUB_USERNAME || 'josht vr').toLowerCase()) {
+    if (githubUsername?.toLowerCase() !== (process.env.ADMIN_GITHUB_USERNAME || 'JoshTVR').toLowerCase()) {
       // Not the authorized admin — sign out and redirect
       await supabase.auth.signOut()
       return NextResponse.redirect(new URL('/', request.url))

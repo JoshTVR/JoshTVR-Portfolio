@@ -22,6 +22,7 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
       name: (form.elements.namedItem('name') as HTMLInputElement).value,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
       message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+      website: (form.elements.namedItem('website') as HTMLInputElement).value,
       service_id: null as null,
     }
     try {
@@ -174,6 +175,8 @@ export default function ContactSection({ title, subtitle }: ContactSectionProps)
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }} noValidate>
+                {/* Honeypot — hidden from humans, filled by bots */}
+                <input type="text" name="website" aria-hidden="true" tabIndex={-1} autoComplete="off" style={{ display: 'none' }} />
                 <input type="text" name="name" required placeholder="Your name" style={inputStyle}
                   onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)' }}
                   onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-glass)' }} />

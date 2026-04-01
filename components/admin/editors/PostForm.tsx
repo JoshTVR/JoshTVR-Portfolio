@@ -494,9 +494,16 @@ export function PostForm({ initial, projects }: PostFormProps) {
                 }}
               />
               {cardImages.length > 0 && (
-                <span style={{ fontSize: '0.8rem', color: '#10b981' }}>
-                  ✓ {cardImages.length} image{cardImages.length > 1 ? 's' : ''} generated
-                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#10b981' }}>
+                    ✓ {cardImages.length} image{cardImages.length > 1 ? 's' : ''} saved
+                  </span>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {cardImages.map((url, i) => (
+                      <img key={i} src={url} alt={`Card ${i + 1}`} style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '6px', border: '1px solid rgba(16,185,129,0.4)' }} />
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
           </div>

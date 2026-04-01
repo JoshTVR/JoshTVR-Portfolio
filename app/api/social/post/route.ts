@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { postToLinkedIn } from '@/lib/linkedin'
 import { postToFacebook } from '@/lib/facebook'
+import { postToThreads } from '@/lib/threads'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing network or postId' }, { status: 400 })
   }
 
-  const { network, postId }: { network: 'linkedin' | 'instagram' | 'facebook'; postId: string } = body
+  const { network, postId }: { network: 'linkedin' | 'instagram' | 'facebook' | 'threads'; postId: string } = body
   const supabase = createAdminClient()
 
   // 1. Fetch post
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
   // 2. Fetch token
   const tokenKey = network === 'linkedin' ? 'linkedin_token'
     : network === 'instagram' ? 'instagram_token'
+    : network === 'threads' ? 'threads_token'
     : 'facebook_token'
   const { data: tokenRow } = await supabase
     .from('settings')
@@ -61,6 +63,8 @@ export async function POST(req: NextRequest) {
       return await handleLinkedIn(post, accessToken, tokenValue.person_urn)
     } else if (network === 'facebook') {
       return await handleFacebook(post, accessToken, tokenValue.page_id)
+    } else if (network === 'threads') {
+      return await handleThreads(post, accessToken, tokenValue.user_id)
     } else {
       return await postToInstagram(post, accessToken, tokenValue.user_id)
     }
@@ -85,6 +89,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 500 })
     }
     await markShared(postId, 'facebook')
+    return NextResponse.json({ ok: true })
+  }
+
+  async function handleThreads(
+    post: { title_es: string; excerpt_es: string | null; cover_image: string | null; slug: string; tags: string[]; card_images: string[] | null; type: string },
+    token: string,
+    userId: string,
+  ) {
+    const imageUrl = post.card_images?.[0] ?? post.cover_image ?? null
+    const tags     = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
+    const text     = `${typeEmoji(post.type)} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n${tags} #joshtvr`.trim()
+    const result   = await postToThreads({ text, imageUrl, token, userId })
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: 500 })
+    }
+    await markShared(postId, 'threads')
     return NextResponse.json({ ok: true })
   }
 
@@ -196,8 +216,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  async function markShared(id: string, net: 'linkedin' | 'instagram' | 'facebook') {
-    const field = net === 'linkedin' ? 'shared_linkedin' : net === 'instagram' ? 'shared_instagram' : 'shared_facebook'
+  async function markShared(id: string, net: 'linkedin' | 'instagram' | 'facebook' | 'threads') {
+    const field = net === 'linkedin' ? 'shared_linkedin'
+      : net === 'instagram' ? 'shared_instagram'
+      : net === 'threads' ? 'shared_threads'
+      : 'shared_facebook'
     await supabase.from('posts').update({ [field]: true }).eq('id', id)
   }
 }

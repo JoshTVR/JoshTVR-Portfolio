@@ -16,6 +16,9 @@ interface Props {
   facebookConnected: boolean
   facebookPageName: string
   facebookExpiresAt: string
+  threadsConnected: boolean
+  threadsUsername: string
+  threadsExpiresAt: string
 }
 
 export function SettingsForm({
@@ -30,6 +33,9 @@ export function SettingsForm({
   facebookConnected,
   facebookPageName,
   facebookExpiresAt,
+  threadsConnected,
+  threadsUsername,
+  threadsExpiresAt,
 }: Props) {
   const [store,       setStore]       = useState(storeVisible)
   const [ghStats,     setGhStats]     = useState(sectionsVisible.github_stats ?? true)
@@ -45,6 +51,7 @@ export function SettingsForm({
     if (connected === 'linkedin')  setSocialMsg('✓ LinkedIn connected successfully')
     else if (connected === 'instagram') setSocialMsg('✓ Instagram connected successfully')
     else if (connected === 'facebook')  setSocialMsg('✓ Facebook Page connected successfully')
+    else if (connected === 'threads')    setSocialMsg('✓ Threads connected successfully')
     else if (error === 'linkedin_token')  setSocialMsg(`LinkedIn token error: ${searchParams.get('detail') ?? 'unknown'}`)
     else if (error === 'linkedin_denied') setSocialMsg('LinkedIn connection was cancelled')
     else if (error === 'instagram_denied') setSocialMsg('Instagram connection was cancelled')
@@ -52,6 +59,8 @@ export function SettingsForm({
     else if (error === 'facebook_denied')   setSocialMsg('Facebook connection was cancelled')
     else if (error === 'facebook_token')    setSocialMsg('Facebook token error — try again')
     else if (error === 'facebook_no_pages') setSocialMsg('No Facebook Pages found — make sure you manage at least one Page')
+    else if (error === 'threads_denied')    setSocialMsg('Threads connection was cancelled')
+    else if (error === 'threads_token')     setSocialMsg('Threads token error — try again')
     else if (error) setSocialMsg('Connection error — try again')
   }, [searchParams])
 
@@ -252,6 +261,41 @@ export function SettingsForm({
               }}
             >
               {facebookConnected ? 'Reconnect' : 'Connect Facebook'}
+            </a>
+          </div>
+
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+
+          {/* Threads */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <div>
+              <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.92rem', marginBottom: '2px' }}>
+                Threads
+                {threadsConnected && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>✓ Connected</span>
+                )}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {threadsConnected
+                  ? `@${threadsUsername}${formatExpiry(threadsExpiresAt)}`
+                  : 'Not connected — personal Threads account for My Content posts'}
+              </p>
+            </div>
+            <a
+              href="/api/auth/threads"
+              style={{
+                flexShrink: 0,
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                background: threadsConnected ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.08)',
+                color: threadsConnected ? 'var(--text-muted)' : 'var(--text-primary)',
+                border: `1px solid ${threadsConnected ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.2)'}`,
+              }}
+            >
+              {threadsConnected ? 'Reconnect' : 'Connect Threads'}
             </a>
           </div>
         </div>

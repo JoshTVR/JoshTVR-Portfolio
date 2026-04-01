@@ -83,7 +83,7 @@ export async function updatePost(id: string, data: PostFormData): Promise<{ erro
   if (error) return { error: error.message }
 
   revalidateAll()
-  redirect('/admin/posts')
+  redirect(`/admin/posts/${id}/edit`)
 }
 
 export async function deletePost(id: string): Promise<{ error?: string }> {

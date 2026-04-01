@@ -41,6 +41,9 @@ export const metadata: Metadata = {
     images: ['/og?title=Joshua+Hernandez&description=VR+%26+Digital+Business+Developer'],
   },
   robots: { index: true, follow: true },
+  other: {
+    'facebook-domain-verification': 'sgc858pdn3b7pdosmt0e6wyacy7a5a',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

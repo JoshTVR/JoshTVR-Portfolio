@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { postToLinkedIn } from '@/lib/linkedin'
 import { postToFacebook } from '@/lib/facebook'
+import { postToThreads } from '@/lib/threads'
 import { generateAndStoreCards } from '@/lib/generate-and-store-cards'
 
 export const dynamic = 'force-dynamic'
@@ -56,17 +57,17 @@ export async function GET(req: NextRequest) {
   const { data: tokenRows } = await supabase
     .from('settings')
     .select('key,value')
-    .in('key', ['linkedin_token', 'instagram_token', 'facebook_token'])
+    .in('key', ['linkedin_token', 'instagram_token', 'facebook_token', 'threads_token'])
 
   const tokenMap: Record<string, Record<string, string>> = {}
   for (const row of tokenRows ?? []) {
     tokenMap[row.key] = row.value as Record<string, string>
   }
 
-  const results: Array<{ id: string; linkedin?: string; instagram?: string; facebook?: string }> = []
+  const results: Array<{ id: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string }> = []
 
   for (const post of posts) {
-    const result: { id: string; linkedin?: string; instagram?: string; facebook?: string } = { id: post.id }
+    const result: { id: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string } = { id: post.id }
     const isAI = post.is_ai_generated ?? false
 
     // ── Auto-generate card images if missing ──────────────────────────────────
@@ -153,6 +154,26 @@ export async function GET(req: NextRequest) {
       }
     } else if (isAI) {
       result.instagram = 'skipped: AI posts not on personal Instagram'
+    }
+
+    // ── Threads (My Content only — personal account) ──────────────────────────
+    const thToken = tokenMap['threads_token']
+    if (thToken?.access_token && !isAI && (!thToken.expires_at || new Date(thToken.expires_at) > new Date())) {
+      try {
+        const tags   = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
+        const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
+        const thResult = await postToThreads({ text, imageUrl, token: thToken.access_token, userId: thToken.user_id })
+        if (thResult.ok) {
+          await supabase.from('posts').update({ shared_threads: true }).eq('id', post.id)
+          result.threads = 'ok'
+        } else {
+          result.threads = `error: ${thResult.error}`
+        }
+      } catch (e) {
+        result.threads = `error: ${e instanceof Error ? e.message : 'unknown'}`
+      }
+    } else if (isAI) {
+      result.threads = 'skipped: AI posts not on personal Threads'
     }
 
     results.push(result)

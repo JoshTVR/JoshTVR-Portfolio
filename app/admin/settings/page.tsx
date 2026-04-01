@@ -18,7 +18,7 @@ async function getSettings() {
     const { data } = await supabase
       .from('settings')
       .select('key,value')
-      .in('key', ['store_visible', 'sections_visible', 'linkedin_token', 'instagram_token'])
+      .in('key', ['store_visible', 'sections_visible', 'linkedin_token', 'instagram_token', 'facebook_token'])
     const map: Record<string, unknown> = {}
     for (const row of data ?? []) map[row.key] = row.value
     return map
@@ -37,11 +37,13 @@ export default async function SettingsPage() {
     store_nav: false,
   }
 
-  const linkedinToken = settings['linkedin_token'] as TokenValue | null | undefined
+  const linkedinToken  = settings['linkedin_token']  as TokenValue | null | undefined
   const instagramToken = settings['instagram_token'] as TokenValue | null | undefined
+  const facebookToken  = settings['facebook_token']  as (TokenValue & { page_id?: string; page_name?: string }) | null | undefined
 
-  const linkedinConnected = !!(linkedinToken?.access_token)
+  const linkedinConnected  = !!(linkedinToken?.access_token)
   const instagramConnected = !!(instagramToken?.access_token)
+  const facebookConnected  = !!(facebookToken?.access_token)
 
   return (
     <div>
@@ -69,6 +71,9 @@ export default async function SettingsPage() {
         instagramConnected={instagramConnected}
         instagramUsername={instagramToken?.username ?? ''}
         instagramExpiresAt={instagramToken?.expires_at ?? ''}
+        facebookConnected={facebookConnected}
+        facebookPageName={(facebookToken as Record<string, string> | null | undefined)?.page_name ?? ''}
+        facebookExpiresAt={facebookToken?.expires_at ?? ''}
       />
     </div>
   )

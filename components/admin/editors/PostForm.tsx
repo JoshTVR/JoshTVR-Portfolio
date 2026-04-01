@@ -42,6 +42,7 @@ interface PostFormProps {
     card_type?: string
     shared_linkedin?: boolean
     shared_instagram?: boolean
+    shared_facebook?: boolean
   }
   projects: Project[]
 }
@@ -669,6 +670,7 @@ export function PostForm({ initial, projects }: PostFormProps) {
           postId={isEdit ? initial?.id : undefined}
           sharedLinkedin={initial?.shared_linkedin}
           sharedInstagram={initial?.shared_instagram}
+          sharedFacebook={initial?.shared_facebook}
         />
       </section>
 

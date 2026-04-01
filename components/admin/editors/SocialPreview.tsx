@@ -15,6 +15,7 @@ interface SocialPreviewProps {
   postId?:    string
   sharedLinkedin?:  boolean
   sharedInstagram?: boolean
+  sharedFacebook?:  boolean
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.joshtvr.com'
@@ -27,10 +28,11 @@ function typeEmoji(type: string) {
 }
 
 export function SocialPreview(p: SocialPreviewProps) {
-  const [tab, setTab] = useState<'linkedin' | 'instagram'>('linkedin')
-  const [sharing,  setSharing]  = useState<'linkedin' | 'instagram' | null>(null)
+  const [tab, setTab] = useState<'linkedin' | 'instagram' | 'facebook'>('linkedin')
+  const [sharing,  setSharing]  = useState<'linkedin' | 'instagram' | 'facebook' | null>(null)
   const [liShared, setLiShared] = useState(p.sharedLinkedin ?? false)
   const [igShared, setIgShared] = useState(p.sharedInstagram ?? false)
+  const [fbShared, setFbShared] = useState(p.sharedFacebook ?? false)
   const [toast,    setToast]    = useState('')
 
   const postUrl  = `${SITE_URL}/en/posts/${p.slug}`
@@ -39,7 +41,7 @@ export function SocialPreview(p: SocialPreviewProps) {
   const liText   = [p.titleEn, p.excerptEn, postUrl].filter(Boolean).join('\n\n')
   const igCaption = `${typeEmoji(p.type)} ${p.titleEs}\n\n${p.excerptEs}\n\n👉 ${SITE_URL}/es/posts/${p.slug}\n\n${hashTags} #joshtvr`
 
-  async function handleShare(network: 'linkedin' | 'instagram') {
+  async function handleShare(network: 'linkedin' | 'instagram' | 'facebook') {
     if (!p.postId) return
     setSharing(network)
     setToast('')
@@ -52,7 +54,8 @@ export function SocialPreview(p: SocialPreviewProps) {
       const json = await res.json()
       if (json.ok) {
         if (network === 'linkedin') setLiShared(true)
-        else setIgShared(true)
+        else if (network === 'instagram') setIgShared(true)
+        else setFbShared(true)
         setToast('¡Publicado! ✓')
       } else {
         setToast(json.error ?? 'Error al publicar')
@@ -68,18 +71,18 @@ export function SocialPreview(p: SocialPreviewProps) {
     <div>
       {/* Tab switcher */}
       <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
-        {(['linkedin', 'instagram'] as const).map(n => (
+        {(['linkedin', 'instagram', 'facebook'] as const).map(n => (
           <button key={n} type="button" onClick={() => setTab(n)} style={{
             padding: '7px 16px', borderRadius: '8px', fontSize: '0.82rem',
             fontWeight: tab === n ? 700 : 500, cursor: 'pointer', border: 'none',
             background: tab === n
-              ? n === 'linkedin' ? 'rgba(0,119,181,0.2)' : 'rgba(225,48,108,0.2)'
+              ? n === 'linkedin' ? 'rgba(0,119,181,0.2)' : n === 'instagram' ? 'rgba(225,48,108,0.2)' : 'rgba(24,119,242,0.2)'
               : 'rgba(255,255,255,0.05)',
             color: tab === n
-              ? n === 'linkedin' ? '#38bdf8' : '#f472b6'
+              ? n === 'linkedin' ? '#38bdf8' : n === 'instagram' ? '#f472b6' : '#60a5fa'
               : 'var(--text-muted)',
           }}>
-            {n === 'linkedin' ? 'LinkedIn' : 'Instagram'}
+            {n === 'linkedin' ? 'LinkedIn' : n === 'instagram' ? 'Instagram' : 'Facebook'}
           </button>
         ))}
       </div>
@@ -149,6 +152,38 @@ export function SocialPreview(p: SocialPreviewProps) {
         </div>
       )}
 
+      {/* Facebook mockup */}
+      {tab === 'facebook' && (
+        <div style={{ background: '#1b1f23', borderRadius: '12px', overflow: 'hidden', maxWidth: '500px', border: '1px solid rgba(255,255,255,0.08)' }}>
+          {/* Header */}
+          <div style={{ padding: '14px 16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(24,119,242,0.25)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 700, color: '#60a5fa' }}>J</div>
+            <div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#e2e8f0' }}>JoshTVR</div>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '1px' }}>Facebook Page · Just now · 🌐</div>
+            </div>
+          </div>
+          {/* Text */}
+          <div style={{ padding: '0 16px 12px', fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.55, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {igCaption.length > 300 ? igCaption.slice(0, 300) + '…' : igCaption}
+          </div>
+          {/* Image */}
+          {p.coverImage ? (
+            <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
+          ) : (
+            <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(24,119,242,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+              No image — generate card first
+            </div>
+          )}
+          {/* Actions */}
+          <div style={{ padding: '8px 16px', display: 'flex', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            {['👍 Like','💬 Comment','↗️ Share'].map(a => (
+              <span key={a} style={{ fontSize: '0.72rem', color: '#64748b' }}>{a}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Manual post buttons (only if postId provided) */}
       {p.postId && (
         <div style={{ marginTop: '16px', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -166,6 +201,14 @@ export function SocialPreview(p: SocialPreviewProps) {
             <button type="button" onClick={() => handleShare('instagram')} disabled={sharing !== null}
               style={{ padding: '7px 16px', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 700, cursor: sharing ? 'default' : 'pointer', background: 'rgba(225,48,108,0.15)', color: '#f472b6', border: '1px solid rgba(225,48,108,0.3)' }}>
               {sharing === 'instagram' ? 'Posting…' : 'Post to Instagram'}
+            </button>
+          )}
+          {fbShared ? (
+            <span style={{ fontSize: '0.78rem', padding: '6px 14px', borderRadius: '8px', background: 'rgba(24,119,242,0.12)', color: '#60a5fa', fontWeight: 700 }}>✓ Posted to Facebook</span>
+          ) : (
+            <button type="button" onClick={() => handleShare('facebook')} disabled={sharing !== null}
+              style={{ padding: '7px 16px', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 700, cursor: sharing ? 'default' : 'pointer', background: 'rgba(24,119,242,0.15)', color: '#60a5fa', border: '1px solid rgba(24,119,242,0.3)' }}>
+              {sharing === 'facebook' ? 'Posting…' : 'Post to Facebook'}
             </button>
           )}
           {toast && (

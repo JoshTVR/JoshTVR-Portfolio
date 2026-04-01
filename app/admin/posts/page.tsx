@@ -18,7 +18,7 @@ async function getPosts() {
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('posts')
-      .select('id,slug,title_en,title_es,excerpt_es,type,tags,is_published,shared_linkedin,shared_instagram,published_at,scheduled_at,is_ai_generated,card_type,created_at')
+      .select('id,slug,title_en,title_es,excerpt_es,type,tags,is_published,shared_linkedin,shared_instagram,shared_facebook,published_at,scheduled_at,is_ai_generated,card_type,created_at')
       .order('created_at', { ascending: false })
     return data ?? []
   } catch {
@@ -103,7 +103,7 @@ export default async function AdminPostsPage() {
 interface PostRow {
   id: string; slug: string; title_en: string; title_es: string
   excerpt_es: string | null; type: string; tags: string[]
-  is_published: boolean; shared_linkedin: boolean; shared_instagram: boolean
+  is_published: boolean; shared_linkedin: boolean; shared_instagram: boolean; shared_facebook: boolean
   published_at: string | null; scheduled_at: string | null
   is_ai_generated: boolean; card_type: string | null
   created_at: string

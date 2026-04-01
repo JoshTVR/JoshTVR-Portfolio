@@ -1,13 +1,42 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { CardContent } from '@/components/posts/CardContent'
 
 export const dynamic = 'force-dynamic'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
 interface PageProps { params: Promise<{ locale: string; slug: string }> }
 
 function getYouTubeId(url: string): string | null {
   const match = url.match(/(?:v=|youtu\.be\/|embed\/)([^&?\s]{11})/)
   return match?.[1] ?? null
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const supabase = createAdminClient()
+  const { data: post } = await supabase
+    .from('posts')
+    .select('title_en,excerpt_en,slug')
+    .eq('slug', slug)
+    .single()
+  if (!post) return {}
+  return {
+    title: post.title_en,
+    description: post.excerpt_en ?? undefined,
+    openGraph: {
+      title: post.title_en,
+      description: post.excerpt_en ?? undefined,
+      images: [{
+        url: `${SITE_URL}/og?title=${encodeURIComponent(post.title_en)}&description=${encodeURIComponent(post.excerpt_en ?? '')}`,
+        width: 1200,
+        height: 630,
+      }],
+    },
+  }
 }
 
 export default async function PostPage({ params }: PageProps) {
@@ -34,9 +63,11 @@ export default async function PostPage({ params }: PageProps) {
     relatedProject = data
   }
 
-  const title   = isEs ? post.title_es   : post.title_en
-  const content = isEs ? post.content_es : post.content_en
+  const title    = isEs ? post.title_es   : post.title_en
+  const content  = isEs ? post.content_es : post.content_en
   const youtubeId = post.youtube_url ? getYouTubeId(post.youtube_url) : null
+  const cardImages: string[] = post.card_images ?? []
+  const cardData  = post.card_data as Record<string, unknown> | null
 
   return (
     <main style={{ minHeight: '100vh', paddingTop: '120px', paddingBottom: '80px', background: 'var(--bg-primary)' }}>
@@ -73,8 +104,8 @@ export default async function PostPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Cover image */}
-        {post.cover_image && !youtubeId && (
+        {/* Cover image (only if no card_images and no YouTube) */}
+        {post.cover_image && !youtubeId && cardImages.length === 0 && (
           <img src={post.cover_image} alt={title} style={{ width: '100%', borderRadius: '12px', marginBottom: '32px', objectFit: 'cover', maxHeight: '400px' }} />
         )}
 
@@ -88,6 +119,27 @@ export default async function PostPage({ params }: PageProps) {
               allowFullScreen
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
             />
+          </div>
+        )}
+
+        {/* Card images (for AI posts without content_en — show the actual card slides) */}
+        {!content && cardImages.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
+            {cardImages.map((url: string, i: number) => (
+              <img
+                key={i}
+                src={url}
+                alt={`${title} — slide ${i + 1}`}
+                style={{ width: '100%', borderRadius: '12px', objectFit: 'contain', background: '#0a0a1a' }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Card data text rendering (readable content + SEO) */}
+        {post.card_type && cardData && (
+          <div style={{ marginBottom: '32px' }}>
+            <CardContent type={post.card_type} data={cardData} />
           </div>
         )}
 

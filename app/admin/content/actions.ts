@@ -150,3 +150,22 @@ export async function bulkDeletePosts(ids: string[]): Promise<{ error?: string }
   revalidatePath('/admin/posts')
   return {}
 }
+
+export async function resetAIPosts(): Promise<{ reset: number; error?: string }> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('posts')
+    .update({
+      is_published:     false,
+      shared_linkedin:  false,
+      shared_instagram: false,
+      shared_facebook:  false,
+      published_at:     null,
+    })
+    .eq('is_ai_generated', true)
+    .select('id')
+  if (error) return { reset: 0, error: error.message }
+  revalidatePath('/admin/content')
+  revalidatePath('/admin/posts')
+  return { reset: data?.length ?? 0 }
+}

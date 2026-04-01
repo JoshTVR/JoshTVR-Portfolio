@@ -13,6 +13,9 @@ interface Props {
   instagramConnected: boolean
   instagramUsername: string
   instagramExpiresAt: string
+  facebookConnected: boolean
+  facebookPageName: string
+  facebookExpiresAt: string
 }
 
 export function SettingsForm({
@@ -24,6 +27,9 @@ export function SettingsForm({
   instagramConnected,
   instagramUsername,
   instagramExpiresAt,
+  facebookConnected,
+  facebookPageName,
+  facebookExpiresAt,
 }: Props) {
   const [store,       setStore]       = useState(storeVisible)
   const [ghStats,     setGhStats]     = useState(sectionsVisible.github_stats ?? true)
@@ -36,12 +42,16 @@ export function SettingsForm({
   useEffect(() => {
     const connected = searchParams.get('social_connected')
     const error = searchParams.get('social_error')
-    if (connected === 'linkedin') setSocialMsg('✓ LinkedIn connected successfully')
+    if (connected === 'linkedin')  setSocialMsg('✓ LinkedIn connected successfully')
     else if (connected === 'instagram') setSocialMsg('✓ Instagram connected successfully')
-    else if (error === 'linkedin_token') setSocialMsg(`LinkedIn token error: ${searchParams.get('detail') ?? 'unknown'}`)
+    else if (connected === 'facebook')  setSocialMsg('✓ Facebook Page connected successfully')
+    else if (error === 'linkedin_token')  setSocialMsg(`LinkedIn token error: ${searchParams.get('detail') ?? 'unknown'}`)
     else if (error === 'linkedin_denied') setSocialMsg('LinkedIn connection was cancelled')
     else if (error === 'instagram_denied') setSocialMsg('Instagram connection was cancelled')
     else if (error === 'instagram_no_account') setSocialMsg('No Instagram Business/Creator account found on your Facebook pages')
+    else if (error === 'facebook_denied')   setSocialMsg('Facebook connection was cancelled')
+    else if (error === 'facebook_token')    setSocialMsg('Facebook token error — try again')
+    else if (error === 'facebook_no_pages') setSocialMsg('No Facebook Pages found — make sure you manage at least one Page')
     else if (error) setSocialMsg('Connection error — try again')
   }, [searchParams])
 
@@ -207,6 +217,41 @@ export function SettingsForm({
               }}
             >
               {instagramConnected ? 'Reconnect' : 'Connect Instagram'}
+            </a>
+          </div>
+
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+
+          {/* Facebook Page */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+            <div>
+              <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.92rem', marginBottom: '2px' }}>
+                Facebook Page
+                {facebookConnected && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>✓ Connected</span>
+                )}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {facebookConnected
+                  ? `${facebookPageName}${formatExpiry(facebookExpiresAt)}`
+                  : 'Not connected — posts will go to Facebook Page for all content types'}
+              </p>
+            </div>
+            <a
+              href="/api/auth/facebook"
+              style={{
+                flexShrink: 0,
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                background: facebookConnected ? 'rgba(255,255,255,0.07)' : 'rgba(24,119,242,0.15)',
+                color: facebookConnected ? 'var(--text-muted)' : '#60a5fa',
+                border: `1px solid ${facebookConnected ? 'rgba(255,255,255,0.1)' : 'rgba(24,119,242,0.3)'}`,
+              }}
+            >
+              {facebookConnected ? 'Reconnect' : 'Connect Facebook'}
             </a>
           </div>
         </div>

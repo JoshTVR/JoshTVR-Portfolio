@@ -21,6 +21,7 @@ interface PostRow {
   is_published:     boolean
   shared_linkedin:  boolean
   shared_instagram: boolean
+  shared_facebook:  boolean
 }
 
 export function PublishToggle({ id, published }: { id: string; published: boolean }) {
@@ -42,9 +43,10 @@ export function PublishToggle({ id, published }: { id: string; published: boolea
 }
 
 export function ShareButtons({ post }: { post: PostRow; siteUrl: string }) {
-  const [sharing,  setSharing]  = useState<'linkedin' | 'instagram' | null>(null)
+  const [sharing,  setSharing]  = useState<'linkedin' | 'instagram' | 'facebook' | null>(null)
   const [liShared, setLiShared] = useState(post.shared_linkedin)
   const [igShared, setIgShared] = useState(post.shared_instagram)
+  const [fbShared, setFbShared] = useState(post.shared_facebook)
   const [toast,    setToast]    = useState('')
 
   function showToast(msg: string) {
@@ -52,7 +54,7 @@ export function ShareButtons({ post }: { post: PostRow; siteUrl: string }) {
     setTimeout(() => setToast(''), 3000)
   }
 
-  async function handleShare(network: 'linkedin' | 'instagram') {
+  async function handleShare(network: 'linkedin' | 'instagram' | 'facebook') {
     setSharing(network)
     try {
       const res  = await fetch('/api/social/post', {
@@ -63,7 +65,8 @@ export function ShareButtons({ post }: { post: PostRow; siteUrl: string }) {
       const json = await res.json()
       if (json.ok) {
         if (network === 'linkedin') setLiShared(true)
-        else setIgShared(true)
+        else if (network === 'instagram') setIgShared(true)
+        else setFbShared(true)
         showToast('¡Publicado! ✓')
       } else {
         showToast(json.error ?? 'Error al publicar')
@@ -106,6 +109,18 @@ export function ShareButtons({ post }: { post: PostRow; siteUrl: string }) {
             style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', background: 'rgba(225,48,108,0.1)', color: '#e1306c', border: '1px solid rgba(225,48,108,0.25)', cursor: sharing ? 'default' : 'pointer', fontWeight: 600 }}
           >
             {sharing === 'instagram' ? '…' : 'Instagram'}
+          </button>
+        )
+      }
+      {fbShared
+        ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(24,119,242,0.12)', color: '#1877f2', fontWeight: 700 }}>✓ Facebook</span>
+        : (
+          <button
+            onClick={() => handleShare('facebook')}
+            disabled={sharing !== null}
+            style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '20px', background: 'rgba(24,119,242,0.1)', color: '#1877f2', border: '1px solid rgba(24,119,242,0.25)', cursor: sharing ? 'default' : 'pointer', fontWeight: 600 }}
+          >
+            {sharing === 'facebook' ? '…' : 'Facebook'}
           </button>
         )
       }

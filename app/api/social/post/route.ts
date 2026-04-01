@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { postToLinkedIn } from '@/lib/linkedin'
+import { postToFacebook } from '@/lib/facebook'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing network or postId' }, { status: 400 })
   }
 
-  const { network, postId }: { network: 'linkedin' | 'instagram'; postId: string } = body
+  const { network, postId }: { network: 'linkedin' | 'instagram' | 'facebook'; postId: string } = body
   const supabase = createAdminClient()
 
   // 1. Fetch post
@@ -34,10 +35,13 @@ export async function POST(req: NextRequest) {
   }
 
   // 2. Fetch token
+  const tokenKey = network === 'linkedin' ? 'linkedin_token'
+    : network === 'instagram' ? 'instagram_token'
+    : 'facebook_token'
   const { data: tokenRow } = await supabase
     .from('settings')
     .select('value')
-    .eq('key', network === 'linkedin' ? 'linkedin_token' : 'instagram_token')
+    .eq('key', tokenKey)
     .single()
 
   if (!tokenRow?.value) {
@@ -55,12 +59,33 @@ export async function POST(req: NextRequest) {
   try {
     if (network === 'linkedin') {
       return await handleLinkedIn(post, accessToken, tokenValue.person_urn)
+    } else if (network === 'facebook') {
+      return await handleFacebook(post, accessToken, tokenValue.page_id)
     } else {
       return await postToInstagram(post, accessToken, tokenValue.user_id)
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     return NextResponse.json({ error: message }, { status: 500 })
+  }
+
+  async function handleFacebook(
+    post: { title_es: string; excerpt_es: string | null; cover_image: string | null; slug: string; tags: string[]; card_images: string[] | null; type: string },
+    token: string,
+    pageId: string,
+  ) {
+    const imageUrl = post.card_images?.[0] ?? post.cover_image ?? null
+    if (!imageUrl) {
+      return NextResponse.json({ error: 'Facebook requiere una imagen para publicar' }, { status: 400 })
+    }
+    const tags    = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
+    const caption = `${typeEmoji(post.type)} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n${tags} #joshtvr`.trim()
+    const result  = await postToFacebook({ caption, imageUrl, token, pageId })
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: 500 })
+    }
+    await markShared(postId, 'facebook')
+    return NextResponse.json({ ok: true })
   }
 
   async function handleLinkedIn(
@@ -171,8 +196,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  async function markShared(id: string, net: 'linkedin' | 'instagram') {
-    const field = net === 'linkedin' ? 'shared_linkedin' : 'shared_instagram'
+  async function markShared(id: string, net: 'linkedin' | 'instagram' | 'facebook') {
+    const field = net === 'linkedin' ? 'shared_linkedin' : net === 'instagram' ? 'shared_instagram' : 'shared_facebook'
     await supabase.from('posts').update({ [field]: true }).eq('id', id)
   }
 }

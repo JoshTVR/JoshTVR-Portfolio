@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { bulkDeletePosts, type ContentPost } from './actions'
+import { bulkDeletePosts, resetAIPosts, type ContentPost } from './actions'
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   published: { label: 'Published', color: '#34d399' },
@@ -59,6 +59,15 @@ export function AIQueue({ posts }: { posts: ContentPost[] }) {
     })
   }
 
+  function handleResetAll() {
+    if (!confirm(`Reset ALL AI posts to draft? This will un-publish them and clear shared flags. Continue?`)) return
+    startTransition(async () => {
+      const res = await resetAIPosts()
+      if (res.error) setMsg(`Error: ${res.error}`)
+      else setMsg(`Reset ${res.reset} AI posts to draft`)
+    })
+  }
+
   return (
     <div>
       {/* Stats row */}
@@ -93,6 +102,9 @@ export function AIQueue({ posts }: { posts: ContentPost[] }) {
         <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           {aiPosts.length} AI posts total
         </span>
+        <button onClick={handleResetAll} disabled={isPending} style={{ ...ghostBtn, color: '#f87171', borderColor: 'rgba(248,113,113,0.3)', marginLeft: '8px' }}>
+          Reset All to Draft
+        </button>
       </div>
 
       {aiPosts.length === 0 ? (

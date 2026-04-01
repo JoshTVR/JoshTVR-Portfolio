@@ -24,16 +24,18 @@ export async function postToLinkedIn(p: LinkedInPostPayload): Promise<{ ok: bool
     'X-Restli-Protocol-Version':  '2.0.0',
   }
 
-  // If we have an image, upload it to LinkedIn Assets first
-  let assetUrn: string | null = null
-  if (p.imageUrl) {
-    assetUrn = await uploadImageToLinkedIn(p.imageUrl, p.token, p.personUrn).catch(() => null)
+  // Require an image — skip posting rather than spamming text-only
+  if (!p.imageUrl) {
+    return { ok: false, error: 'No image available — post skipped' }
   }
 
-  const shareMediaCategory = assetUrn ? 'IMAGE' : 'NONE'
-  const media = assetUrn
-    ? [{ status: 'READY', media: assetUrn, title: { text: p.title } }]
-    : []
+  const assetUrn = await uploadImageToLinkedIn(p.imageUrl, p.token, p.personUrn).catch(() => null)
+  if (!assetUrn) {
+    return { ok: false, error: 'Image upload to LinkedIn failed' }
+  }
+
+  const shareMediaCategory = 'IMAGE'
+  const media = [{ status: 'READY', media: assetUrn, title: { text: p.title } }]
 
   const body: Record<string, unknown> = {
     author:         p.personUrn,

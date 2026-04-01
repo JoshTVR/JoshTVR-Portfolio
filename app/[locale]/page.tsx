@@ -168,8 +168,30 @@ export default async function HomePage({
     github: 'Open Source',
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://joshtvr.com'
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            name: 'Joshua Hernandez',
+            alternateName: 'JoshTVR',
+            url: siteUrl,
+            sameAs: [
+              'https://github.com/JoshTVR',
+              'https://www.linkedin.com/in/joshtvr',
+            ],
+            jobTitle: locale === 'es' ? 'Desarrollador Fullstack & Artista 3D/VR' : 'Fullstack Developer & 3D/VR Artist',
+            description: locale === 'es'
+              ? 'Desarrollador backend, científico de datos y artista 3D/VR.'
+              : 'Backend developer, data scientist, and 3D/VR artist.',
+          }),
+        }}
+      />
       <HeroSection />
       <AboutSection
         title={tAbout('title')}

@@ -73,6 +73,26 @@ export default async function PostPage({ params }: PageProps) {
     <main style={{ minHeight: '100vh', paddingTop: '120px', paddingBottom: '80px', background: 'var(--bg-primary)' }}>
       <div className="container" style={{ maxWidth: '760px' }}>
 
+        {/* JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Article',
+              headline: title,
+              description: isEs ? post.excerpt_es : post.excerpt_en,
+              author: { '@type': 'Person', name: 'Joshua Hernandez', url: SITE_URL },
+              publisher: { '@type': 'Person', name: 'Joshua Hernandez', url: SITE_URL },
+              datePublished: post.published_at ?? post.created_at,
+              dateModified: post.published_at ?? post.created_at,
+              image: post.card_images?.[0] ?? post.cover_image ?? `${SITE_URL}/og?title=${encodeURIComponent(title)}`,
+              url: `${SITE_URL}/${locale}/posts/${post.slug}`,
+              inLanguage: locale === 'es' ? 'es' : 'en',
+            }),
+          }}
+        />
+
         {/* Back */}
         <a href={`/${locale}/posts`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-muted)', textDecoration: 'none', marginBottom: '32px' }}>
           ← {isEs ? 'Todas las publicaciones' : 'All posts'}

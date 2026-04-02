@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
     method:  'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      client_id:     process.env.META_APP_ID!,
-      client_secret: process.env.META_APP_SECRET!,
+      client_id:     process.env.THREADS_APP_ID!,
+      client_secret: process.env.THREADS_APP_SECRET!,
       grant_type:    'authorization_code',
       redirect_uri:  `${siteUrl}/api/auth/threads/callback`,
       code,
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   // 2. Exchange for long-lived token (~60 days)
   const longRes = await fetch(
-    `https://graph.threads.net/access_token?grant_type=th_exchange_token&client_secret=${process.env.META_APP_SECRET}&access_token=${shortToken}`,
+    `https://graph.threads.net/access_token?grant_type=th_exchange_token&client_secret=${process.env.THREADS_APP_SECRET}&access_token=${shortToken}`,
   )
 
   let accessToken = shortToken

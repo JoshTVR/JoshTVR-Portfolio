@@ -62,14 +62,18 @@ export default function GitHubStatsSection({
         ) : (
           <div
             className="glass"
-            style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}
+            style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)', borderRadius: '16px' }}
           >
-            <p style={{ fontSize: '0.95rem' }}>
-              GitHub stats will appear here once{' '}
+            <p style={{ fontSize: '1.5rem', marginBottom: '12px' }}>📊</p>
+            <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
+              GitHub stats unavailable
+            </p>
+            <p style={{ fontSize: '0.85rem', lineHeight: 1.6 }}>
+              Configure{' '}
               <code style={{ color: 'var(--accent-light)', background: 'rgba(124,58,237,0.1)', padding: '2px 6px', borderRadius: '4px' }}>
                 GITHUB_TOKEN
               </code>{' '}
-              is configured in <code style={{ color: 'var(--accent-light)', background: 'rgba(124,58,237,0.1)', padding: '2px 6px', borderRadius: '4px' }}>.env.local</code>.
+              and refresh the cache from the admin panel.
             </p>
           </div>
         )}

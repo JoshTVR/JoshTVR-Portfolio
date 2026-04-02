@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendNewInquiryNotification } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
@@ -31,6 +32,15 @@ export async function POST(request: Request) {
       .single()
 
     if (error) throw error
+
+    const metadata = body.metadata as Record<string, string> | undefined
+    sendNewInquiryNotification({
+      name: name.trim(),
+      email: email.trim(),
+      message: message.trim(),
+      budget: budget ?? null,
+      serviceTitle: metadata?.service_title ?? null,
+    }).catch(e => console.error('[email] new inquiry:', e))
 
     return NextResponse.json({ ok: true, id: data.id })
   } catch (err) {

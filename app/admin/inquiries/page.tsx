@@ -68,8 +68,10 @@ export default async function InquiriesPage() {
             const sc     = STATUS_STYLES[inq.status] ?? STATUS_STYLES.read
             const svcTitle = (meta.service_title as string) || null
             const responseNote = (meta.response_note as string) || ''
+            const daysAgo = Math.floor((Date.now() - new Date(inq.created_at).getTime()) / 86400000)
+            const isNew   = inq.status === 'new'
             return (
-              <div key={inq.id} className="glass" style={{ padding: '24px', borderRadius: '14px' }}>
+              <div key={inq.id} className="glass" style={{ padding: '24px', borderRadius: '14px', borderLeft: isNew ? '3px solid #f59e0b' : '3px solid transparent' }}>
                 {/* Header row */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
                   <div>
@@ -81,6 +83,10 @@ export default async function InquiriesPage() {
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
                       <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                         {new Date(inq.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                        {' '}
+                        <span style={{ color: daysAgo === 0 ? '#f59e0b' : 'var(--text-dim)' }}>
+                          ({daysAgo === 0 ? 'today' : `${daysAgo}d ago`})
+                        </span>
                       </p>
                       {svcTitle && <span style={{ fontSize: '0.78rem', color: 'var(--accent-light)', background: 'rgba(124,58,237,0.1)', padding: '2px 8px', borderRadius: '4px' }}>{svcTitle}</span>}
                       {meta.timeline && <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>⏱ {meta.timeline as string}</span>}

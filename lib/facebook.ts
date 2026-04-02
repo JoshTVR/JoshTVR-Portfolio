@@ -14,7 +14,7 @@ export interface FacebookPostPayload {
 
 export async function postToFacebook(
   p: FacebookPostPayload,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; postId?: string | null; error?: string }> {
   const res = await fetch(`${FB_GRAPH}/${p.pageId}/photos`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${p.token}` },
@@ -25,5 +25,6 @@ export async function postToFacebook(
     const err = await res.text()
     return { ok: false, error: `Facebook API error: ${err.slice(0, 300)}` }
   }
-  return { ok: true }
+  const data = await res.json() as { post_id?: string; id?: string }
+  return { ok: true, postId: data.post_id ?? data.id ?? null }
 }

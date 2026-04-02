@@ -3,7 +3,7 @@ export async function postToThreads(p: {
   imageUrl?: string | null
   token: string
   userId: string
-}): Promise<{ ok: boolean; error?: string }> {
+}): Promise<{ ok: boolean; postId?: string | null; error?: string }> {
   const base = `https://graph.threads.net/v1.0/${p.userId}`
 
   // 1. Create media container
@@ -45,5 +45,6 @@ export async function postToThreads(p: {
     return { ok: false, error: `Publish failed: ${err}` }
   }
 
-  return { ok: true }
+  const publishData = await publishRes.json() as { id?: string }
+  return { ok: true, postId: publishData.id ?? null }
 }

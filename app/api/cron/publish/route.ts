@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
             pageId: fbToken.page_id,
           })
           if (fbResult.ok) {
-            await supabase.from('posts').update({ shared_facebook: true }).eq('id', post.id)
+            await supabase.from('posts').update({ shared_facebook: true, facebook_post_id: fbResult.postId ?? null }).eq('id', post.id)
             result.facebook = 'ok'
           } else {
             result.facebook = `error: ${fbResult.error}`
@@ -164,7 +164,7 @@ export async function GET(req: NextRequest) {
         const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
         const thResult = await postToThreads({ text, imageUrl, token: thToken.access_token, userId: thToken.user_id })
         if (thResult.ok) {
-          await supabase.from('posts').update({ shared_threads: true }).eq('id', post.id)
+          await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null }).eq('id', post.id)
           result.threads = 'ok'
         } else {
           result.threads = `error: ${thResult.error}`

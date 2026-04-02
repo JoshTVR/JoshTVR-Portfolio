@@ -43,6 +43,7 @@ interface PostFormProps {
     shared_linkedin?: boolean
     shared_instagram?: boolean
     shared_facebook?: boolean
+    shared_threads?: boolean
   }
   projects: Project[]
 }
@@ -662,24 +663,27 @@ export function PostForm({ initial, projects }: PostFormProps) {
         )}
       </section>
 
-      {/* Social Preview */}
-      <section className="glass" style={{ padding: '24px', borderRadius: '12px' }}>
-        <h3 style={heading}>Social Preview</h3>
-        <SocialPreview
-          titleEn={titleEn}
-          titleEs={titleEs}
-          excerptEn={excerptEn}
-          excerptEs={excerptEs}
-          coverImage={cardImages[0] || coverImage}
-          slug={initial?.slug as string ?? ''}
-          tags={tags}
-          type={type}
-          postId={isEdit ? initial?.id : undefined}
-          sharedLinkedin={initial?.shared_linkedin}
-          sharedInstagram={initial?.shared_instagram}
-          sharedFacebook={initial?.shared_facebook}
-        />
-      </section>
+      {/* Social Preview — hidden for devlogs */}
+      {type !== 'devlog' && (
+        <section className="glass" style={{ padding: '24px', borderRadius: '12px' }}>
+          <h3 style={heading}>Social Preview</h3>
+          <SocialPreview
+            titleEn={titleEn}
+            titleEs={titleEs}
+            excerptEn={excerptEn}
+            excerptEs={excerptEs}
+            coverImage={cardImages[0] || coverImage}
+            slug={initial?.slug as string ?? ''}
+            tags={tags}
+            type={type}
+            postId={isEdit ? initial?.id : undefined}
+            sharedLinkedin={initial?.shared_linkedin}
+            sharedInstagram={initial?.shared_instagram}
+            sharedFacebook={initial?.shared_facebook}
+            sharedThreads={initial?.shared_threads}
+          />
+        </section>
+      )}
 
       <div style={{ display: 'flex', gap: '12px' }}>
         <button type="submit" disabled={isPending} className="btn btn-primary" style={{ fontSize: '0.9rem', padding: '12px 28px' }}>

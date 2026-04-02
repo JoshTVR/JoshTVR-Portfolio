@@ -140,8 +140,8 @@ Each post object must have ALL of these fields:
   "title_es": "Spanish translation of title",
   "excerpt_en": "1-2 sentence hook in English",
   "excerpt_es": "1-2 sentence hook in Spanish",
-  "content_en": "full post content in English (can be empty string for AI cards)",
-  "content_es": "full post content in Spanish (can be empty string for AI cards)",
+  "content_en": "Full post body in English — NEVER empty. Write 2-4 paragraphs explaining the concept, the WHY behind it, and a real-world use case.",
+  "content_es": "Full post body in Spanish — NEVER empty. Translate content_en completely.",
   "type": "post | devlog | announcement | tutorial",
   "card_type": "code_tip | qa | logic_challenge | study | devlog | video_promo | announcement",
   "card_data": { ... fields per schema above ... },
@@ -156,13 +156,17 @@ Each post object must have ALL of these fields:
 ## Important Rules
 1. Use the theme assigned to each month (see Theme Schedule above).
 2. For seasonal months (Oct 15-31 = spooky, Dec = holiday), use the seasonal theme regardless of the schedule.
-3. Write COMPLETE content for each post — full code snippets, full questions, full answers. No placeholders.
-4. For code_tip cards: write real, useful code snippets in the specified language. The tip should be a clear takeaway.
-5. Distribute types according to the AI Mix percentages above.
-6. Space posts evenly throughout each day (e.g., if 2/day: 09:00 and 18:00 UTC).
-7. My Content items override AI content for that date/slot.
-8. Burst week posts get their burst_group_id and are ADDED to the regular ${freq}/day schedule (so burst days will have more posts).
-9. All card content is in English only (title_en, card_data fields). Translations only for title_es, excerpt_es.
+3. Write COMPLETE content for each post — full code snippets, full questions, full answers. NO placeholders, NO ellipsis, NO "...".
+4. content_en and content_es must NEVER be empty strings. They must be full explanatory text (2-4 paragraphs minimum).
+5. **code_tip**: Include the full code snippet, then explain WHY this technique exists, when to use it, and a common mistake to avoid. Real, runnable code only.
+6. **qa**: Use an analogy from everyday life (cooking, construction, sports) to explain the concept before the technical answer. Make it memorable.
+7. **logic_challenge**: Include the full challenge statement, constraints, and example input/output. The solution must show the reasoning step by step, not just the final code.
+8. **study**: Include a real finding or statistic from a known source (MDN, TC39, research papers), then show a practical application in a small code example.
+9. Distribute types according to the AI Mix percentages above.
+10. Space posts evenly throughout each day (e.g., if 2/day: 09:00 and 18:00 UTC).
+11. My Content items override AI content for that date/slot.
+12. Burst week posts get their burst_group_id and are ADDED to the regular ${freq}/day schedule (so burst days will have more posts).
+13. All card_data fields are in English. title_es and content_es are full Spanish translations — not summaries.
 `
 
     setPrompt(p)

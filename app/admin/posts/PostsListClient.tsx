@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
-import { PublishToggle, ShareButtons, DeletePostButton } from './PostRowActions'
+import { PublishToggle, ShareButtons, DevlogActions, DeletePostButton } from './PostRowActions'
 
 const TYPE_COLORS: Record<string, { bg: string; color: string }> = {
   devlog:        { bg: 'rgba(124,58,237,0.15)', color: '#a78bfa' },
@@ -21,6 +21,7 @@ export interface PostRow {
   is_published: boolean; shared_linkedin: boolean; shared_instagram: boolean; shared_facebook: boolean; shared_threads: boolean
   published_at: string | null; scheduled_at: string | null
   is_ai_generated: boolean; card_type: string | null
+  card_images: string[] | null; cover_image: string | null
   created_at: string
 }
 
@@ -126,7 +127,7 @@ export default function PostsListClient({ posts, siteUrl }: Props) {
           {filtered.map((post) => {
             const tc = TYPE_COLORS[post.type] ?? TYPE_COLORS.post
             return (
-              <div key={post.id} className="glass" style={{ padding: '16px 20px', borderRadius: '12px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center' }}>
+              <div key={post.id} className="glass" style={{ padding: '16px 20px', borderRadius: '12px', display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'center', borderLeft: post.type === 'devlog' ? '3px solid #a78bfa' : '3px solid transparent' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.7rem', padding: '2px 9px', borderRadius: '20px', fontWeight: 700, background: tc.bg, color: tc.color }}>
@@ -153,7 +154,10 @@ export default function PostsListClient({ posts, siteUrl }: Props) {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                     <PublishToggle id={post.id} published={post.is_published} />
-                    <ShareButtons post={post} siteUrl={siteUrl} />
+                    {post.type === 'devlog'
+                      ? <DevlogActions id={post.id} />
+                      : <ShareButtons post={post} />
+                    }
                     <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
                       {new Date(post.created_at).toLocaleDateString()}
                     </span>

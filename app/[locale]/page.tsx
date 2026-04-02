@@ -36,6 +36,7 @@ import CertificationsSection from '@/components/sections/CertificationsSection'
 import TestimonialsSection from '@/components/sections/TestimonialsSection'
 import { PostsFeedSection } from '@/components/sections/PostsFeedSection'
 import ContactSection from '@/components/sections/ContactSection'
+import { DevlogSection } from '@/components/sections/DevlogSection'
 import { getGitHubStats, getPublicRepos } from '@/lib/github/cache'
 
 export default async function HomePage({
@@ -70,6 +71,7 @@ export default async function HomePage({
   let certifications: CertRow[] = []
   let testimonials: TestimonialRow[] = []
   let latestPosts: PostPreview[] = []
+  let recentDevlogs: DevlogItem[] = []
   let aboutStats = defaultStats
   let showGitHubStats = true
   let showTestimonials = true
@@ -77,7 +79,7 @@ export default async function HomePage({
   try {
     const supabase = await createClient()
 
-    const [projectsRes, expRes, certsRes, testimonialsRes, settingsRes, postsRes] =
+    const [projectsRes, expRes, certsRes, testimonialsRes, settingsRes, postsRes, devlogsRes] =
       await Promise.all([
         supabase
           .from('projects')
@@ -105,15 +107,24 @@ export default async function HomePage({
           .from('posts')
           .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,youtube_url,type,published_at')
           .eq('is_published', true)
+          .neq('type', 'devlog')
           .order('published_at', { ascending: false })
           .limit(3),
+        supabase
+          .from('posts')
+          .select('id,title_en,card_data,published_at')
+          .eq('is_published', true)
+          .eq('type', 'devlog')
+          .order('published_at', { ascending: false })
+          .limit(4),
       ])
 
     projects      = (projectsRes.data ?? []) as ProjectRow[]
     experience    = (expRes.data ?? []) as ExperienceRow[]
     certifications = (certsRes.data ?? []) as CertRow[]
     testimonials  = (testimonialsRes.data ?? []) as TestimonialRow[]
-    latestPosts   = (postsRes.data ?? []) as PostPreview[]
+    latestPosts    = (postsRes.data ?? []) as PostPreview[]
+    recentDevlogs  = (devlogsRes.data ?? []) as DevlogItem[]
 
     if (settingsRes.data && settingsRes.data.length > 0) {
       const map: Record<string, string> = {}
@@ -217,6 +228,7 @@ export default async function HomePage({
           heatmapLabel={tGh('heatmapLabel')}
         />
       )}
+      <DevlogSection items={recentDevlogs} locale={locale} />
       <GitHubReposSection repos={githubRepos} locale={locale} linkedProjects={linkedProjects} />
       <ExperienceSection
         items={experience}
@@ -289,6 +301,13 @@ interface TestimonialRow {
   author_name: string
   author_role_en: string
   author_role_es: string
+}
+
+interface DevlogItem {
+  id: string
+  title_en: string
+  card_data: { project?: string; update?: string } | null
+  published_at: string | null
 }
 
 interface PostPreview {

@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef, useEffect } from 'react'
 import { BilingualTabs } from './BilingualTabs'
 import { TipTapEditor } from './TipTapEditor'
-import { createPost, updatePost, type PostFormData } from '@/app/admin/posts/actions'
+import { createPost, updatePost, persistGeneratedCards, type PostFormData } from '@/app/admin/posts/actions'
 import { THEMES, BASE_THEMES, type ThemeName } from '@/components/content-cards/themes'
 import { CardExporter } from '@/components/content-cards/CardExporter'
 import { CodeTipCard } from '@/components/content-cards/CodeTipCard'
@@ -489,9 +489,14 @@ export function PostForm({ initial, projects }: PostFormProps) {
               <CardExporter
                 slides={slides}
                 label={`Generate ${slides.length > 1 ? slides.length + ' slides' : 'image'} & set as cover`}
-                onExport={(urls) => {
+                onExport={async (urls) => {
                   setCardImages(urls)
                   if (urls[0]) setCoverImage(urls[0])
+                  // Persist immediately if the post already exists, so the social
+                  // share buttons can use these URLs without waiting for a Save.
+                  if (isEdit && initial?.id && urls.length) {
+                    await persistGeneratedCards(initial.id, urls)
+                  }
                 }}
               />
               {cardImages.length > 0 && (

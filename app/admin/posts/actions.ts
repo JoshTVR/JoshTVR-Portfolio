@@ -113,3 +113,23 @@ export async function markShared(id: string, network: 'linkedin' | 'instagram'):
   revalidatePath('/admin/posts')
   return {}
 }
+
+/**
+ * Persist generated card images directly to the DB so the social-share buttons
+ * can pick them up immediately, without requiring the user to hit Save first.
+ * The first slide also becomes the post's cover image.
+ */
+export async function persistGeneratedCards(
+  id: string,
+  urls: string[],
+): Promise<{ error?: string }> {
+  if (!urls.length) return { error: 'No images to persist' }
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('posts')
+    .update({ card_images: urls, cover_image: urls[0] })
+    .eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/posts')
+  return {}
+}

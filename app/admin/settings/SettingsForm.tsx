@@ -43,7 +43,26 @@ export function SettingsForm({
   const [saved,       setSaved]       = useState(false)
   const [isPending,   startTransition]= useTransition()
   const [socialMsg,   setSocialMsg]   = useState('')
+  const [cronJob,     setCronJob]     = useState<string | null>(null)
+  const [cronResult,  setCronResult]  = useState<unknown>(null)
   const searchParams = useSearchParams()
+
+  async function runCron(job: 'publish' | 'github-devlog' | 'metrics') {
+    setCronJob(job)
+    setCronResult(null)
+    try {
+      const res  = await fetch('/api/admin/run-cron', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ job }),
+      })
+      const json = await res.json()
+      setCronResult(json)
+    } catch (e) {
+      setCronResult({ error: e instanceof Error ? e.message : 'unknown' })
+    }
+    setCronJob(null)
+  }
 
   useEffect(() => {
     const connected = searchParams.get('social_connected')
@@ -300,8 +319,47 @@ export function SettingsForm({
           </div>
         </div>
       </div>
+
+      {/* Cron Diagnostics */}
+      <div className="glass" style={{ padding: '24px', borderRadius: '12px' }}>
+        <h2 style={sectionTitle}>Cron Diagnostics</h2>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '20px', lineHeight: 1.5 }}>
+          Run any scheduled job on demand and inspect the result. Useful when posts aren&apos;t getting published automatically.
+        </p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+          <button type="button" onClick={() => runCron('publish')} disabled={cronJob !== null}
+            style={cronBtn}>
+            {cronJob === 'publish' ? 'Running…' : '▶ Run Publish Now'}
+          </button>
+          <button type="button" onClick={() => runCron('github-devlog')} disabled={cronJob !== null}
+            style={cronBtn}>
+            {cronJob === 'github-devlog' ? 'Running…' : '▶ Run GitHub Devlog'}
+          </button>
+          <button type="button" onClick={() => runCron('metrics')} disabled={cronJob !== null}
+            style={cronBtn}>
+            {cronJob === 'metrics' ? 'Running…' : '▶ Run Metrics'}
+          </button>
+        </div>
+
+        {cronResult != null && (
+          <pre style={{
+            background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '8px', padding: '12px', fontSize: '0.74rem', color: '#cbd5e1',
+            overflow: 'auto', maxHeight: '320px', margin: 0, lineHeight: 1.5,
+          }}>
+            {JSON.stringify(cronResult, null, 2)}
+          </pre>
+        )}
+      </div>
     </div>
   )
+}
+
+const cronBtn: React.CSSProperties = {
+  padding: '8px 16px', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 600,
+  background: 'rgba(124,58,237,0.15)', color: 'var(--accent-light)',
+  border: '1px solid rgba(124,58,237,0.3)', cursor: 'pointer',
 }
 
 function Toggle({

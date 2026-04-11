@@ -19,6 +19,8 @@ export interface PostRow {
   id: string; slug: string; title_en: string; title_es: string
   excerpt_es: string | null; type: string; tags: string[]
   is_published: boolean; shared_linkedin: boolean; shared_instagram: boolean; shared_facebook: boolean; shared_threads: boolean
+  linkedin_post_id: string | null; facebook_post_id: string | null
+  instagram_post_url: string | null; threads_post_url: string | null
   published_at: string | null; scheduled_at: string | null
   is_ai_generated: boolean; card_type: string | null
   card_images: string[] | null; cover_image: string | null

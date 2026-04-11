@@ -113,8 +113,8 @@ export async function POST(req: NextRequest) {
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 500 })
     }
-    await markShared(postId, 'facebook')
-    return NextResponse.json({ ok: true })
+    await markShared(postId, 'facebook', { facebook_post_id: result.postId ?? null })
+    return NextResponse.json({ ok: true, postId: result.postId ?? null })
   }
 
   async function handleThreads(
@@ -129,8 +129,8 @@ export async function POST(req: NextRequest) {
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 500 })
     }
-    await markShared(postId, 'threads')
-    return NextResponse.json({ ok: true })
+    await markShared(postId, 'threads', { threads_post_id: result.postId ?? null, threads_post_url: result.permalink ?? null })
+    return NextResponse.json({ ok: true, postId: result.postId ?? null, url: result.permalink ?? null })
   }
 
   async function handleLinkedIn(
@@ -151,8 +151,8 @@ export async function POST(req: NextRequest) {
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 500 })
     }
-    await markShared(postId, 'linkedin')
-    return NextResponse.json({ ok: true })
+    await markShared(postId, 'linkedin', { linkedin_post_id: result.postId ?? null })
+    return NextResponse.json({ ok: true, postId: result.postId ?? null })
   }
 
   async function postToInstagram(
@@ -176,6 +176,8 @@ export async function POST(req: NextRequest) {
     const tags = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
     const caption = `${typeEmoji(body.type ?? 'post')} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n👉 ${SITE_URL}/es/posts/${post.slug}\n\n${tags} #joshtvr`.trim()
 
+    let publishedMediaId: string | null = null
+
     if (images.length === 1) {
       // Single image post
       const containerRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
@@ -198,6 +200,8 @@ export async function POST(req: NextRequest) {
         const errBody = await publishRes.text()
         return NextResponse.json({ error: `Instagram publish error: ${errBody}` }, { status: 500 })
       }
+      const publishData = await publishRes.json().catch(() => ({})) as { id?: string }
+      publishedMediaId = publishData.id ?? null
     } else {
       // Carousel: N item containers → carousel container → publish
       const itemIds: string[] = []
@@ -235,17 +239,37 @@ export async function POST(req: NextRequest) {
         const errBody = await publishRes.text()
         return NextResponse.json({ error: `Carousel publish error: ${errBody}` }, { status: 500 })
       }
+      const publishData = await publishRes.json().catch(() => ({})) as { id?: string }
+      publishedMediaId = publishData.id ?? null
     }
 
-    await markShared(postId, 'instagram')
-    return NextResponse.json({ ok: true })
+    let permalink: string | null = null
+    if (publishedMediaId) {
+      try {
+        const linkRes = await fetch(
+          `https://graph.instagram.com/v21.0/${publishedMediaId}?fields=permalink&access_token=${encodeURIComponent(token)}`,
+          { cache: 'no-store' },
+        )
+        if (linkRes.ok) {
+          const linkData = await linkRes.json() as { permalink?: string }
+          permalink = linkData.permalink ?? null
+        }
+      } catch { /* permalink fetch failed — non-fatal */ }
+    }
+
+    await markShared(postId, 'instagram', { instagram_post_url: permalink })
+    return NextResponse.json({ ok: true, postId: publishedMediaId, url: permalink })
   }
 
-  async function markShared(id: string, net: 'linkedin' | 'instagram' | 'facebook' | 'threads') {
+  async function markShared(
+    id: string,
+    net: 'linkedin' | 'instagram' | 'facebook' | 'threads',
+    extra: Record<string, unknown> = {},
+  ) {
     const field = net === 'linkedin' ? 'shared_linkedin'
       : net === 'instagram' ? 'shared_instagram'
       : net === 'threads' ? 'shared_threads'
       : 'shared_facebook'
-    await supabase.from('posts').update({ [field]: true }).eq('id', id)
+    await supabase.from('posts').update({ [field]: true, ...extra }).eq('id', id)
   }
 }

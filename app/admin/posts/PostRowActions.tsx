@@ -18,20 +18,47 @@ function typeEmoji(type: string) {
 }
 
 interface PostRow {
-  id:               string
-  slug:             string
-  title_en:         string
-  title_es:         string
-  excerpt_es:       string | null
-  type:             string
-  tags:             string[]
-  is_published:     boolean
-  shared_linkedin:  boolean
-  shared_instagram: boolean
-  shared_facebook:  boolean
-  shared_threads:   boolean
-  card_images?:     string[] | null
-  cover_image?:     string | null
+  id:                  string
+  slug:                string
+  title_en:            string
+  title_es:            string
+  excerpt_es:          string | null
+  type:                string
+  tags:                string[]
+  is_published:        boolean
+  shared_linkedin:     boolean
+  shared_instagram:    boolean
+  shared_facebook:     boolean
+  shared_threads:      boolean
+  linkedin_post_id?:   string | null
+  facebook_post_id?:   string | null
+  instagram_post_url?: string | null
+  threads_post_url?:   string | null
+  card_images?:        string[] | null
+  cover_image?:        string | null
+}
+
+/**
+ * Resolve a clickable URL for each network from the data we store on the post.
+ *  - LinkedIn: we store the URN (`urn:li:share:7XXX`), URL derives directly from it.
+ *  - Facebook: `post_id` is `pageId_postId`, splits cleanly into a canonical URL.
+ *  - Instagram / Threads: we fetch and store the full `permalink` after publishing,
+ *    because the media ID alone is not enough to build a public URL.
+ */
+function getShareUrl(net: 'linkedin' | 'facebook' | 'instagram' | 'threads', post: PostRow): string | null {
+  if (net === 'linkedin') {
+    if (!post.linkedin_post_id) return null
+    return `https://www.linkedin.com/feed/update/${encodeURIComponent(post.linkedin_post_id)}/`
+  }
+  if (net === 'facebook') {
+    if (!post.facebook_post_id) return null
+    const parts = post.facebook_post_id.split('_')
+    if (parts.length === 2) return `https://www.facebook.com/${parts[0]}/posts/${parts[1]}`
+    return `https://www.facebook.com/${post.facebook_post_id}`
+  }
+  if (net === 'instagram') return post.instagram_post_url ?? null
+  if (net === 'threads')   return post.threads_post_url   ?? null
+  return null
 }
 
 type Network = 'linkedin' | 'instagram' | 'facebook' | 'threads'
@@ -158,6 +185,21 @@ export function ShareButtons({ post }: { post: PostRow }) {
     background: bg, color, border, cursor: sharing ? 'default' : 'pointer', fontWeight: 600,
   })
 
+  const sharedBadge = (label: string, bg: string, color: string, url: string | null) => {
+    const style: React.CSSProperties = {
+      fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px',
+      background: bg, color, fontWeight: 700, textDecoration: 'none', cursor: url ? 'pointer' : 'default',
+    }
+    if (url) {
+      return (
+        <a href={url} target="_blank" rel="noreferrer" style={style} title="Open published post">
+          ✓ {label} ↗
+        </a>
+      )
+    }
+    return <span style={style}>✓ {label}</span>
+  }
+
   return (
     <>
       {pendingNet && (
@@ -179,25 +221,25 @@ export function ShareButtons({ post }: { post: PostRow }) {
           </span>
         )}
         {liShared
-          ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(0,119,181,0.12)', color: '#0077b5', fontWeight: 700 }}>✓ LinkedIn</span>
+          ? sharedBadge('LinkedIn', 'rgba(0,119,181,0.12)', '#0077b5', getShareUrl('linkedin', post))
           : <button onClick={() => requestShare('linkedin')} disabled={sharing !== null} style={btnStyle('rgba(0,119,181,0.1)', '#0077b5', '1px solid rgba(0,119,181,0.25)')}>
               {sharing === 'linkedin' ? '…' : 'LinkedIn'}
             </button>
         }
         {igShared
-          ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(225,48,108,0.12)', color: '#e1306c', fontWeight: 700 }}>✓ Instagram</span>
+          ? sharedBadge('Instagram', 'rgba(225,48,108,0.12)', '#e1306c', getShareUrl('instagram', post))
           : <button onClick={() => requestShare('instagram')} disabled={sharing !== null} style={btnStyle('rgba(225,48,108,0.1)', '#e1306c', '1px solid rgba(225,48,108,0.25)')}>
               {sharing === 'instagram' ? '…' : 'Instagram'}
             </button>
         }
         {fbShared
-          ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(24,119,242,0.12)', color: '#1877f2', fontWeight: 700 }}>✓ Facebook</span>
+          ? sharedBadge('Facebook', 'rgba(24,119,242,0.12)', '#1877f2', getShareUrl('facebook', post))
           : <button onClick={() => requestShare('facebook')} disabled={sharing !== null} style={btnStyle('rgba(24,119,242,0.1)', '#1877f2', '1px solid rgba(24,119,242,0.25)')}>
               {sharing === 'facebook' ? '…' : 'Facebook'}
             </button>
         }
         {thShared
-          ? <span style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '20px', background: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)', fontWeight: 700 }}>✓ Threads</span>
+          ? sharedBadge('Threads', 'rgba(255,255,255,0.08)', 'var(--text-primary)', getShareUrl('threads', post))
           : <button onClick={() => requestShare('threads')} disabled={sharing !== null} style={btnStyle('rgba(255,255,255,0.07)', 'var(--text-primary)', '1px solid rgba(255,255,255,0.15)')}>
               {sharing === 'threads' ? '…' : 'Threads'}
             </button>

@@ -3,7 +3,7 @@ export async function postToThreads(p: {
   imageUrl?: string | null
   token: string
   userId: string
-}): Promise<{ ok: boolean; postId?: string | null; error?: string }> {
+}): Promise<{ ok: boolean; postId?: string | null; permalink?: string | null; error?: string }> {
   const base = `https://graph.threads.net/v1.0/${p.userId}`
 
   // 1. Create media container
@@ -46,5 +46,21 @@ export async function postToThreads(p: {
   }
 
   const publishData = await publishRes.json() as { id?: string }
-  return { ok: true, postId: publishData.id ?? null }
+  const mediaId    = publishData.id ?? null
+  const permalink  = mediaId ? await fetchThreadsPermalink(mediaId, p.token) : null
+  return { ok: true, postId: mediaId, permalink }
+}
+
+async function fetchThreadsPermalink(mediaId: string, token: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://graph.threads.net/v1.0/${mediaId}?fields=permalink&access_token=${encodeURIComponent(token)}`,
+      { cache: 'no-store' },
+    )
+    if (!res.ok) return null
+    const data = await res.json() as { permalink?: string }
+    return data.permalink ?? null
+  } catch {
+    return null
+  }
 }

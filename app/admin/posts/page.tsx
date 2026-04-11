@@ -11,7 +11,7 @@ async function getPosts() {
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('posts')
-      .select('id,slug,title_en,title_es,excerpt_es,type,tags,is_published,shared_linkedin,shared_instagram,shared_facebook,shared_threads,published_at,scheduled_at,is_ai_generated,card_type,card_images,cover_image,created_at')
+      .select('id,slug,title_en,title_es,excerpt_es,type,tags,is_published,shared_linkedin,shared_instagram,shared_facebook,shared_threads,linkedin_post_id,facebook_post_id,instagram_post_url,threads_post_url,published_at,scheduled_at,is_ai_generated,card_type,card_images,cover_image,created_at')
       .order('created_at', { ascending: false })
     return data ?? []
   } catch {

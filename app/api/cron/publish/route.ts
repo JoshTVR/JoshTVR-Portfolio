@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
             siteUrl:   SITE_URL,
           })
           if (liResult.ok) {
-            await supabase.from('posts').update({ shared_linkedin: true }).eq('id', post.id)
+            await supabase.from('posts').update({ shared_linkedin: true, linkedin_post_id: liResult.postId ?? null }).eq('id', post.id)
             result.linkedin = 'ok'
           } else {
             result.linkedin = `error: ${liResult.error}`
@@ -144,7 +144,7 @@ export async function GET(req: NextRequest) {
       try {
         const igResult = await publishToInstagram(post, cardImages, igToken.access_token, igToken.user_id)
         if (igResult.ok) {
-          await supabase.from('posts').update({ shared_instagram: true }).eq('id', post.id)
+          await supabase.from('posts').update({ shared_instagram: true, instagram_post_url: igResult.permalink ?? null }).eq('id', post.id)
           result.instagram = 'ok'
         } else {
           result.instagram = `error: ${igResult.error}`
@@ -164,7 +164,7 @@ export async function GET(req: NextRequest) {
         const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
         const thResult = await postToThreads({ text, imageUrl, token: thToken.access_token, userId: thToken.user_id })
         if (thResult.ok) {
-          await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null }).eq('id', post.id)
+          await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null, threads_post_url: thResult.permalink ?? null }).eq('id', post.id)
           result.threads = 'ok'
         } else {
           result.threads = `error: ${thResult.error}`
@@ -196,7 +196,7 @@ async function publishToInstagram(
   cardImages: string[],
   token: string,
   userId: string,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; postId?: string | null; permalink?: string | null; error?: string }> {
   const tags    = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
   const caption = `${typeEmoji(post.type)} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n👉 ${SITE_URL}/es/posts/${post.slug}\n\n${tags} #joshtvr`.trim()
 
@@ -230,7 +230,10 @@ async function publishToInstagram(
     if (!publishRes.ok) {
       return { ok: false, error: `publish: ${await publishRes.text()}` }
     }
-    return { ok: true }
+    const publishData = await publishRes.json().catch(() => ({})) as { id?: string }
+    const mediaId    = publishData.id ?? null
+    const permalink  = mediaId ? await fetchInstagramPermalink(mediaId, token) : null
+    return { ok: true, postId: mediaId, permalink }
   }
 
   // Carousel
@@ -266,5 +269,22 @@ async function publishToInstagram(
   if (!publishRes.ok) {
     return { ok: false, error: `carousel publish: ${await publishRes.text()}` }
   }
-  return { ok: true }
+  const publishData = await publishRes.json().catch(() => ({})) as { id?: string }
+  const mediaId    = publishData.id ?? null
+  const permalink  = mediaId ? await fetchInstagramPermalink(mediaId, token) : null
+  return { ok: true, postId: mediaId, permalink }
+}
+
+async function fetchInstagramPermalink(mediaId: string, token: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://graph.instagram.com/v21.0/${mediaId}?fields=permalink&access_token=${encodeURIComponent(token)}`,
+      { cache: 'no-store' },
+    )
+    if (!res.ok) return null
+    const data = await res.json() as { permalink?: string }
+    return data.permalink ?? null
+  } catch {
+    return null
+  }
 }

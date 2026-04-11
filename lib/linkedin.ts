@@ -15,7 +15,17 @@ export interface LinkedInPostPayload {
   siteUrl:    string
 }
 
-export async function postToLinkedIn(p: LinkedInPostPayload): Promise<{ ok: boolean; error?: string }> {
+function detectContentType(url: string): string {
+  const lower = url.toLowerCase().split('?')[0]
+  if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg'
+  if (lower.endsWith('.webp')) return 'image/webp'
+  if (lower.endsWith('.gif'))  return 'image/gif'
+  return 'image/png'
+}
+
+export async function postToLinkedIn(
+  p: LinkedInPostPayload,
+): Promise<{ ok: boolean; postId?: string | null; error?: string }> {
   const postUrl = `${p.siteUrl}/en/posts/${p.slug}`
   const text    = [p.title, p.excerpt, postUrl].filter(Boolean).join('\n\n')
   const headers = {
@@ -29,10 +39,20 @@ export async function postToLinkedIn(p: LinkedInPostPayload): Promise<{ ok: bool
     return { ok: false, error: 'No image available — post skipped' }
   }
 
-  const assetUrn = await uploadImageToLinkedIn(p.imageUrl, p.token, p.personUrn).catch(() => null)
-  if (!assetUrn) {
-    return { ok: false, error: 'Image upload to LinkedIn failed' }
+  let assetUrn: string | null = null
+  try {
+    assetUrn = await uploadImageToLinkedIn(p.imageUrl, p.token, p.personUrn)
+  } catch (e) {
+    return { ok: false, error: `Image upload to LinkedIn failed: ${e instanceof Error ? e.message : 'unknown'}` }
   }
+  if (!assetUrn) {
+    return { ok: false, error: 'Image upload to LinkedIn returned no asset URN' }
+  }
+
+  // LinkedIn processes the uploaded image asynchronously. Give it a moment
+  // before referencing the asset in a UGC post — otherwise the post can be
+  // created with no visible media.
+  await new Promise((r) => setTimeout(r, 2500))
 
   const shareMediaCategory = 'IMAGE'
   const media = [{ status: 'READY', media: assetUrn, title: { text: p.title } }]
@@ -60,7 +80,11 @@ export async function postToLinkedIn(p: LinkedInPostPayload): Promise<{ ok: bool
     const err = await res.text()
     return { ok: false, error: `LinkedIn API error: ${err.slice(0, 200)}` }
   }
-  return { ok: true }
+
+  const data = await res.json().catch(() => ({})) as { id?: string }
+  // The LinkedIn API also exposes the URN in the `x-restli-id` response header.
+  const headerId = res.headers.get('x-restli-id')
+  return { ok: true, postId: data.id ?? headerId ?? null }
 }
 
 async function uploadImageToLinkedIn(
@@ -81,6 +105,7 @@ async function uploadImageToLinkedIn(
         recipes:              ['urn:li:digitalmediaRecipe:feedshare-image'],
         owner:                personUrn,
         serviceRelationships: [{ relationshipType: 'OWNER', identifier: 'urn:li:userGeneratedContent' }],
+        supportedUploadMechanism: ['SYNCHRONOUS_UPLOAD'],
       },
     }),
   })
@@ -94,22 +119,28 @@ async function uploadImageToLinkedIn(
     ].uploadUrl
   const assetUrn: string = registerData.value.asset
 
-  // Step 2 — fetch image binary and upload
+  // Step 2 — fetch image binary
   const imgRes = await fetch(imageUrl)
-  if (!imgRes.ok) throw new Error('Could not fetch image for upload')
+  if (!imgRes.ok) throw new Error(`Could not fetch image for upload: ${imgRes.status}`)
   const imgBuffer = await imgRes.arrayBuffer()
+  if (imgBuffer.byteLength === 0) throw new Error('Image buffer is empty')
 
-  // Detect content type from URL
-  const contentType = imageUrl.includes('.jpg') || imageUrl.includes('.jpeg')
-    ? 'image/jpeg'
-    : 'image/png'
-
+  // Step 3 — PUT to pre-signed upload URL.
+  // LinkedIn's pre-signed URL still expects the bearer token; without it the
+  // upload returns 401. The Content-Type must match the binary type.
+  const contentType = detectContentType(imageUrl)
   const uploadRes = await fetch(uploadUrl, {
     method:  'PUT',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': contentType },
-    body:    imgBuffer,
+    headers: {
+      Authorization:  `Bearer ${token}`,
+      'Content-Type': contentType,
+    },
+    body: imgBuffer,
   })
 
-  if (!uploadRes.ok) throw new Error(`Image upload failed: ${uploadRes.status}`)
+  if (!uploadRes.ok) {
+    const errText = await uploadRes.text().catch(() => '')
+    throw new Error(`Image upload failed: ${uploadRes.status} ${errText.slice(0, 200)}`)
+  }
   return assetUrn
 }

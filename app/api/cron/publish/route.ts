@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
   // Only publish posts scheduled within the last 48h to prevent backlog flooding
   const { data: posts, error: fetchErr } = await supabase
     .from('posts')
-    .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,type,tags,card_images,card_type,is_ai_generated')
+    .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,type,tags,card_images,card_type')
     .lte('scheduled_at', new Date().toISOString())
     .gte('scheduled_at', window48h)
     .eq('is_published', false)
@@ -68,7 +68,6 @@ export async function GET(req: NextRequest) {
 
   for (const post of posts) {
     const result: { id: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string } = { id: post.id }
-    const isAI = post.is_ai_generated ?? false
 
     // ── Auto-generate card images if missing ──────────────────────────────────
     let cardImages: string[] = (post.card_images as string[] | null) ?? []
@@ -81,9 +80,10 @@ export async function GET(req: NextRequest) {
     }
     const imageUrl = cardImages[0] ?? post.cover_image ?? null
 
-    // ── LinkedIn Personal (My Content only — AI posts await MDP approval) ────
+    // ── LinkedIn Personal (publishes EVERYTHING until Company Page approved) ─
+    // Once linkedin_company_token exists, route AI posts there instead.
     const liToken = tokenMap['linkedin_token']
-    if (liToken?.access_token && !isAI && (!liToken.expires_at || new Date(liToken.expires_at) > new Date())) {
+    if (liToken?.access_token && (!liToken.expires_at || new Date(liToken.expires_at) > new Date())) {
       if (imageUrl) {
         try {
           const liResult = await postToLinkedIn({
@@ -107,8 +107,6 @@ export async function GET(req: NextRequest) {
       } else {
         result.linkedin = 'skipped: no image available'
       }
-    } else if (isAI) {
-      result.linkedin = 'skipped: AI posts use Company Page (pending MDP approval)'
     }
 
     // ── Facebook Page (ALL post types — both AI and My Content) ──────────────
@@ -138,9 +136,9 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // ── Instagram Personal (My Content only — AI posts never on personal) ────
+    // ── Instagram (publishes EVERYTHING) ─────────────────────────────────────
     const igToken = tokenMap['instagram_token']
-    if (igToken?.access_token && !isAI && (!igToken.expires_at || new Date(igToken.expires_at) > new Date())) {
+    if (igToken?.access_token && (!igToken.expires_at || new Date(igToken.expires_at) > new Date())) {
       try {
         const igResult = await publishToInstagram(post, cardImages, igToken.access_token, igToken.user_id)
         if (igResult.ok) {
@@ -152,13 +150,11 @@ export async function GET(req: NextRequest) {
       } catch (e) {
         result.instagram = `error: ${e instanceof Error ? e.message : 'unknown'}`
       }
-    } else if (isAI) {
-      result.instagram = 'skipped: AI posts not on personal Instagram'
     }
 
-    // ── Threads (My Content only — personal account) ──────────────────────────
+    // ── Threads (publishes EVERYTHING) ────────────────────────────────────────
     const thToken = tokenMap['threads_token']
-    if (thToken?.access_token && !isAI && (!thToken.expires_at || new Date(thToken.expires_at) > new Date())) {
+    if (thToken?.access_token && (!thToken.expires_at || new Date(thToken.expires_at) > new Date())) {
       try {
         const tags   = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
         const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
@@ -172,8 +168,6 @@ export async function GET(req: NextRequest) {
       } catch (e) {
         result.threads = `error: ${e instanceof Error ? e.message : 'unknown'}`
       }
-    } else if (isAI) {
-      result.threads = 'skipped: AI posts not on personal Threads'
     }
 
     results.push(result)

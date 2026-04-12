@@ -2,7 +2,14 @@
 
 import React, { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { bulkDeletePosts, resetAIPosts, type ContentPost } from './actions'
+import {
+  bulkDeletePosts,
+  resetAIPosts,
+  rescheduleQueue,
+  type ContentPost,
+  type RescheduleEntry,
+  type RescheduleOptions,
+} from './actions'
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   published: { label: 'Published', color: '#34d399' },
@@ -21,6 +28,42 @@ export function AIQueue({ posts }: { posts: ContentPost[] }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
   const [msg, setMsg] = useState('')
+
+  // Reschedule state
+  const [showReschedule, setShowReschedule] = useState(false)
+  const [rsPostsPerDay, setRsPostsPerDay]   = useState<1 | 2>(2)
+  const [rsStartDate,   setRsStartDate]     = useState<string>(() => {
+    const d = new Date()
+    d.setDate(d.getDate() + 1)
+    return d.toISOString().slice(0, 10)
+  })
+  const [rsScope,       setRsScope]         = useState<'all' | 'ai' | 'overdue'>('all')
+  const [rsPreview,     setRsPreview]       = useState<RescheduleEntry[] | null>(null)
+  const [rsRunning,     setRsRunning]       = useState(false)
+  const [rsMsg,         setRsMsg]           = useState('')
+
+  async function runReschedule(apply: boolean) {
+    setRsRunning(true)
+    setRsMsg('')
+    const opts: RescheduleOptions = {
+      postsPerDay: rsPostsPerDay,
+      startDate:   rsStartDate,
+      scope:       rsScope,
+      apply,
+    }
+    const res = await rescheduleQueue(opts)
+    setRsRunning(false)
+    if (res.error) {
+      setRsMsg(`Error: ${res.error}`)
+      return
+    }
+    setRsPreview(res.preview)
+    if (apply) {
+      setRsMsg(`✓ Rescheduled ${res.total} posts. Cron will pick them up automatically.`)
+    } else {
+      setRsMsg(`Preview only — ${res.total} posts will be rescheduled. Click Apply to confirm.`)
+    }
+  }
 
   const now = new Date()
   const scheduled  = aiPosts.filter(p => !p.is_published && p.scheduled_at && new Date(p.scheduled_at) > now)
@@ -102,10 +145,118 @@ export function AIQueue({ posts }: { posts: ContentPost[] }) {
         <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           {aiPosts.length} AI posts total
         </span>
+        <button
+          onClick={() => setShowReschedule(s => !s)}
+          style={{ ...ghostBtn, color: '#a78bfa', borderColor: 'rgba(124,58,237,0.4)', marginLeft: '8px' }}
+        >
+          {showReschedule ? 'Hide Reschedule' : '📅 Reschedule Queue'}
+        </button>
         <button onClick={handleResetAll} disabled={isPending} style={{ ...ghostBtn, color: '#f87171', borderColor: 'rgba(248,113,113,0.3)', marginLeft: '8px' }}>
           Reset All to Draft
         </button>
       </div>
+
+      {/* Reschedule panel */}
+      {showReschedule && (
+        <div className="glass" style={{ padding: '20px', borderRadius: '12px', marginBottom: '20px', border: '1px solid rgba(124,58,237,0.3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#a78bfa' }}>📅 Reschedule Queue</span>
+            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+              Distributes unpublished posts at 1-2 per day so the cron picks them up steadily.
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+            <div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Posts per day</span>
+              <select
+                className="admin-input"
+                value={rsPostsPerDay}
+                onChange={e => setRsPostsPerDay(Number(e.target.value) as 1 | 2)}
+              >
+                <option value={1}>1 / day (8 AM CDMX)</option>
+                <option value={2}>2 / day (8 AM + 5 PM CDMX)</option>
+              </select>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Start date</span>
+              <input
+                type="date"
+                className="admin-input"
+                value={rsStartDate}
+                onChange={e => setRsStartDate(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Scope</span>
+              <select
+                className="admin-input"
+                value={rsScope}
+                onChange={e => setRsScope(e.target.value as 'all' | 'ai' | 'overdue')}
+              >
+                <option value="all">All unpublished</option>
+                <option value="ai">AI-generated only</option>
+                <option value="overdue">Overdue only (past scheduled_at)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => runReschedule(false)}
+              disabled={rsRunning}
+              style={{ ...ghostBtn, color: '#38bdf8', borderColor: 'rgba(56,189,248,0.3)' }}
+            >
+              {rsRunning ? 'Loading…' : '👁 Preview'}
+            </button>
+            <button
+              onClick={() => {
+                if (!confirm(`Apply reschedule to ${rsPreview?.length ?? 'all'} posts? You can re-run anytime.`)) return
+                runReschedule(true)
+              }}
+              disabled={rsRunning || !rsPreview || rsPreview.length === 0}
+              style={{ ...ghostBtn, color: '#34d399', borderColor: 'rgba(52,211,153,0.4)' }}
+            >
+              ✓ Apply
+            </button>
+            {rsMsg && (
+              <span style={{ fontSize: '0.78rem', color: rsMsg.startsWith('Error') ? '#f87171' : '#a78bfa', marginLeft: '6px' }}>
+                {rsMsg}
+              </span>
+            )}
+          </div>
+
+          {rsPreview && rsPreview.length > 0 && (
+            <div style={{ marginTop: '14px', maxHeight: '320px', overflowY: 'auto', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px' }}>
+              <table style={{ width: '100%', fontSize: '0.76rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255,255,255,0.04)', position: 'sticky', top: 0 }}>
+                    <th style={{ textAlign: 'left',  padding: '8px 12px', color: 'var(--text-muted)' }}>Post</th>
+                    <th style={{ textAlign: 'left',  padding: '8px 12px', color: 'var(--text-muted)' }}>Old</th>
+                    <th style={{ textAlign: 'left',  padding: '8px 12px', color: 'var(--text-muted)' }}>New</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rsPreview.slice(0, 200).map((entry) => (
+                    <tr key={entry.id} style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <td style={{ padding: '6px 12px', color: 'var(--text-primary)', maxWidth: '320px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.title}</td>
+                      <td style={{ padding: '6px 12px', color: '#94a3b8' }}>{entry.old_scheduled ? new Date(entry.old_scheduled).toLocaleString('en', { month: 'short', day: 'numeric', hour: '2-digit' }) : '—'}</td>
+                      <td style={{ padding: '6px 12px', color: '#34d399' }}>{new Date(entry.new_scheduled).toLocaleString('en', { month: 'short', day: 'numeric', hour: '2-digit' })}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {rsPreview.length > 200 && (
+                <div style={{ padding: '8px 12px', fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                  …and {rsPreview.length - 200} more
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {aiPosts.length === 0 ? (
         <div className="glass" style={{ padding: '40px', borderRadius: '12px', textAlign: 'center', color: 'var(--text-muted)' }}>

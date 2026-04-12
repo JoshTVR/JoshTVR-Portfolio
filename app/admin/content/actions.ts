@@ -151,6 +151,113 @@ export async function bulkDeletePosts(ids: string[]): Promise<{ error?: string }
   return {}
 }
 
+// ─── Reschedule queue ─────────────────────────────────────────────────────────
+
+export interface RescheduleOptions {
+  postsPerDay: 1 | 2
+  startDate?:  string             // 'YYYY-MM-DD' — defaults to tomorrow CDMX
+  scope?:      'all' | 'ai' | 'overdue'
+  apply?:      boolean
+}
+
+export interface RescheduleEntry {
+  id:             string
+  title:          string
+  old_scheduled:  string | null
+  new_scheduled:  string
+}
+
+export interface RescheduleResult {
+  total:    number
+  applied:  boolean
+  preview:  RescheduleEntry[]
+  error?:   string
+}
+
+/**
+ * Spreads unpublished posts across upcoming days at 1-2 posts/day so the
+ * publish cron picks them up steadily. Default times are 14:00 UTC and
+ * 23:00 UTC, which land at ~8 AM and ~5 PM in CDMX (UTC-6, no DST).
+ *
+ * Pass `apply: false` first to inspect the assignment, then call again
+ * with `apply: true` to commit.
+ */
+export async function rescheduleQueue(
+  opts: RescheduleOptions,
+): Promise<RescheduleResult> {
+  const supabase = createAdminClient()
+
+  // 1. Fetch eligible posts
+  let q = supabase
+    .from('posts')
+    .select('id,title_en,scheduled_at,created_at,is_ai_generated')
+    .eq('is_published', false)
+
+  if (opts.scope === 'ai') {
+    q = q.eq('is_ai_generated', true)
+  } else if (opts.scope === 'overdue') {
+    q = q.lt('scheduled_at', new Date().toISOString())
+         .not('scheduled_at', 'is', null)
+  }
+  // 'all' (default) → every unpublished post
+
+  q = q.order('created_at', { ascending: true })
+
+  const { data: rows, error } = await q
+  if (error) return { total: 0, applied: false, preview: [], error: error.message }
+
+  const posts = (rows ?? []) as Array<{ id: string; title_en: string; scheduled_at: string | null }>
+
+  // 2. Build day-by-day slots
+  // Start at user-supplied date or tomorrow (UTC midnight).
+  const startDate = opts.startDate
+    ? new Date(`${opts.startDate}T00:00:00Z`)
+    : (() => {
+        const d = new Date()
+        d.setUTCDate(d.getUTCDate() + 1)
+        d.setUTCHours(0, 0, 0, 0)
+        return d
+      })()
+
+  // 14:00 UTC = 8 AM CDMX, 23:00 UTC = 5 PM CDMX
+  const slotsUTC = opts.postsPerDay === 1 ? [14] : [14, 23]
+
+  const preview: RescheduleEntry[] = posts.map((p, i) => {
+    const dayOffset = Math.floor(i / opts.postsPerDay)
+    const slotIdx   = i % opts.postsPerDay
+    const date      = new Date(startDate)
+    date.setUTCDate(date.getUTCDate() + dayOffset)
+    date.setUTCHours(slotsUTC[slotIdx], 0, 0, 0)
+    return {
+      id:            p.id,
+      title:         p.title_en,
+      old_scheduled: p.scheduled_at,
+      new_scheduled: date.toISOString(),
+    }
+  })
+
+  // 3. Apply if requested. Supabase has no native batch-update with distinct
+  //    values per row, so we fire one update per post in parallel.
+  if (opts.apply && preview.length > 0) {
+    const results = await Promise.all(
+      preview.map((entry) =>
+        supabase
+          .from('posts')
+          .update({ scheduled_at: entry.new_scheduled })
+          .eq('id', entry.id),
+      ),
+    )
+    const failed = results.find((r) => r.error)
+    if (failed?.error) {
+      return { total: preview.length, applied: false, preview, error: failed.error.message }
+    }
+    revalidatePath('/admin/content')
+    revalidatePath('/admin/posts')
+  }
+
+  return { total: preview.length, applied: !!opts.apply, preview }
+}
+
 export async function resetAIPosts(): Promise<{ reset: number; error?: string }> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

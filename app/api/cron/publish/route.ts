@@ -152,21 +152,25 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // ── Threads (publishes EVERYTHING) ────────────────────────────────────────
+    // ── Threads — requires image, same rule as LinkedIn ───────────────────────
     const thToken = tokenMap['threads_token']
     if (thToken?.access_token && (!thToken.expires_at || new Date(thToken.expires_at) > new Date())) {
-      try {
-        const tags   = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
-        const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
-        const thResult = await postToThreads({ text, imageUrl, token: thToken.access_token, userId: thToken.user_id })
-        if (thResult.ok) {
-          await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null, threads_post_url: thResult.permalink ?? null }).eq('id', post.id)
-          result.threads = 'ok'
-        } else {
-          result.threads = `error: ${thResult.error}`
+      if (imageUrl) {
+        try {
+          const tags   = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
+          const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
+          const thResult = await postToThreads({ text, imageUrl, token: thToken.access_token, userId: thToken.user_id })
+          if (thResult.ok) {
+            await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null, threads_post_url: thResult.permalink ?? null }).eq('id', post.id)
+            result.threads = 'ok'
+          } else {
+            result.threads = `error: ${thResult.error}`
+          }
+        } catch (e) {
+          result.threads = `error: ${e instanceof Error ? e.message : 'unknown'}`
         }
-      } catch (e) {
-        result.threads = `error: ${e instanceof Error ? e.message : 'unknown'}`
+      } else {
+        result.threads = 'skipped: no image'
       }
     }
 

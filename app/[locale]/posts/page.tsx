@@ -26,6 +26,7 @@ export default async function PostsFeedPage({ params }: PageProps) {
 
   return (
     <main style={{ minHeight: '100vh', paddingTop: '120px', paddingBottom: '80px', background: 'var(--bg-primary)' }}>
+      <style>{`.post-card:hover { border-color: rgba(124,58,237,0.3) !important; }`}</style>
       <div className="container" style={{ maxWidth: '900px' }}>
         <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.4rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
           {isEs ? 'Publicaciones' : 'Posts'}
@@ -52,10 +53,7 @@ export default async function PostsFeedPage({ params }: PageProps) {
                   href={`/${locale}/posts/${post.slug}`}
                   style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column' }}
                 >
-                  <article className="glass" style={{ borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid rgba(255,255,255,0.07)', transition: 'border-color 0.2s' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'rgba(124,58,237,0.3)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')}
-                  >
+                  <article className="glass post-card" style={{ borderRadius: '14px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid rgba(255,255,255,0.07)', transition: 'border-color 0.2s' }}>
                     {/* Cover */}
                     {post.cover_image ? (
                       <div style={{ height: '160px', overflow: 'hidden', flexShrink: 0 }}>

@@ -62,6 +62,9 @@ export async function postToThreads(p: {
       itemIds.push(item.id)
     }
 
+    // Threads processes item containers asynchronously — wait before combining
+    await new Promise((r) => setTimeout(r, 3000))
+
     // Carousel container (text goes here, not on individual items)
     const carouselRes = await fetch(`${base}/threads`, {
       method:  'POST',

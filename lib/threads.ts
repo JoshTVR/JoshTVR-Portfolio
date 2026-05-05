@@ -1,39 +1,88 @@
 export async function postToThreads(p: {
   text: string
-  imageUrl?: string | null
+  imageUrls?: string[]      // all card slides — posts as carousel if >1
+  imageUrl?:  string | null // single image fallback (legacy callers)
   token: string
   userId: string
 }): Promise<{ ok: boolean; postId?: string | null; permalink?: string | null; error?: string }> {
   const base = `https://graph.threads.net/v1.0/${p.userId}`
 
-  // 1. Create media container
-  const containerParams: Record<string, string> = {
-    text:         p.text,
-    access_token: p.token,
+  // Resolve images: prefer imageUrls array, fall back to single imageUrl
+  const images: string[] = p.imageUrls?.length
+    ? p.imageUrls
+    : p.imageUrl
+    ? [p.imageUrl]
+    : []
+
+  if (images.length === 0) {
+    return { ok: false, error: 'No image provided' }
   }
-  if (p.imageUrl) {
-    containerParams.media_type = 'IMAGE'
-    containerParams.image_url  = p.imageUrl
+
+  let creationId: string
+
+  if (images.length === 1) {
+    // Single image post
+    const containerRes = await fetch(`${base}/threads`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        text:         p.text,
+        media_type:   'IMAGE',
+        image_url:    images[0],
+        access_token: p.token,
+      }),
+    })
+    if (!containerRes.ok) {
+      const err = await containerRes.text()
+      return { ok: false, error: `Container creation failed: ${err}` }
+    }
+    const data = await containerRes.json() as { id?: string }
+    if (!data.id) return { ok: false, error: 'No creation_id returned' }
+    creationId = data.id
   } else {
-    containerParams.media_type = 'TEXT'
+    // Carousel — create one item container per image, then combine
+    const itemIds: string[] = []
+    for (const url of images) {
+      const itemRes = await fetch(`${base}/threads`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          media_type:       'IMAGE',
+          image_url:        url,
+          is_carousel_item: 'true',
+          access_token:     p.token,
+        }),
+      })
+      if (!itemRes.ok) {
+        const err = await itemRes.text()
+        return { ok: false, error: `Carousel item failed: ${err}` }
+      }
+      const item = await itemRes.json() as { id?: string }
+      if (!item.id) return { ok: false, error: 'Carousel item returned no id' }
+      itemIds.push(item.id)
+    }
+
+    // Carousel container (text goes here, not on individual items)
+    const carouselRes = await fetch(`${base}/threads`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        text:         p.text,
+        media_type:   'CAROUSEL',
+        children:     itemIds.join(','),
+        access_token: p.token,
+      }),
+    })
+    if (!carouselRes.ok) {
+      const err = await carouselRes.text()
+      return { ok: false, error: `Carousel container failed: ${err}` }
+    }
+    const carousel = await carouselRes.json() as { id?: string }
+    if (!carousel.id) return { ok: false, error: 'Carousel container returned no id' }
+    creationId = carousel.id
   }
 
-  const containerRes = await fetch(`${base}/threads`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body:    new URLSearchParams(containerParams),
-  })
-
-  if (!containerRes.ok) {
-    const err = await containerRes.text()
-    return { ok: false, error: `Container creation failed: ${err}` }
-  }
-
-  const containerData = await containerRes.json()
-  const creationId: string = containerData.id
-  if (!creationId) return { ok: false, error: 'No creation_id returned' }
-
-  // 2. Publish container
+  // Publish
   const publishRes = await fetch(`${base}/threads_publish`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -46,8 +95,8 @@ export async function postToThreads(p: {
   }
 
   const publishData = await publishRes.json() as { id?: string }
-  const mediaId    = publishData.id ?? null
-  const permalink  = mediaId ? await fetchThreadsPermalink(mediaId, p.token) : null
+  const mediaId     = publishData.id ?? null
+  const permalink   = mediaId ? await fetchThreadsPermalink(mediaId, p.token) : null
   return { ok: true, postId: mediaId, permalink }
 }
 

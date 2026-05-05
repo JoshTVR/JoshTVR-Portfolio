@@ -1,5 +1,6 @@
 /**
  * LinkedIn image upload + UGC post helper.
+ * Supports multi-image posts (carousel) when imageUrls has >1 entry.
  * Used by both /api/social/post and /api/cron/publish.
  */
 
@@ -9,7 +10,8 @@ export interface LinkedInPostPayload {
   title:      string
   excerpt:    string | null
   slug:       string
-  imageUrl:   string | null   // card_images[0] or cover_image
+  imageUrls?: string[]      // all card slides — posts as multi-image if >1
+  imageUrl?:  string | null // single image fallback (legacy callers)
   token:      string
   personUrn:  string
   siteUrl:    string
@@ -29,33 +31,40 @@ export async function postToLinkedIn(
   const postUrl = `${p.siteUrl}/en/posts/${p.slug}`
   const text    = [p.title, p.excerpt, postUrl].filter(Boolean).join('\n\n')
   const headers = {
-    Authorization:                `Bearer ${p.token}`,
-    'Content-Type':               'application/json',
-    'X-Restli-Protocol-Version':  '2.0.0',
+    Authorization:               `Bearer ${p.token}`,
+    'Content-Type':              'application/json',
+    'X-Restli-Protocol-Version': '2.0.0',
   }
 
-  // Require an image — skip posting rather than spamming text-only
-  if (!p.imageUrl) {
+  // Resolve images: prefer imageUrls array, fall back to single imageUrl
+  const images: string[] = p.imageUrls?.length
+    ? p.imageUrls
+    : p.imageUrl
+    ? [p.imageUrl]
+    : []
+
+  if (images.length === 0) {
     return { ok: false, error: 'No image available — post skipped' }
   }
 
-  let assetUrn: string | null = null
+  // Upload all images in parallel
+  let assetUrns: string[]
   try {
-    assetUrn = await uploadImageToLinkedIn(p.imageUrl, p.token, p.personUrn)
+    assetUrns = await Promise.all(
+      images.map((url) => uploadImageToLinkedIn(url, p.token, p.personUrn)),
+    )
   } catch (e) {
     return { ok: false, error: `Image upload to LinkedIn failed: ${e instanceof Error ? e.message : 'unknown'}` }
   }
-  if (!assetUrn) {
-    return { ok: false, error: 'Image upload to LinkedIn returned no asset URN' }
-  }
 
-  // LinkedIn processes the uploaded image asynchronously. Give it a moment
-  // before referencing the asset in a UGC post — otherwise the post can be
-  // created with no visible media.
+  // LinkedIn processes uploaded images asynchronously — wait before posting
   await new Promise((r) => setTimeout(r, 2500))
 
-  const shareMediaCategory = 'IMAGE'
-  const media = [{ status: 'READY', media: assetUrn, title: { text: p.title } }]
+  const media = assetUrns.map((urn, i) => ({
+    status: 'READY',
+    media:  urn,
+    ...(i === 0 ? { title: { text: p.title } } : {}),
+  }))
 
   const body: Record<string, unknown> = {
     author:         p.personUrn,
@@ -63,8 +72,8 @@ export async function postToLinkedIn(
     specificContent: {
       'com.linkedin.ugc.ShareContent': {
         shareCommentary:   { text },
-        shareMediaCategory,
-        ...(media.length > 0 ? { media } : {}),
+        shareMediaCategory: 'IMAGE',
+        media,
       },
     },
     visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
@@ -81,8 +90,7 @@ export async function postToLinkedIn(
     return { ok: false, error: `LinkedIn API error: ${err.slice(0, 200)}` }
   }
 
-  const data = await res.json().catch(() => ({})) as { id?: string }
-  // The LinkedIn API also exposes the URN in the `x-restli-id` response header.
+  const data     = await res.json().catch(() => ({})) as { id?: string }
   const headerId = res.headers.get('x-restli-id')
   return { ok: true, postId: data.id ?? headerId ?? null }
 }
@@ -92,7 +100,6 @@ async function uploadImageToLinkedIn(
   token: string,
   personUrn: string,
 ): Promise<string> {
-  // Step 1 — register upload
   const registerRes = await fetch(`${LI_API}/assets?action=registerUpload`, {
     method:  'POST',
     headers: {
@@ -119,21 +126,16 @@ async function uploadImageToLinkedIn(
     ].uploadUrl
   const assetUrn: string = registerData.value.asset
 
-  // Step 2 — fetch image binary
   const imgRes = await fetch(imageUrl)
   if (!imgRes.ok) throw new Error(`Could not fetch image for upload: ${imgRes.status}`)
   const imgBuffer = await imgRes.arrayBuffer()
   if (imgBuffer.byteLength === 0) throw new Error('Image buffer is empty')
 
-  // Step 3 — PUT to pre-signed upload URL.
-  // LinkedIn's pre-signed URL still expects the bearer token; without it the
-  // upload returns 401. The Content-Type must match the binary type.
-  const contentType = detectContentType(imageUrl)
   const uploadRes = await fetch(uploadUrl, {
     method:  'PUT',
     headers: {
       Authorization:  `Bearer ${token}`,
-      'Content-Type': contentType,
+      'Content-Type': detectContentType(imageUrl),
     },
     body: imgBuffer,
   })

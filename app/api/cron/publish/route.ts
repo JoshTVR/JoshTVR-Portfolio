@@ -90,7 +90,7 @@ export async function GET(req: NextRequest) {
             title:     post.title_en,
             excerpt:   post.excerpt_en,
             slug:      post.slug,
-            imageUrl,
+            imageUrls: cardImages.length ? cardImages : (imageUrl ? [imageUrl] : []),
             token:     liToken.access_token,
             personUrn: liToken.person_urn,
             siteUrl:   SITE_URL,
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
         try {
           const tags   = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
           const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
-          const thResult = await postToThreads({ text, imageUrl, token: thToken.access_token, userId: thToken.user_id })
+          const thResult = await postToThreads({ text, imageUrls: cardImages.length ? cardImages : (imageUrl ? [imageUrl] : []), token: thToken.access_token, userId: thToken.user_id })
           if (thResult.ok) {
             await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null, threads_post_url: thResult.permalink ?? null }).eq('id', post.id)
             result.threads = 'ok'

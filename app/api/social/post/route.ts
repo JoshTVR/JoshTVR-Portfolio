@@ -122,10 +122,10 @@ export async function POST(req: NextRequest) {
     token: string,
     userId: string,
   ) {
-    const imageUrl = post.card_images?.[0] ?? post.cover_image ?? null
-    const tags     = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
-    const text     = `${typeEmoji(post.type)} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n${tags} #joshtvr`.trim()
-    const result   = await postToThreads({ text, imageUrl, token, userId })
+    const imageUrls = post.card_images?.length ? post.card_images : (post.cover_image ? [post.cover_image] : [])
+    const tags      = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
+    const text      = `${typeEmoji(post.type)} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n${tags} #joshtvr`.trim()
+    const result    = await postToThreads({ text, imageUrls, token, userId })
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 500 })
     }
@@ -138,12 +138,12 @@ export async function POST(req: NextRequest) {
     token: string,
     personUrn: string,
   ) {
-    const imageUrl = post.card_images?.[0] ?? post.cover_image ?? null
+    const imageUrls = post.card_images?.length ? post.card_images : (post.cover_image ? [post.cover_image] : [])
     const result = await postToLinkedIn({
       title:     post.title_en,
       excerpt:   post.excerpt_en,
       slug:      post.slug,
-      imageUrl,
+      imageUrls,
       token,
       personUrn,
       siteUrl:   SITE_URL,

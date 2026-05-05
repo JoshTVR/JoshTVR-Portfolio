@@ -8,6 +8,7 @@ interface SocialPreviewProps {
   excerptEn:  string
   excerptEs:  string
   coverImage: string
+  cardImages?: string[]  // all generated slides
   slug:       string
   tags:       string   // comma-separated
   type:       string
@@ -71,6 +72,15 @@ function ConfirmModal({ network, previewText, hasImage, onCancel, onConfirm }: C
   )
 }
 
+function SlideBadge({ count }: { count: number }) {
+  if (count <= 1) return null
+  return (
+    <div style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '20px', backdropFilter: 'blur(4px)', pointerEvents: 'none' }}>
+      📎 {count} slides
+    </div>
+  )
+}
+
 export function SocialPreview(p: SocialPreviewProps) {
   const [tab,        setTab]        = useState<Network>('linkedin')
   const [sharing,    setSharing]    = useState<Network | null>(null)
@@ -81,6 +91,7 @@ export function SocialPreview(p: SocialPreviewProps) {
   const [thShared,   setThShared]   = useState(p.sharedThreads   ?? false)
   const [toast,      setToast]      = useState('')
 
+  const slideCount = (p.cardImages?.length ?? 0) > 0 ? p.cardImages!.length : (p.coverImage ? 1 : 0)
   const postUrl   = `${SITE_URL}/en/posts/${p.slug}`
   const tagList   = p.tags.split(',').map(t => t.trim()).filter(Boolean)
   const hashTags  = tagList.map(t => `#${t}`).join(' ')
@@ -175,13 +186,16 @@ export function SocialPreview(p: SocialPreviewProps) {
           <div style={{ padding: '0 16px 12px', fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.55, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
             {liText.length > 300 ? liText.slice(0, 300) + '…' : liText}
           </div>
-          {p.coverImage ? (
-            <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
-          ) : (
-            <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(124,58,237,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
-              No image — generate card first
-            </div>
-          )}
+          <div style={{ position: 'relative' }}>
+            {p.coverImage ? (
+              <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
+            ) : (
+              <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(124,58,237,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+                No image — generate card first
+              </div>
+            )}
+            <SlideBadge count={slideCount} />
+          </div>
           <div style={{ padding: '8px 16px', display: 'flex', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             {['👍 Like','💬 Comment','🔁 Repost','📤 Send'].map(a => (
               <span key={a} style={{ fontSize: '0.72rem', color: '#64748b' }}>{a}</span>
@@ -198,13 +212,16 @@ export function SocialPreview(p: SocialPreviewProps) {
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0' }}>joshtvrr</span>
             <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#64748b' }}>···</span>
           </div>
-          {p.coverImage ? (
-            <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
-          ) : (
-            <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(225,48,108,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
-              No image — generate card first
-            </div>
-          )}
+          <div style={{ position: 'relative' }}>
+            {p.coverImage ? (
+              <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
+            ) : (
+              <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(225,48,108,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+                No image — generate card first
+              </div>
+            )}
+            <SlideBadge count={slideCount} />
+          </div>
           <div style={{ padding: '10px 14px 4px', display: 'flex', gap: '14px' }}>
             {['❤️','💬','📤'].map(a => <span key={a} style={{ fontSize: '1.1rem' }}>{a}</span>)}
             <span style={{ marginLeft: 'auto', fontSize: '1.1rem' }}>🔖</span>
@@ -231,13 +248,16 @@ export function SocialPreview(p: SocialPreviewProps) {
           <div style={{ padding: '0 16px 12px', fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.55, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
             {igCaption.length > 300 ? igCaption.slice(0, 300) + '…' : igCaption}
           </div>
-          {p.coverImage ? (
-            <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
-          ) : (
-            <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(24,119,242,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
-              No image — generate card first
-            </div>
-          )}
+          <div style={{ position: 'relative' }}>
+            {p.coverImage ? (
+              <img src={p.coverImage} alt="" style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />
+            ) : (
+              <div style={{ width: '100%', aspectRatio: '1/1', background: 'rgba(24,119,242,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+                No image — generate card first
+              </div>
+            )}
+            <SlideBadge count={slideCount} />
+          </div>
           <div style={{ padding: '8px 16px', display: 'flex', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             {['👍 Like','💬 Comment','↗️ Share'].map(a => (
               <span key={a} style={{ fontSize: '0.72rem', color: '#64748b' }}>{a}</span>
@@ -260,7 +280,10 @@ export function SocialPreview(p: SocialPreviewProps) {
                 {thText.length > 300 ? thText.slice(0, 300) + '…' : thText}
               </div>
               {p.coverImage && (
-                <img src={p.coverImage} alt="" style={{ width: '100%', borderRadius: '8px', marginTop: '10px', objectFit: 'cover' }} />
+                <div style={{ position: 'relative', marginTop: '10px' }}>
+                  <img src={p.coverImage} alt="" style={{ width: '100%', borderRadius: '8px', objectFit: 'cover', display: 'block' }} />
+                  <SlideBadge count={slideCount} />
+                </div>
               )}
             </div>
           </div>

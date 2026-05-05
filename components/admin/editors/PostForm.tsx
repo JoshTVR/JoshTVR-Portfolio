@@ -678,6 +678,7 @@ export function PostForm({ initial, projects }: PostFormProps) {
             excerptEn={excerptEn}
             excerptEs={excerptEs}
             coverImage={cardImages[0] || coverImage}
+            cardImages={cardImages}
             slug={initial?.slug as string ?? ''}
             tags={tags}
             type={type}

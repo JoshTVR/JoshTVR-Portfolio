@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { marked } from 'marked'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { CardContent } from '@/components/posts/CardContent'
@@ -163,11 +164,12 @@ export default async function PostPage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Rich content */}
+        {/* Rich content — markdown stored in DB, parsed server-side (admin-only source, trusted) */}
         {content && (
           <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: content }}
+            className="prose-dark"
+            // Content authored only by admin — not user-supplied input
+            dangerouslySetInnerHTML={{ __html: marked.parse(content) as string }}
             style={{ color: 'var(--text-muted)', lineHeight: 1.75, fontSize: '1rem' }}
           />
         )}

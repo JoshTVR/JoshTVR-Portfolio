@@ -1,13 +1,5 @@
-/**
- * Server-side card image generation + Supabase storage upload.
- * Called by the cron (when card_images is null) and by the admin
- * "Generate & Save Images" button via /api/admin/generate-and-store-cards.
- */
-
 import { createAdminClient } from '@/lib/supabase/admin'
-
-const SITE_URL    = process.env.NEXT_PUBLIC_SITE_URL ?? ''
-const CRON_SECRET = process.env.CRON_SECRET ?? ''
+import { renderCardSlide } from '@/lib/render-card-slide'
 
 function slideCount(cardType: string | null): number {
   if (cardType === 'code_tip')        return 3
@@ -16,29 +8,12 @@ function slideCount(cardType: string | null): number {
   return 1
 }
 
-async function fetchSlide(postId: string, slide: number, maxAttempts = 3): Promise<Response | null> {
-  const url = `${SITE_URL}/api/admin/generate-card?postId=${encodeURIComponent(postId)}&slide=${slide}`
-  const opts = { headers: { Authorization: `Bearer ${CRON_SECRET}` } }
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    if (attempt > 0) await new Promise(r => setTimeout(r, 1500 * attempt))
-    try {
-      const res = await fetch(url, opts)
-      if (res.ok) return res
-      console.error(`generate-card ${postId} slide ${slide} attempt ${attempt + 1}: status ${res.status}`)
-    } catch (e) {
-      console.error(`generate-card ${postId} slide ${slide} attempt ${attempt + 1}: fetch error`, e)
-    }
-  }
-  return null
-}
-
 export async function generateAndStoreCards(postId: string): Promise<string[]> {
   const supabase = createAdminClient()
 
   const { data: post } = await supabase
     .from('posts')
-    .select('card_type')
+    .select('card_type,card_data,color_theme,title_en,tags')
     .eq('id', postId)
     .single()
 
@@ -48,29 +23,28 @@ export async function generateAndStoreCards(postId: string): Promise<string[]> {
   const urls: string[] = []
 
   for (let slide = 0; slide < count; slide++) {
-    const res = await fetchSlide(postId, slide)
-    if (!res) {
-      console.error(`generate-card permanently failed for ${postId} slide ${slide} after retries`)
-      continue
+    try {
+      const imageResponse = renderCardSlide(post, slide)
+      const buffer        = Buffer.from(await imageResponse.arrayBuffer())
+      const filename      = `cards/${postId}-${slide}.png`
+
+      const { error: uploadErr } = await supabase.storage
+        .from('project-images')
+        .upload(filename, buffer, { contentType: 'image/png', upsert: true })
+
+      if (uploadErr) {
+        console.error(`Storage upload failed for ${postId} slide ${slide}:`, uploadErr)
+        continue
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('project-images')
+        .getPublicUrl(filename)
+
+      urls.push(publicUrl)
+    } catch (e) {
+      console.error(`Card render failed for ${postId} slide ${slide}:`, e)
     }
-
-    const buffer   = Buffer.from(await res.arrayBuffer())
-    const filename = `cards/${postId}-${slide}.png`
-
-    const { error: uploadErr } = await supabase.storage
-      .from('project-images')
-      .upload(filename, buffer, { contentType: 'image/png', upsert: true })
-
-    if (uploadErr) {
-      console.error(`Storage upload failed for ${postId} slide ${slide}:`, uploadErr)
-      continue
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('project-images')
-      .getPublicUrl(filename)
-
-    urls.push(publicUrl)
   }
 
   if (urls.length > 0) {

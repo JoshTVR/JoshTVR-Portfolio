@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [{ data: posts }, { data: projects }] = await Promise.all([
     supabase
       .from('posts')
-      .select('slug, published_at, updated_at')
+      .select('slug, published_at')
       .eq('is_published', true)
       .order('published_at', { ascending: false }),
     supabase
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const postEntries: MetadataRoute.Sitemap = LOCALES.flatMap(locale =>
     (posts ?? []).map(post => ({
       url: `${SITE_URL}/${locale}/posts/${post.slug}`,
-      lastModified: new Date(post.published_at ?? post.updated_at ?? Date.now()),
+      lastModified: new Date(post.published_at ?? Date.now()),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     }))

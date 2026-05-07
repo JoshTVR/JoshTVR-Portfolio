@@ -79,10 +79,10 @@ export async function GET(req: NextRequest) {
     tokenMap[row.key] = row.value as Record<string, string>
   }
 
-  const results: Array<{ id: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string }> = []
+  const results: Array<{ id: string; card_error?: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string }> = []
 
   for (const post of posts) {
-    const result: { id: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string } = { id: post.id }
+    const result: { id: string; card_error?: string; linkedin?: string; instagram?: string; facebook?: string; threads?: string } = { id: post.id }
 
     // ── Auto-generate card images if missing ──────────────────────────────────
     let cardImages: string[] = (post.card_images as string[] | null) ?? []
@@ -90,7 +90,9 @@ export async function GET(req: NextRequest) {
       try {
         cardImages = await generateAndStoreCards(post.id)
       } catch (e) {
-        console.error(`Card generation failed for ${post.id}:`, e)
+        const msg = e instanceof Error ? e.message : String(e)
+        console.error(`Card generation failed for ${post.id}:`, msg)
+        result.card_error = msg
       }
     }
     const imageUrl = cardImages[0] ?? post.cover_image ?? null

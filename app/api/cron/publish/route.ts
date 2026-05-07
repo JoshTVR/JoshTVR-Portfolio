@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
   const maxPerRun   = parseInt(process.env.CRON_MAX_PER_RUN ?? '1')
   const window48h   = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
 
-  // Only publish posts scheduled within the last 48h to prevent backlog flooding
-  const { data: posts, error: fetchErr } = await supabase
+  // Primary: unpublished posts scheduled within last 48h
+  const { data: newPosts, error: fetchErr } = await supabase
     .from('posts')
     .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,type,tags,card_images,card_type')
     .lte('scheduled_at', new Date().toISOString())
@@ -42,16 +42,31 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: fetchErr.message }, { status: 500 })
   }
 
-  if (!posts || posts.length === 0) {
-    return NextResponse.json({ published: 0 })
+  // Mark new posts as published
+  const newIds = (newPosts ?? []).map(p => p.id)
+  if (newIds.length > 0) {
+    await supabase
+      .from('posts')
+      .update({ is_published: true, published_at: new Date().toISOString() })
+      .in('id', newIds)
   }
 
-  // Mark all as published first
-  const ids = posts.map(p => p.id)
-  await supabase
+  // Secondary: already published within 48h but social sharing failed (card_images null + not shared)
+  const { data: retryPosts } = await supabase
     .from('posts')
-    .update({ is_published: true, published_at: new Date().toISOString() })
-    .in('id', ids)
+    .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,type,tags,card_images,card_type')
+    .eq('is_published', true)
+    .gte('published_at', window48h)
+    .is('card_images', null)
+    .eq('shared_linkedin', false)
+    .eq('shared_threads', false)
+    .limit(maxPerRun)
+
+  const posts = [...(newPosts ?? []), ...(retryPosts ?? [])]
+
+  if (posts.length === 0) {
+    return NextResponse.json({ published: 0, retried: 0 })
+  }
 
   // Fetch social tokens
   const { data: tokenRows } = await supabase

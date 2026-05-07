@@ -16,6 +16,23 @@ function slideCount(cardType: string | null): number {
   return 1
 }
 
+async function fetchSlide(postId: string, slide: number, maxAttempts = 3): Promise<Response | null> {
+  const url = `${SITE_URL}/api/admin/generate-card?postId=${encodeURIComponent(postId)}&slide=${slide}`
+  const opts = { headers: { Authorization: `Bearer ${CRON_SECRET}` } }
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (attempt > 0) await new Promise(r => setTimeout(r, 1500 * attempt))
+    try {
+      const res = await fetch(url, opts)
+      if (res.ok) return res
+      console.error(`generate-card ${postId} slide ${slide} attempt ${attempt + 1}: status ${res.status}`)
+    } catch (e) {
+      console.error(`generate-card ${postId} slide ${slide} attempt ${attempt + 1}: fetch error`, e)
+    }
+  }
+  return null
+}
+
 export async function generateAndStoreCards(postId: string): Promise<string[]> {
   const supabase = createAdminClient()
 
@@ -31,19 +48,9 @@ export async function generateAndStoreCards(postId: string): Promise<string[]> {
   const urls: string[] = []
 
   for (let slide = 0; slide < count; slide++) {
-    let res: Response
-    try {
-      res = await fetch(
-        `${SITE_URL}/api/admin/generate-card?postId=${encodeURIComponent(postId)}&slide=${slide}`,
-        { headers: { Authorization: `Bearer ${CRON_SECRET}` } },
-      )
-    } catch (e) {
-      console.error(`generate-card fetch failed for ${postId} slide ${slide}:`, e)
-      continue
-    }
-
-    if (!res.ok) {
-      console.error(`generate-card returned ${res.status} for ${postId} slide ${slide}`)
+    const res = await fetchSlide(postId, slide)
+    if (!res) {
+      console.error(`generate-card permanently failed for ${postId} slide ${slide} after retries`)
       continue
     }
 

@@ -35,7 +35,7 @@ export function renderCardSlide(post: CardPost, slide: number): ImageResponse {
   function Badge({ text, color }: { text: string; color: string }) {
     return (
       <div style={{
-        display: 'inline-flex', alignItems: 'center',
+        display: 'flex', alignItems: 'center',
         padding: '6px 16px', borderRadius: 100,
         background: `rgba(${theme.accentRgb},0.15)`,
         color, fontSize: 14, fontWeight: 700,

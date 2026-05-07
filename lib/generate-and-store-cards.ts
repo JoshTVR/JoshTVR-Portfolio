@@ -9,6 +9,7 @@ function slideCount(cardType: string | null): number {
 }
 
 export async function generateAndStoreCards(postId: string): Promise<string[]> {
+  // errors thrown here will surface in the cron response for debugging
   const supabase = createAdminClient()
 
   const { data: post } = await supabase
@@ -43,7 +44,7 @@ export async function generateAndStoreCards(postId: string): Promise<string[]> {
 
       urls.push(publicUrl)
     } catch (e) {
-      console.error(`Card render failed for ${postId} slide ${slide}:`, e)
+      throw new Error(`Card render failed for ${postId} slide ${slide}: ${e instanceof Error ? e.message : String(e)}`)
     }
   }
 

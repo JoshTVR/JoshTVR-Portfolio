@@ -90,16 +90,31 @@ ${burstWeeks.length === 0 ? '(none)' : burstWeeks.map(b => `- ${b.start} to ${b.
 
 ---
 
+## Content Direction
+
+**Domain**: Data Engineering — Python, SQL, AWS, Snowflake, dbt, data pipelines
+**Audience**: Beginners to juniors learning Data Engineering from scratch
+**Level calibration**:
+- code_tip: real, runnable Python or SQL. Concepts like list comprehensions, dict manipulation, JOINs, CTEs, window functions, file I/O, error handling, Pandas basics. NO advanced ML, no VR, no JavaScript, no C#.
+- qa: conceptual questions a junior DE would face in interviews or on the job (e.g. "What is a data pipeline?", "When do you use a CTE vs subquery?", "What is idempotency in ETL?")
+- logic_challenge: algorithmic problems solvable with Python + SQL at junior level. No LeetCode hard. Think: "parse a CSV and compute grouped averages", "write a SQL query that finds the top 3 vendors by revenue per month"
+- study: real findings from the data/cloud industry — tools, benchmarks, architectural decisions. Topics: Snowflake vs Redshift, dbt best practices, AWS Glue vs EMR, data modeling patterns (star schema, SCD)
+- devlog: progress updates from the data-engineering-journey GitHub repo (learning Python, building pipelines, studying for AWS cert, completing Snowflake tutorials)
+
+All content must feel like it comes from someone actively learning Data Engineering in public — authentic, educational, growing.
+
+---
+
 ## Card Type Schemas (card_data fields per type)
 
 **code_tip** (3 slides):
 \`\`\`json
-{ "title_en": "...", "card_type": "code_tip", "card_data": { "language": "javascript", "code": "...", "tip": "key takeaway" }, "tags": ["js","tip"] }
+{ "title_en": "...", "card_type": "code_tip", "card_data": { "language": "python", "code": "...", "tip": "key takeaway" }, "tags": ["python","data-engineering"] }
 \`\`\`
 
 **qa** (2 slides):
 \`\`\`json
-{ "card_type": "qa", "card_data": { "question": "...", "answer": "...", "language": "javascript" } }
+{ "card_type": "qa", "card_data": { "question": "...", "answer": "...", "language": "python" } }
 \`\`\`
 
 **logic_challenge** (2 slides):
@@ -109,12 +124,12 @@ ${burstWeeks.length === 0 ? '(none)' : burstWeeks.map(b => `- ${b.start} to ${b.
 
 **study** (single):
 \`\`\`json
-{ "card_type": "study", "card_data": { "finding": "...", "source": "...", "topic": "JavaScript" } }
+{ "card_type": "study", "card_data": { "finding": "...", "source": "...", "topic": "Data Engineering" } }
 \`\`\`
 
 **devlog** (single):
 \`\`\`json
-{ "card_type": "devlog", "card_data": { "project": "Apheeleon", "update": "...", "milestone": "v0.4" } }
+{ "card_type": "devlog", "card_data": { "project": "data-engineering-journey", "update": "...", "milestone": "..." } }
 \`\`\`
 
 **video_promo** (single):
@@ -158,15 +173,17 @@ Each post object must have ALL of these fields:
 2. For seasonal months (Oct 15-31 = spooky, Dec = holiday), use the seasonal theme regardless of the schedule.
 3. Write COMPLETE content for each post — full code snippets, full questions, full answers. NO placeholders, NO ellipsis, NO "...".
 4. content_en and content_es must NEVER be empty strings. They must be full explanatory text (2-4 paragraphs minimum).
-5. **code_tip**: Include the full code snippet, then explain WHY this technique exists, when to use it, and a common mistake to avoid. Real, runnable code only.
-6. **qa**: Use an analogy from everyday life (cooking, construction, sports) to explain the concept before the technical answer. Make it memorable.
-7. **logic_challenge**: Include the full challenge statement, constraints, and example input/output. The solution must show the reasoning step by step, not just the final code.
-8. **study**: Include a real finding or statistic from a known source (MDN, TC39, research papers), then show a practical application in a small code example.
-9. Distribute types according to the AI Mix percentages above.
-10. Space posts evenly throughout each day (e.g., if 2/day: 09:00 and 18:00 UTC).
-11. My Content items override AI content for that date/slot.
-12. Burst week posts get their burst_group_id and are ADDED to the regular ${freq}/day schedule (so burst days will have more posts).
-13. All card_data fields are in English. title_es and content_es are full Spanish translations — not summaries.
+5. **code_tip**: Python or SQL only. Full runnable code. Explain WHY the technique exists, when to use it, and a common mistake to avoid. Never use JavaScript, C#, or unrelated languages.
+6. **qa**: Use an analogy from everyday life (cooking, construction, logistics) to explain the concept before the technical answer. Questions must be things a junior Data Engineer would face in an interview or on the job.
+7. **logic_challenge**: Python or SQL only. Include the full challenge, constraints, and example input/output. Solution must show the reasoning step by step, not just final code. Calibrate to junior level.
+8. **study**: Real finding from the data/cloud industry (AWS docs, Snowflake docs, dbt blog, Martin Fowler, industry benchmarks). Show a practical example relevant to Data Engineering.
+9. **devlog**: Always reference the data-engineering-journey project. Updates should reflect realistic junior learning milestones (consolidating Python basics, studying for AWS cert, completing a Snowflake tutorial, building a small pipeline).
+10. Distribute types according to the AI Mix percentages above.
+11. Space posts evenly throughout each day (e.g., if 2/day: 09:00 and 18:00 UTC).
+12. My Content items override AI content for that date/slot.
+13. Burst week posts get their burst_group_id and are ADDED to the regular ${freq}/day schedule (so burst days will have more posts).
+14. All card_data fields are in English. title_es and content_es are full Spanish translations — not summaries.
+15. NEVER generate content about JavaScript, C#, VR, game development, 3D modeling, or web development. This account is a Data Engineering brand.
 `
 
     setPrompt(p)

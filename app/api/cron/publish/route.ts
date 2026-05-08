@@ -51,16 +51,15 @@ export async function GET(req: NextRequest) {
       .in('id', newIds)
   }
 
-  // Secondary: already published within 48h but social sharing failed (card_images null + not shared)
-  const { data: retryPosts } = await supabase
+  // Secondary: published posts not yet shared on any platform (no time restriction)
+  let retryQuery = supabase
     .from('posts')
     .select('id,slug,title_en,title_es,excerpt_en,excerpt_es,cover_image,type,tags,card_images,card_type')
     .eq('is_published', true)
-    .gte('published_at', window48h)
-    .is('card_images', null)
-    .eq('shared_linkedin', false)
-    .eq('shared_threads', false)
-    .limit(maxPerRun)
+    .not('published_at', 'is', null)
+    .or('shared_linkedin.eq.false,shared_threads.eq.false')
+  if (newIds.length > 0) retryQuery = retryQuery.not('id', 'in', `(${newIds.join(',')})`)
+  const { data: retryPosts } = await retryQuery.limit(maxPerRun)
 
   const posts = [...(newPosts ?? []), ...(retryPosts ?? [])]
 
@@ -132,7 +131,7 @@ export async function GET(req: NextRequest) {
       if (imageUrl) {
         try {
           const tags    = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
-          const caption = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
+          const caption = `${typeEmoji(post.type)} ${post.title_en}\n\n${post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
           const fbResult = await postToFacebook({
             caption,
             imageUrl,
@@ -175,7 +174,7 @@ export async function GET(req: NextRequest) {
       if (imageUrl) {
         try {
           const tags   = ((post.tags ?? []) as string[]).map((t: string) => `#${t}`).join(' ')
-          const text   = `${typeEmoji(post.type)} ${post.title_es ?? post.title_en}\n\n${post.excerpt_es ?? post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
+          const text   = `${typeEmoji(post.type)} ${post.title_en}\n\n${post.excerpt_en ?? ''}\n\n${tags} #joshtvr`.trim()
           const thResult = await postToThreads({ text, imageUrls: cardImages.length ? cardImages : (imageUrl ? [imageUrl] : []), token: thToken.access_token, userId: thToken.user_id })
           if (thResult.ok) {
             await supabase.from('posts').update({ shared_threads: true, threads_post_id: thResult.postId ?? null, threads_post_url: thResult.permalink ?? null }).eq('id', post.id)
@@ -201,8 +200,8 @@ async function publishToInstagram(
   post: {
     id: string
     slug: string
-    title_es: string
-    excerpt_es: string | null
+    title_en: string
+    excerpt_en: string | null
     cover_image: string | null
     type: string
     tags: string[]
@@ -213,7 +212,7 @@ async function publishToInstagram(
   userId: string,
 ): Promise<{ ok: boolean; postId?: string | null; permalink?: string | null; error?: string }> {
   const tags    = (post.tags ?? []).map((t: string) => `#${t}`).join(' ')
-  const caption = `${typeEmoji(post.type)} ${post.title_es}\n\n${post.excerpt_es ?? ''}\n\n👉 ${SITE_URL}/es/posts/${post.slug}\n\n${tags} #joshtvr`.trim()
+  const caption = `${typeEmoji(post.type)} ${post.title_en}\n\n${post.excerpt_en ?? ''}\n\n👉 ${SITE_URL}/posts/${post.slug}\n\n${tags} #joshtvr`.trim()
 
   // Prefer generated card images, fall back to cover_image
   const images: string[] = cardImages.length

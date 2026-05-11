@@ -136,7 +136,7 @@ export function renderCardSlide(post: CardPost, slide: number): ImageResponse {
             {str('question') || post.title_en}
           </div>
           <div style={{ marginTop: 24, fontSize: 22, color: theme.textMuted, lineHeight: 1.5, maxWidth: 860 }}>
-            ¿Sabes cuándo usarlo y por qué importa?
+            Do you know when to use it and why it matters?
           </div>
           <Brand ctx={ctx} />
         </PageFrame>,
@@ -190,7 +190,7 @@ export function renderCardSlide(post: CardPost, slide: number): ImageResponse {
           }}>
             {str('question')}
           </div>
-          <div style={{ marginTop: 32, fontSize: 22, color: theme.textMuted }}>👇 Swipe para ver la respuesta</div>
+          <div style={{ marginTop: 32, fontSize: 22, color: theme.textMuted }}>👇 Swipe for the answer</div>
           <Brand ctx={ctx} />
         </PageFrame>,
         SIZE,
@@ -199,7 +199,7 @@ export function renderCardSlide(post: CardPost, slide: number): ImageResponse {
     const hasCode = !!data.code_example
     return new ImageResponse(
       <PageFrame ctx={ctx}>
-        <Badge text="Respuesta ✓" color={theme.accent} ctx={ctx} />
+        <Badge text="Answer ✓" color={theme.accent} ctx={ctx} />
         <div style={{ marginTop: 28, fontSize: 26, color: theme.text, lineHeight: 1.6, maxWidth: 940 }}>{str('answer').slice(0, 320)}</div>
         {hasCode && (
           <div style={{
@@ -235,7 +235,7 @@ export function renderCardSlide(post: CardPost, slide: number): ImageResponse {
             </div>
           </div>
           <div style={{ fontSize: 28, color: theme.text, lineHeight: 1.6, maxWidth: 940 }}>{str('challenge')}</div>
-          <div style={{ marginTop: 32, fontSize: 20, color: theme.textMuted }}>⏱️ ¿Puedes resolverlo? Swipe para la solución →</div>
+          <div style={{ marginTop: 32, fontSize: 20, color: theme.textMuted }}>⏱️ Can you solve it? Swipe for the solution →</div>
           <Brand ctx={ctx} />
         </PageFrame>,
         SIZE,
@@ -245,7 +245,7 @@ export function renderCardSlide(post: CardPost, slide: number): ImageResponse {
     const hasCodeBlock = solution.includes('\n') && (solution.includes('def ') || solution.includes('SELECT') || solution.includes('import '))
     return new ImageResponse(
       <PageFrame ctx={ctx}>
-        <Badge text="Solución ✓" color={theme.accent} ctx={ctx} />
+        <Badge text="Solution ✓" color={theme.accent} ctx={ctx} />
         {hasCodeBlock ? (
           <CodeBlock code={solution} ctx={ctx} maxChars={900} />
         ) : (

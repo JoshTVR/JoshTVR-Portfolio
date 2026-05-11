@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Joshua Hernandez — Junior Data Engineer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --accent: #2563eb; --accent2: #1d4ed8; --text: #111827; --muted: #6b7280; --border: #e5e7eb; --bg: #ffffff; }
+  html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 10.5px; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 794px; min-height: 1123px; margin: 0 auto; padding: 40px 48px 36px; display: flex; flex-direction: column; gap: 18px; }
+  .header { border-bottom: 2px solid var(--accent); padding-bottom: 14px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-end; }
+  .name { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .role-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); background: #eff6ff; padding: 3px 10px; border-radius: 20px; }
+  .contact { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; font-size: 9.5px; color: var(--muted); }
+  .contact a { color: var(--muted); text-decoration: none; }
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-title { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .entry { display: flex; flex-direction: column; gap: 3px; }
+  .entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .entry-title { font-size: 11px; font-weight: 700; color: var(--text); }
+  .entry-company { font-size: 10.5px; font-weight: 500; color: var(--accent2); }
+  .entry-date { font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  .entry ul { padding-left: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .entry li { font-size: 10px; color: #374151; line-height: 1.55; }
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .skill { font-size: 9.5px; font-weight: 500; padding: 3px 9px; border-radius: 4px; background: #f3f4f6; color: #374151; border: 1px solid var(--border); }
+  .skill.highlight { background: #eff6ff; color: var(--accent2); border-color: #bfdbfe; }
+  .skill.inprogress { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; font-style: italic; }
+  .project { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+  .project-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .project-name { font-size: 10.5px; font-weight: 700; color: var(--text); }
+  .project-stack { font-size: 9.5px; color: var(--accent2); font-weight: 500; }
+  .project-desc { font-size: 10px; color: #374151; line-height: 1.55; padding-left: 14px; }
+  .project ul { padding-left: 14px; display: flex; flex-direction: column; gap: 2px; }
+  .project li { font-size: 10px; color: #374151; line-height: 1.55; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .edu-title { font-size: 10.5px; font-weight: 700; color: var(--text); }
+  .edu-sub { font-size: 10px; color: var(--muted); }
+  .langs { display: flex; gap: 24px; }
+  .lang { font-size: 10px; }
+  .lang strong { color: var(--text); font-weight: 700; }
+  .lang span { color: var(--muted); }
+  .summary { font-size: 10.5px; color: #374151; line-height: 1.6; }
+  @media print { html, body { font-size: 10.5px; } .page { padding: 32px 44px; margin: 0; width: 100%; min-height: unset; } a { color: inherit !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <div class="header-top">
+      <h1 class="name">Joshua Hernandez</h1>
+      <span class="role-tag">Junior Data Engineer</span>
+    </div>
+    <div class="contact">
+      <span>Pachuca, Hidalgo, México</span>
+      <a href="mailto:joshtvr4@gmail.com">joshtvr4@gmail.com</a>
+      <a href="https://joshtvr.com">joshtvr.com</a>
+      <a href="https://github.com/JoshTVR">github.com/JoshTVR</a>
+      <a href="https://linkedin.com/in/joshtvr">linkedin.com/in/joshtvr</a>
+    </div>
+  </header>
+
+  <section class="section">
+    <p class="summary">
+      Data Engineering student specializing in Python, SQL, and AWS — building in public at <strong>github.com/JoshTVR/data-engineering-journey</strong>.
+      Background in full-stack development and BI pipelines. Currently pursuing AWS Cloud Practitioner certification.
+      Seeking a remote junior role where I can grow fast and contribute from day one.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-grid">
+      <span class="skill highlight">Python</span>
+      <span class="skill highlight">SQL</span>
+      <span class="skill highlight">PostgreSQL</span>
+      <span class="skill highlight">Git</span>
+      <span class="skill highlight">REST APIs</span>
+      <span class="skill highlight">ETL / ELT</span>
+      <span class="skill highlight">Data Modeling</span>
+      <span class="skill">SQL Server</span>
+      <span class="skill">SSIS</span>
+      <span class="skill">Power BI</span>
+      <span class="skill">Batch Processing</span>
+      <span class="skill">Data Pipelines</span>
+      <span class="skill">Supabase</span>
+      <span class="skill">TypeScript</span>
+      <span class="skill inprogress">AWS ↗ in progress</span>
+      <span class="skill inprogress">Snowflake ↗ in progress</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Projects</h2>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">joshtvr.com — Automated Content Pipeline</span>
+        <span class="project-stack">Next.js · PostgreSQL · Supabase · Vercel · REST APIs</span>
+      </div>
+      <ul>
+        <li>Designed and deployed a scheduled data pipeline (cron jobs) that processes records from a PostgreSQL database and publishes to LinkedIn, Instagram, Threads, and Facebook via platform APIs.</li>
+        <li>Built admin system for content management: structured data ingestion, status tracking, and automated image generation from data records.</li>
+        <li>Production system serving live traffic at joshtvr.com — full ownership of schema design, API integration, and deployment.</li>
+      </ul>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">Business Intelligence Pipeline</span>
+        <span class="project-stack">SQL Server · SSIS · Power BI · Kimball Dimensional Modeling</span>
+      </div>
+      <ul>
+        <li>Implemented a data warehouse using Kimball dimensional modeling methodology (star schema, fact and dimension tables).</li>
+        <li>Built ETL processes with SQL Server Integration Services (SSIS) and interactive Power BI dashboards for reporting.</li>
+      </ul>
+    </div>
+
+    <div class="project">
+      <div class="project-header">
+        <span class="project-name">data-engineering-journey</span>
+        <span class="project-stack">Python · SQL · AWS · public learning repo</span>
+      </div>
+      <ul>
+        <li>Public GitHub repository documenting hands-on learning in Data Engineering: Python consolidation, SQL exercises, and cloud architecture patterns.</li>
+        <li>Each commit represents a consolidated concept — not tutorial output, but verified understanding.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Experience</h2>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">Game Developer & Technical Contributor</div><div class="entry-company">Vortex Editorial / Plandi — Torturama</div></div>
+        <span class="entry-date">Jan 2026 – Present</span>
+      </div>
+      <ul>
+        <li>Scripting and game logic in Unity/C# within a professional studio environment.</li>
+        <li>Contributing to game build pipeline and asset integration workflows.</li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="entry-header">
+        <div><div class="entry-title">Technical Intern</div><div class="entry-company">Universidad Tecnológica de Zimapán (UTZ)</div></div>
+        <span class="entry-date">2024</span>
+      </div>
+      <ul>
+        <li>Contributed to a VR-based training simulation project, reducing onboarding time by 30%.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Education & Certifications</h2>
+    <div class="two-col">
+      <div>
+        <div class="edu-title">B.Eng. Virtual Environments & Digital Business</div>
+        <div class="edu-sub">Universidad Tecnológica de Tula-Tepeji (UTT) · 2021 – 2026</div>
+      </div>
+      <div>
+        <div class="edu-title">Python Essentials 1 — Cisco Networking Academy</div>
+        <div class="edu-sub">Python Institute · Sep 2025</div>
+        <div class="edu-title" style="margin-top:6px;">AWS Cloud Practitioner <em style="font-weight:400;color:#16a34a;">(in progress)</em></div>
+        <div class="edu-sub">Amazon Web Services · 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Languages</h2>
+    <div class="langs">
+      <div class="lang"><strong>Spanish</strong> <span>— Native</span></div>
+      <div class="lang"><strong>English</strong> <span>— B2 · Professional working proficiency</span></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

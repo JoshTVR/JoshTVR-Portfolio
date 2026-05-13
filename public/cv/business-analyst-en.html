@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Joshua Hernandez — Business Analyst</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #fff;
+    color: #111;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 10.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 760px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+
+  /* Header */
+  .name {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .contact {
+    text-align: center;
+    font-size: 9.5px;
+    color: #333;
+    margin-top: 4px;
+  }
+  .contact a { color: #333; text-decoration: none; }
+  .contact span + span::before { content: " | "; }
+
+  /* Section */
+  .section { margin-top: 14px; }
+  .section-title {
+    font-size: 10.5px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1.2px solid #111;
+    padding-bottom: 2px;
+    margin-bottom: 7px;
+  }
+
+  /* Entry */
+  .entry { margin-bottom: 8px; }
+  .entry-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .entry-title { font-weight: bold; font-size: 10.5px; }
+  .entry-sub { font-style: italic; font-size: 10px; color: #333; }
+  .entry-date { font-size: 10px; color: #333; white-space: nowrap; }
+  .entry-loc { font-size: 10px; color: #333; }
+
+  ul {
+    padding-left: 16px;
+    margin-top: 3px;
+  }
+  li {
+    font-size: 10px;
+    line-height: 1.6;
+    color: #222;
+    margin-bottom: 1px;
+  }
+
+  /* Skills inline */
+  .skills-block { font-size: 10px; line-height: 1.8; }
+  .skills-block strong { font-weight: bold; }
+
+  /* Summary */
+  .summary { font-size: 10.5px; line-height: 1.65; color: #222; margin-bottom: 2px; }
+
+  @media print {
+    .page { padding: 36px 44px; margin: 0; width: 100%; }
+    a { color: inherit !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="name">Joshua Hernandez</div>
+  <div class="contact">
+    <span>Pachuca, Hidalgo, México</span>
+    <span><a href="mailto:joshtvr4@gmail.com">joshtvr4@gmail.com</a></span>
+    <span>+52 773 111 0361</span>
+    <span><a href="https://linkedin.com/in/joshtvr">linkedin.com/in/joshtvr</a></span>
+    <span><a href="https://github.com/JoshTVR">github.com/JoshTVR</a></span>
+  </div>
+
+  <!-- Summary -->
+  <div class="section">
+    <div class="section-title">Summary</div>
+    <p class="summary">
+      Bilingual data analyst (Spanish native, English B2) with hands-on experience building data pipelines,
+      BI dashboards, and automated reporting systems. Background in SQL, Python, and Power BI — applied to
+      real production environments. Comfortable working with large datasets, translating data findings into
+      business decisions, and collaborating across technical and non-technical teams.
+    </p>
+  </div>
+
+  <!-- Skills -->
+  <div class="section">
+    <div class="section-title">Skills</div>
+    <div class="skills-block">
+      <strong>Analysis &amp; Reporting:</strong> SQL, Microsoft Excel, Power BI, Data Analysis, Business Intelligence, KPI Tracking, Reporting<br>
+      <strong>Engineering &amp; Tools:</strong> Python, PostgreSQL, SQL Server, SSIS, ETL, REST APIs, Git<br>
+      <strong>Competencies:</strong> Data Modeling, Business Analysis, Cross-functional Collaboration, Process Improvement<br>
+      <strong>Languages:</strong> Spanish (Native) · English (B2 — Professional Working Proficiency)
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="section">
+    <div class="section-title">Projects</div>
+
+    <div class="entry">
+      <div class="entry-top">
+        <span class="entry-title">Automated Content Pipeline — joshtvr.com</span>
+        <span class="entry-date">2025 – Present</span>
+      </div>
+      <div class="entry-sub">Python · PostgreSQL · REST APIs · Cron Jobs · Vercel</div>
+      <ul>
+        <li>Designed and deployed an end-to-end data pipeline that ingests structured records from a PostgreSQL database, applies transformation logic, and distributes content to 4 external platforms (LinkedIn, Instagram, Threads, Facebook) via REST APIs on a scheduled basis — with zero manual intervention.</li>
+        <li>Built an admin reporting layer to track pipeline status, content performance, and publication history across platforms.</li>
+        <li>Owned full lifecycle: schema design, data ingestion, business logic, delivery, and monitoring in production.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-top">
+        <span class="entry-title">Business Intelligence Data Warehouse</span>
+        <span class="entry-date">2024</span>
+      </div>
+      <div class="entry-sub">SQL Server · SSIS · Power BI · Kimball Dimensional Modeling</div>
+      <ul>
+        <li>Implemented a dimensional data warehouse using Kimball methodology — star schema with fact and dimension tables — enabling structured reporting for business stakeholders.</li>
+        <li>Built ETL automation with SSIS and developed Power BI dashboards tracking operational KPIs, replacing manual Excel-based reporting.</li>
+        <li>Presented findings and dashboard walkthroughs to non-technical audiences, translating data trends into actionable recommendations.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Experience -->
+  <div class="section">
+    <div class="section-title">Experience</div>
+
+    <div class="entry">
+      <div class="entry-top">
+        <div>
+          <span class="entry-title">Technical Contributor</span>
+          <span> · </span>
+          <span class="entry-sub">Vortex Editorial / Plandi — Torturama</span>
+        </div>
+        <span class="entry-date">Jan 2026 – Present</span>
+      </div>
+      <ul>
+        <li>Contributed to build pipeline and asset integration workflows within a cross-functional studio team of developers and artists.</li>
+        <li>Coordinated deliverables across design and engineering workstreams, tracking milestones against project timelines.</li>
+      </ul>
+    </div>
+
+    <div class="entry">
+      <div class="entry-top">
+        <div>
+          <span class="entry-title">Technical Intern</span>
+          <span> · </span>
+          <span class="entry-sub">Universidad Tecnológica de Zimapán (UTZ)</span>
+        </div>
+        <span class="entry-date">2024</span>
+      </div>
+      <ul>
+        <li>Contributed to a VR-based training simulation that reduced onboarding time by 30%, working directly with faculty stakeholders to define requirements and validate outcomes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Education -->
+  <div class="section">
+    <div class="section-title">Education</div>
+
+    <div class="entry">
+      <div class="entry-top">
+        <div>
+          <span class="entry-title">B.Eng. Virtual Environments &amp; Digital Business</span>
+          <span> · </span>
+          <span class="entry-sub">Universidad Tecnológica de Tula-Tepeji (UTT)</span>
+        </div>
+        <span class="entry-date">2022 – 2026</span>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-top">
+        <div>
+          <span class="entry-title">Python Essentials 1</span>
+          <span> · </span>
+          <span class="entry-sub">Cisco Networking Academy / Python Institute</span>
+        </div>
+        <span class="entry-date">Sep 2025</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

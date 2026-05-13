@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
 const FROM  = process.env.FROM_EMAIL ?? 'noreply@joshtvr.com'
-const TO_ME = 'josh@joshtvr.com'
+const TO_ME = 'joshtvr4@gmail.com'
 
 function client() {
   return new Resend(process.env.RESEND_API_KEY)
